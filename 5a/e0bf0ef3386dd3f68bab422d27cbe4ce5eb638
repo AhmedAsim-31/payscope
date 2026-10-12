@@ -1,0 +1,58 @@
+packages/provider-adapters/package.json
+  h_78e539a96187c3 19
+packages/provider-adapters/src/stripe/fixtures/charge-dispute-closed.json
+  h_78e539a96187c3 1-27
+packages/provider-adapters/src/stripe/fixtures/charge-dispute-created.json
+  h_78e539a96187c3 1-27
+packages/provider-adapters/src/stripe/fixtures/charge-refunded.json
+  h_78e539a96187c3 1-29
+packages/provider-adapters/src/stripe/fixtures/customer-subscription-created.json
+  h_78e539a96187c3 1-44
+packages/provider-adapters/src/stripe/fixtures/customer-subscription-deleted.json
+  h_78e539a96187c3 1-46
+packages/provider-adapters/src/stripe/fixtures/customer-subscription-updated-canceled.json
+  h_78e539a96187c3 1-46
+packages/provider-adapters/src/stripe/fixtures/customer-subscription-updated.json
+  h_78e539a96187c3 1-44
+packages/provider-adapters/src/stripe/fixtures/invoice-paid-subscription-create.json
+  h_78e539a96187c3 1-35
+packages/provider-adapters/src/stripe/fixtures/invoice-paid-subscription-cycle.json
+  h_78e539a96187c3 1-35
+packages/provider-adapters/src/stripe/fixtures/livemode-payment-intent-succeeded.json
+  h_78e539a96187c3 1-27
+packages/provider-adapters/src/stripe/fixtures/payment-intent-payment-failed.json
+  h_78e539a96187c3 1-30
+packages/provider-adapters/src/stripe/fixtures/payment-intent-succeeded.json
+  h_78e539a96187c3 1-27
+packages/provider-adapters/src/stripe/fixtures/unsupported-customer-created.json
+  h_78e539a96187c3 1-22
+packages/provider-adapters/src/stripe/stripe-adapter.test.ts
+  h_78e539a96187c3 1-40
+packages/provider-adapters/src/stripe/stripe-adapter.ts
+  h_78e539a96187c3 1-49
+packages/provider-adapters/src/stripe/stripe-client.test.ts
+  h_78e539a96187c3 1-131
+packages/provider-adapters/src/stripe/stripe-client.ts
+  h_78e539a96187c3 1-132
+packages/provider-adapters/src/stripe/stripe-fixtures.ts
+  h_78e539a96187c3 1-6
+packages/provider-adapters/src/stripe/stripe-normalize.test.ts
+  h_78e539a96187c3 1-189
+packages/provider-adapters/src/stripe/stripe-normalize.ts
+  h_78e539a96187c3 1-239
+packages/provider-adapters/src/stripe/stripe-signature.test.ts
+  h_78e539a96187c3 1-100
+packages/provider-adapters/src/stripe/stripe-signature.ts
+  h_78e539a96187c3 1-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5ae0bf0ef3386dd3f68bab422d27cbe4ce5eb638",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
