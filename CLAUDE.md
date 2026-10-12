@@ -7,17 +7,26 @@ Fintech portfolio prototype — payment operations, webhook reliability, reconci
 - **Frontend:** Next.js + TypeScript + Tailwind CSS + shadcn/ui
 - **Backend:** Fastify + TypeScript + Zod
 - **Database:** Supabase PostgreSQL + Drizzle ORM
-- **Monorepo:** pnpm
+- **Monorepo:** pnpm + Turbo
+- **Testing:** Vitest (unit/integration, all packages), Playwright (E2E)
 
 ## Repository structure
 ```
-apps/web/          Next.js frontend
-apps/api/          Fastify backend + worker
-packages/shared/   Shared contracts and types
-packages/provider-adapters/
-packages/test-utils/
-supabase/migrations/
+packages/
+  web/                Next.js frontend       (@payscope/web)
+  api/                Fastify backend + worker (@payscope/api)
+  shared/             Shared contracts/types  (@payscope/shared)
+  provider-adapters/  Provider integrations  (@payscope/provider-adapters)
+  test-utils/         Test helpers           (@payscope/test-utils)
+supabase/
+  migrations/
 docs/
+scripts/
+pnpm-workspace.yaml
+package.json          (root — scripts only, no src)
+turbo.json
+tsconfig.base.json
+eslint.config.mjs     (flat config)
 ```
 
 ## Constraints
@@ -28,7 +37,7 @@ docs/
 
 ## Tracking
 - Jira: https://ahmedasim.atlassian.net/jira/software/projects/PAYSCOPE — tickets prefixed `PAYSCOPE-`
-- GitHub: https://github.com/AhmedAsim-31/payscope (private)
+- GitHub: https://github.com/AhmedAsim-31/payscope (public) — default branch: `master`
 - PR review: Cubic (`/cubic:run-review`)
 
 ## Key docs
