@@ -1,0 +1,17 @@
+reviews:
+  incremental_commits: false
+  ignore:
+    pr_labels:
+      - wip
+      - draft
+    files:
+      - 'docs/**'
+      - '*.md'
+      - '.env.example'
+      - '*.json'
+      - '*.yaml'
+      - '*.yml'
+      - '*.toml'
+      - 'supabase/migrations/**'
+      - 'scripts/**'
+      - '*.lock'
