@@ -1,0 +1,6 @@
+reviews:
+  incremental_commits: false
+  ignore:
+    pr_labels:
+      - wip
+      - draft
