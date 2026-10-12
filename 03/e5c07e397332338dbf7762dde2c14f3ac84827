@@ -1,0 +1,42 @@
+packages/provider-adapters/package.json
+  h_78e539a96187c3 14-16,18
+packages/provider-adapters/src/adapter.ts
+  h_78e539a96187c3 1-20
+packages/provider-adapters/src/capabilities.ts
+  h_78e539a96187c3 1-21
+packages/provider-adapters/src/normalized-event.test.ts
+  h_78e539a96187c3 1-48
+packages/provider-adapters/src/normalized-event.ts
+  h_78e539a96187c3 1-50
+packages/provider-adapters/src/provider-context.ts
+  h_78e539a96187c3 1-16
+packages/provider-adapters/src/provider-error.test.ts
+  h_78e539a96187c3 1-45
+packages/provider-adapters/src/provider-error.ts
+  h_78e539a96187c3 1-46
+packages/provider-adapters/src/provider-object.ts
+  h_78e539a96187c3 1-11
+packages/provider-adapters/src/registry.test.ts
+  h_78e539a96187c3 1-36
+packages/provider-adapters/src/registry.ts
+  h_78e539a96187c3 1-28
+packages/provider-adapters/src/signature-utils.test.ts
+  h_78e539a96187c3 1-53
+packages/provider-adapters/src/signature-utils.ts
+  h_78e539a96187c3 1-25
+packages/provider-adapters/src/webhook.ts
+  h_78e539a96187c3 1-12
+packages/provider-adapters/tsconfig.json
+  h_78e539a96187c3 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "03e5c07e397332338dbf7762dde2c14f3ac84827",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
