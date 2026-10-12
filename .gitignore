@@ -13,3 +13,5 @@ pnpm-lock.yaml
 supabase/.branches/
 supabase/.temp/
 graphify-out/
+.turbo/
+AGENTS.md

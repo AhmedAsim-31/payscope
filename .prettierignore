@@ -1,0 +1,10 @@
+dist
+.next
+coverage
+graphify-out
+pnpm-lock.yaml
+docs/PRD.md
+docs/provider-research.md
+.turbo
+CLAUDE.md
+IMPLEMENTATION_STATUS.md
