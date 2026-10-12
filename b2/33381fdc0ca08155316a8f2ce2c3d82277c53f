@@ -1,0 +1,14 @@
+packages/web/src/app/auth/sign-out/route.ts
+  h_78e539a96187c3 5-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b233381fdc0ca08155316a8f2ce2c3d82277c53f",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
