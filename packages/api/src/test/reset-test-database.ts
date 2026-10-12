@@ -8,7 +8,7 @@ export async function resetTestDatabase(url: string): Promise<void> {
   const sql = postgres(url, { max: 1, onnotice: () => undefined });
   try {
     await sql.unsafe(
-      'DROP SCHEMA IF EXISTS drizzle CASCADE; DROP SCHEMA IF EXISTS auth CASCADE; DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;',
+      'DROP SCHEMA IF EXISTS drizzle CASCADE; DROP SCHEMA IF EXISTS app CASCADE; DROP SCHEMA IF EXISTS auth CASCADE; DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;',
     );
   } finally {
     await sql.end();

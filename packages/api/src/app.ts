@@ -10,6 +10,8 @@ import { healthRoutes, type ReadinessCheck } from './health-routes';
 import { authenticatePlugin } from './auth/authenticate';
 import { meRoutes } from './auth/me-routes';
 import type { TokenVerifier } from './auth/token-verifier';
+import type { Db } from './db/client';
+import { identityRoutes } from './orgs/identity-routes';
 
 export type BuildAppOptions = {
   corsOrigins?: string[];
@@ -19,6 +21,7 @@ export type BuildAppOptions = {
   trustProxy?: boolean;
   readinessChecks?: ReadinessCheck[];
   tokenVerifier?: TokenVerifier;
+  db?: Db;
 };
 
 const BODY_LIMIT_BYTES = 1024 * 1024;
@@ -69,6 +72,7 @@ export async function buildApp(opts: BuildAppOptions = {}) {
   if (opts.tokenVerifier) {
     await app.register(authenticatePlugin, { tokenVerifier: opts.tokenVerifier });
     await app.register(meRoutes, { prefix: '/api/v1' });
+    if (opts.db) await app.register(identityRoutes, { db: opts.db });
   }
 
   return app;

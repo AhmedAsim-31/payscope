@@ -8,6 +8,20 @@
       "when": 1791845169375,
       "tag": "20261012224609_supabase_local_compat",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791845441896,
+      "tag": "20261012225041_identity",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791845442160,
+      "tag": "20261012225042_identity_guards",
+      "breakpoints": true
     }
   ]
 }

@@ -3,6 +3,7 @@ import type { FastifyError, FastifyReply, FastifyRequest } from 'fastify';
 import { hasZodFastifySchemaValidationErrors } from 'fastify-type-provider-zod';
 import type { ApiError } from '@payscope/shared/api-error';
 import { AuthError } from './auth/token-verifier';
+import { ApiHttpError } from './http-error';
 
 function codeForStatus(status: number): string {
   return (STATUS_CODES[status] ?? 'ERROR').toUpperCase().replace(/[^A-Z0-9]+/g, '_');
@@ -28,6 +29,9 @@ export function errorHandler(error: FastifyError, request: FastifyRequest, reply
     }
     reply.header('www-authenticate', 'Bearer');
     return send(reply, 401, { code: error.code, message: error.message });
+  }
+  if (error instanceof ApiHttpError) {
+    return send(reply, error.statusCode, { code: error.code, message: error.message });
   }
   const status = error.statusCode ?? 500;
   if (status < 500) {

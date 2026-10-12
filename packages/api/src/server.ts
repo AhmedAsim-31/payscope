@@ -5,7 +5,7 @@ import { loadConfig } from './config';
 import { createDb } from './db/client';
 
 const config = loadConfig();
-const { sql } = createDb(config.databaseUrl, { max: config.dbPoolMax });
+const { db, sql } = createDb(config.databaseUrl, { max: config.dbPoolMax });
 const app = await buildApp({
   corsOrigins: config.corsOrigins,
   logLevel: config.logLevel,
@@ -18,6 +18,7 @@ const app = await buildApp({
       },
     },
   ],
+  db,
   tokenVerifier: createTokenVerifier({
     issuer: config.jwtIssuer,
     audience: config.jwtAudience,
