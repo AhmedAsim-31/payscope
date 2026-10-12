@@ -1,0 +1,40 @@
+.env.example
+  h_78e539a96187c3 15-16
+packages/api/package.json
+  h_78e539a96187c3 1-31
+packages/api/src/app.test.ts
+  h_78e539a96187c3 1-155
+packages/api/src/app.ts
+  h_78e539a96187c3 1-65
+packages/api/src/config.test.ts
+  h_78e539a96187c3 1-39
+packages/api/src/config.ts
+  h_78e539a96187c3 1-51
+packages/api/src/error-handler.ts
+  h_78e539a96187c3 1-33
+packages/api/src/health-routes.ts
+  h_78e539a96187c3 1-48
+packages/api/src/server.ts
+  h_78e539a96187c3 1-29
+packages/api/tsconfig.json
+  h_78e539a96187c3 1-5
+packages/api/tsdown.config.ts
+  h_78e539a96187c3 1-10
+packages/shared/package.json
+  h_78e539a96187c3 16-18
+packages/shared/src/api-error.ts
+  h_78e539a96187c3 1-12
+pnpm-workspace.yaml
+  h_78e539a96187c3 18-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "80073ca1d76fd1dba3ce557ad92b932c319a94d2",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
