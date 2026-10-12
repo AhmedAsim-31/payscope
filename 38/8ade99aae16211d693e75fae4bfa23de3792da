@@ -1,0 +1,16 @@
+.env.example
+  h_78e539a96187c3 9
+docker-compose.yml
+  h_78e539a96187c3 1,8,10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "388ade99aae16211d693e75fae4bfa23de3792da",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
