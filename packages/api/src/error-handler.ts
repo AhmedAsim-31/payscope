@@ -22,6 +22,10 @@ export function errorHandler(error: FastifyError, request: FastifyRequest, reply
     });
   }
   if (error instanceof AuthError) {
+    if (error.code === 'AUTH_UNAVAILABLE') {
+      request.log.warn({ err: error }, 'token key set unavailable');
+      return send(reply, 503, { code: error.code, message: error.message });
+    }
     reply.header('www-authenticate', 'Bearer');
     return send(reply, 401, { code: error.code, message: error.message });
   }

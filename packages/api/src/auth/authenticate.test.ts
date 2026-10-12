@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
-import { SignJWT } from 'jose';
+import { SignJWT, errors } from 'jose';
 import { apiErrorSchema } from '@payscope/shared/api-error';
 import {
   TEST_AUDIENCE,
@@ -128,6 +128,22 @@ describe('GET /api/v1/me', () => {
     await build();
     const token = await signTestToken({ sub: 'not-a-uuid' });
     expectRejected(await getMe(`Bearer ${token}`), 'INVALID_TOKEN');
+  });
+
+  it.each([
+    ['a network failure', new TypeError('fetch failed')],
+    ['a JWKS timeout', new errors.JWKSTimeout()],
+  ])('returns 503 when the key set fails with %s', async (_label, failure) => {
+    const unavailable = createTokenVerifier({
+      issuer: TEST_ISSUER,
+      audience: TEST_AUDIENCE,
+      keySet: () => Promise.reject(failure),
+    });
+    await build({ tokenVerifier: unavailable });
+    const res = await getMe(`Bearer ${await signTestToken()}`);
+    expect(res.statusCode).toBe(503);
+    expect(res.headers['www-authenticate']).toBeUndefined();
+    expect(apiErrorSchema.parse(res.json()).error.code).toBe('AUTH_UNAVAILABLE');
   });
 });
 

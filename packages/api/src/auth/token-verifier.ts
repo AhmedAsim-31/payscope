@@ -1,7 +1,8 @@
 import { errors, jwtVerify, type JWTVerifyGetKey } from 'jose';
 import { z } from 'zod';
 
-export type AuthErrorCode = 'UNAUTHENTICATED' | 'TOKEN_EXPIRED' | 'INVALID_TOKEN';
+export type AuthErrorCode =
+  'UNAUTHENTICATED' | 'TOKEN_EXPIRED' | 'INVALID_TOKEN' | 'AUTH_UNAVAILABLE';
 
 export class AuthError extends Error {
   readonly code: AuthErrorCode;
@@ -31,6 +32,16 @@ const claimsSchema = z.object({
 
 const CLOCK_TOLERANCE_SECONDS = 5;
 
+/** JWKS fetch failures are upstream outages, not bad tokens, so clients must not sign out. */
+function isKeySetUnavailable(err: unknown): boolean {
+  return (
+    !(err instanceof errors.JOSEError) ||
+    err instanceof errors.JWKSTimeout ||
+    err instanceof errors.JWKSInvalid ||
+    err.constructor === errors.JOSEError
+  );
+}
+
 export function createTokenVerifier(opts: {
   issuer: string;
   audience: string;
@@ -49,6 +60,9 @@ export function createTokenVerifier(opts: {
       } catch (err) {
         if (err instanceof errors.JWTExpired) {
           throw new AuthError('TOKEN_EXPIRED', 'Access token has expired');
+        }
+        if (isKeySetUnavailable(err)) {
+          throw new AuthError('AUTH_UNAVAILABLE', 'Authentication is temporarily unavailable');
         }
         throw new AuthError('INVALID_TOKEN', 'Access token is invalid');
       }
