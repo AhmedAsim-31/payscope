@@ -8,3 +8,4 @@ docs/provider-research.md
 .turbo
 CLAUDE.md
 IMPLEMENTATION_STATUS.md
+next-env.d.ts

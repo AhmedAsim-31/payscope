@@ -15,3 +15,5 @@ supabase/.temp/
 graphify-out/
 .turbo/
 AGENTS.md
+next-env.d.ts
+*.tsbuildinfo
