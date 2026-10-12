@@ -1,0 +1,14 @@
+cubic.yaml
+  h_78e539a96187c3 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a7a2cbd1de1fff856557d361e0effe8fa8240a41",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
