@@ -1,0 +1,14 @@
+CLAUDE.md
+  h_78e539a96187c3 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1497de51758140b19b9e09e6db502474cabb4c3a",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
