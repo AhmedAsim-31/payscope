@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-**Phase 0 — Assessment & Research** (not started)
+**Phase 1 — Foundation** (next)
 
 ## Infrastructure
 
@@ -13,13 +13,13 @@
 | Jira backlog | Seeded | 10 epics, 34 tasks (PAYSCOPE-1 to PAYSCOPE-44) |
 | Monorepo scaffold | Not started | pnpm + Turbo, all packages under `packages/` |
 | CI pipeline | Not started | |
-| Hosting | Not decided | Frontend + API + worker |
+| Hosting | Decided | Web on Vercel Hobby; API with in-process worker on Render Free; see `docs/provider-research.md` |
 
 ## Phases
 
 | Phase | Epic | Status |
 |-------|------|--------|
-| 0 — Assessment & Research | PAYSCOPE-1 | Not started |
+| 0 — Assessment & Research | PAYSCOPE-1 | Done (`docs/provider-research.md`) |
 | 1 — Foundation | PAYSCOPE-2 | Not started |
 | 2 — Product Shell & Demo | PAYSCOPE-3 | Not started |
 | 3 — Reliability Engine | PAYSCOPE-4 | Not started |
@@ -36,9 +36,9 @@ _To be filled in as phases complete._
 
 ## Known Limitations
 
-_To be filled in as phases complete._
+- No free, card-free, always-on host exists for the API and worker. Render Free sleeps after 15 minutes idle, so the first request after sleep takes about a minute.
+- Supabase Free projects may pause after 7 days of low activity.
 
 ## Next Actions
 
-1. Complete Phase 0 research (PAYSCOPE-11, 12, 13): stack docs, provider APIs, free-tier constraints
-2. Begin Phase 1 monorepo scaffold (PAYSCOPE-14)
+1. Begin Phase 1 monorepo scaffold (PAYSCOPE-14)
