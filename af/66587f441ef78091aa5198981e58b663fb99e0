@@ -1,0 +1,58 @@
+.env.example
+  h_78e539a96187c3 10-11
+.gitignore
+  h_78e539a96187c3 20
+.prettierignore
+  h_78e539a96187c3 12
+IMPLEMENTATION_STATUS.md
+  h_78e539a96187c3 14-15
+packages/api/drizzle.config.ts
+  h_78e539a96187c3 1-10
+packages/api/package.json
+  h_78e539a96187c3 12-14,22,28,34
+packages/api/src/config.test.ts
+  h_78e539a96187c3 5-6,10,21-22,28,43-44,48,52-64,69
+packages/api/src/config.ts
+  h_78e539a96187c3 11-12,39-40,65-66
+packages/api/src/db/client.ts
+  h_78e539a96187c3 1-14
+packages/api/src/db/migrate-cli.ts
+  h_78e539a96187c3 1-16
+packages/api/src/db/migrate.integration.test.ts
+  h_78e539a96187c3 1-49
+packages/api/src/db/migrate.ts
+  h_78e539a96187c3 1-15
+packages/api/src/db/ready.integration.test.ts
+  h_78e539a96187c3 1-46
+packages/api/src/db/schema/auth.ts
+  h_78e539a96187c3 1-7
+packages/api/src/server.ts
+  h_78e539a96187c3 5,8,13-20,31-40
+packages/api/src/test/integration-global-setup.ts
+  h_78e539a96187c3 1-8
+packages/api/src/test/reset-test-database.ts
+  h_78e539a96187c3 1-16
+packages/api/src/test/test-database-url.ts
+  h_78e539a96187c3 1-2
+packages/api/tsconfig.json
+  h_78e539a96187c3 4
+packages/api/vitest.config.ts
+  h_78e539a96187c3 1-22
+supabase/migrations/20261012224609_supabase_local_compat.sql
+  h_78e539a96187c3 1-30
+supabase/migrations/meta/20261012224609_snapshot.json
+  h_78e539a96187c3 1-18
+supabase/migrations/meta/_journal.json
+  h_78e539a96187c3 1-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "af66587f441ef78091aa5198981e58b663fb99e0",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
