@@ -8,10 +8,10 @@
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| GitHub repo | Ready | `AhmedAsim-31/payscope` (private) |
+| GitHub repo | Ready | `AhmedAsim-31/payscope` (public), default branch: `master` |
 | Supabase project | Provisioned | `pjdpdltjnuuychvyfesj`, `ap-south-1`, PostgreSQL 17 |
 | Jira backlog | Seeded | 10 epics, 34 tasks (PAYSCOPE-1 to PAYSCOPE-44) |
-| Monorepo scaffold | Not started | |
+| Monorepo scaffold | Not started | pnpm + Turbo, all packages under `packages/` |
 | CI pipeline | Not started | |
 | Hosting | Not decided | Frontend + API + worker |
 
