@@ -8,7 +8,7 @@ Fintech portfolio prototype — payment operations, webhook reliability, reconci
 - **Backend:** Fastify + TypeScript + Zod
 - **Database:** Supabase PostgreSQL + Drizzle ORM
 - **Monorepo:** pnpm + Turbo
-- **Testing:** Vitest (API), Jest + Playwright (web)
+- **Testing:** Vitest (unit/integration, all packages), Playwright (E2E)
 
 ## Repository structure
 ```
