@@ -1,0 +1,16 @@
+.github/workflows/ci.yml
+  h_78e539a96187c3 1-61
+turbo.json
+  h_78e539a96187c3 6,12-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a9e7c450fc7054f009b9d85318d6b4257fce37c1",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
