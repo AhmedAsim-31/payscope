@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791845169375,
+      "tag": "20261012224609_supabase_local_compat",
+      "breakpoints": true
+    }
+  ]
+}

@@ -8,6 +8,8 @@ const envSchema = z
     API_PORT: z.coerce.number().int().min(1).max(65535).default(3001),
     API_HOST: z.string().min(1).default('0.0.0.0'),
     SUPABASE_URL: z.url(),
+    DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
+    DB_POOL_MAX: z.coerce.number().int().min(1).max(100).default(10),
     SUPABASE_JWKS_URL: z.url().optional(),
     CORS_ORIGIN: z.string().min(1).optional(),
     LOG_LEVEL: z
@@ -34,6 +36,8 @@ export type Config = {
   jwksUrl: string;
   jwtIssuer: string;
   jwtAudience: string;
+  databaseUrl: string;
+  dbPoolMax: number;
 };
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
@@ -58,5 +62,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     jwksUrl: e.SUPABASE_JWKS_URL ?? `${supabaseBase}/auth/v1/.well-known/jwks.json`,
     jwtIssuer: `${supabaseBase}/auth/v1`,
     jwtAudience: 'authenticated',
+    databaseUrl: e.DATABASE_URL,
+    dbPoolMax: e.DB_POOL_MAX,
   };
 }
