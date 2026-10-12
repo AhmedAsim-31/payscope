@@ -1,0 +1,14 @@
+.gitignore
+  h_78e539a96187c3 15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d2b66e2e6778a35236dce8eeebf8edeee4064f5b",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
