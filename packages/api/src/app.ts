@@ -7,13 +7,18 @@ import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod
 import { z } from 'zod';
 import { errorHandler, notFoundHandler } from './error-handler';
 import { healthRoutes, type ReadinessCheck } from './health-routes';
+import { authenticatePlugin } from './auth/authenticate';
+import { meRoutes } from './auth/me-routes';
+import type { TokenVerifier } from './auth/token-verifier';
 
 export type BuildAppOptions = {
   corsOrigins?: string[];
   logger?: false;
   logLevel?: string;
+  logStream?: { write: (msg: string) => void };
   trustProxy?: boolean;
   readinessChecks?: ReadinessCheck[];
+  tokenVerifier?: TokenVerifier;
 };
 
 const BODY_LIMIT_BYTES = 1024 * 1024;
@@ -39,6 +44,7 @@ export async function buildApp(opts: BuildAppOptions = {}) {
         ? false
         : {
             level: opts.logLevel ?? 'info',
+            stream: opts.logStream,
             redact: { paths: REDACT_PATHS, censor: '[REDACTED]' },
           },
     bodyLimit: BODY_LIMIT_BYTES,
@@ -60,6 +66,10 @@ export async function buildApp(opts: BuildAppOptions = {}) {
   await app.register(cors, { origin: opts.corsOrigins ?? [], credentials: true });
   await app.register(sensible);
   await app.register(healthRoutes, { readinessChecks: opts.readinessChecks ?? [] });
+  if (opts.tokenVerifier) {
+    await app.register(authenticatePlugin, { tokenVerifier: opts.tokenVerifier });
+    await app.register(meRoutes, { prefix: '/api/v1' });
+  }
 
   return app;
 }

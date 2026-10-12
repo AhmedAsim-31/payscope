@@ -18,11 +18,14 @@
     "@fastify/swagger": "^9.9.2",
     "@payscope/shared": "workspace:*",
     "fastify": "^5.12.5",
+    "fastify-plugin": "^6.0.1",
     "fastify-type-provider-zod": "^7.0.0",
+    "jose": "^6.2.12",
     "openapi-types": "^12.1.3",
     "zod": "^4.6.6"
   },
   "devDependencies": {
+    "@payscope/test-utils": "workspace:*",
     "@types/node": "^26.6.5",
     "tsdown": "^0.23.1",
     "tsx": "^4.23.15",

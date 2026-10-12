@@ -7,6 +7,8 @@ const envSchema = z
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     API_PORT: z.coerce.number().int().min(1).max(65535).default(3001),
     API_HOST: z.string().min(1).default('0.0.0.0'),
+    SUPABASE_URL: z.url(),
+    SUPABASE_JWKS_URL: z.url().optional(),
     CORS_ORIGIN: z.string().min(1).optional(),
     LOG_LEVEL: z
       .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'])
@@ -28,6 +30,10 @@ export type Config = {
   corsOrigins: string[];
   logLevel: 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace' | 'silent';
   trustProxy: boolean;
+  supabaseUrl: string;
+  jwksUrl: string;
+  jwtIssuer: string;
+  jwtAudience: string;
 };
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
@@ -37,6 +43,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     throw new Error(`Invalid environment configuration: ${keys.join(', ')}`);
   }
   const e = result.data;
+  const supabaseBase = e.SUPABASE_URL.replace(/\/+$/, '');
   return {
     nodeEnv: e.NODE_ENV,
     port: e.API_PORT,
@@ -47,5 +54,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       .filter(Boolean),
     logLevel: e.LOG_LEVEL,
     trustProxy: e.TRUST_PROXY,
+    supabaseUrl: supabaseBase,
+    jwksUrl: e.SUPABASE_JWKS_URL ?? `${supabaseBase}/auth/v1/.well-known/jwks.json`,
+    jwtIssuer: `${supabaseBase}/auth/v1`,
+    jwtAudience: 'authenticated',
   };
 }

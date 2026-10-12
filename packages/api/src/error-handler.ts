@@ -2,6 +2,7 @@ import { STATUS_CODES } from 'node:http';
 import type { FastifyError, FastifyReply, FastifyRequest } from 'fastify';
 import { hasZodFastifySchemaValidationErrors } from 'fastify-type-provider-zod';
 import type { ApiError } from '@payscope/shared/api-error';
+import { AuthError } from './auth/token-verifier';
 
 function codeForStatus(status: number): string {
   return (STATUS_CODES[status] ?? 'ERROR').toUpperCase().replace(/[^A-Z0-9]+/g, '_');
@@ -19,6 +20,14 @@ export function errorHandler(error: FastifyError, request: FastifyRequest, reply
       message: 'Request validation failed',
       details: error.validation.map((v) => ({ path: v.instancePath, message: v.message })),
     });
+  }
+  if (error instanceof AuthError) {
+    if (error.code === 'AUTH_UNAVAILABLE') {
+      request.log.warn({ err: error }, 'token key set unavailable');
+      return send(reply, 503, { code: error.code, message: error.message });
+    }
+    reply.header('www-authenticate', 'Bearer');
+    return send(reply, 401, { code: error.code, message: error.message });
   }
   const status = error.statusCode ?? 500;
   if (status < 500) {
