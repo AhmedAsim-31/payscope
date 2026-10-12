@@ -1,0 +1,16 @@
+IMPLEMENTATION_STATUS.md
+  h_78e539a96187c3 5,16,22,39-40,44
+docs/provider-research.md
+  h_78e539a96187c3 1-215
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5a258851e49f4bc2840903daaad0c383f597bcbc",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
