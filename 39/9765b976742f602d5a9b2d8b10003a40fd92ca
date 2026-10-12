@@ -1,0 +1,50 @@
+.gitignore
+  h_78e539a96187c3 18-19
+.prettierignore
+  h_78e539a96187c3 11
+packages/web/components.json
+  h_78e539a96187c3 1-21
+packages/web/eslint.config.mjs
+  h_78e539a96187c3 1-10
+packages/web/next.config.ts
+  h_78e539a96187c3 1-8
+packages/web/package.json
+  h_78e539a96187c3 1-40
+packages/web/postcss.config.mjs
+  h_78e539a96187c3 1-3
+packages/web/src/app/error.tsx
+  h_78e539a96187c3 1-21
+packages/web/src/app/globals.css
+  h_78e539a96187c3 1-87
+packages/web/src/app/layout.tsx
+  h_78e539a96187c3 1-24
+packages/web/src/app/not-found.tsx
+  h_78e539a96187c3 1-14
+packages/web/src/app/page.tsx
+  h_78e539a96187c3 1-20
+packages/web/src/components/providers.tsx
+  h_78e539a96187c3 1-12
+packages/web/src/components/ui/button.tsx
+  h_78e539a96187c3 1-61
+packages/web/src/components/ui/card.tsx
+  h_78e539a96187c3 1-74
+packages/web/src/lib/env.test.ts
+  h_78e539a96187c3 1-24
+packages/web/src/lib/env.ts
+  h_78e539a96187c3 1-22
+packages/web/src/lib/utils.ts
+  h_78e539a96187c3 1-6
+packages/web/tsconfig.json
+  h_78e539a96187c3 1-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "399765b976742f602d5a9b2d8b10003a40fd92ca",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
