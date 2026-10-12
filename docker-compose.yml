@@ -1,13 +1,13 @@
-# Local Postgres can be used instead of Docker; DATABASE_URL in .env.example works for either.
+# Local-only dev database: trust auth, bound to loopback. Local Postgres works too.
 services:
   postgres:
     image: postgres:17
     environment:
       POSTGRES_DB: payscope
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
     ports:
-      - '5432:5432'
+      - '127.0.0.1:5432:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
