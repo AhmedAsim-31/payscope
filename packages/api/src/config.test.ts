@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { loadConfig } from './config';
 
 const SUPABASE_URL = 'https://abc.supabase.co';
+const DATABASE_URL = 'postgresql://postgres@localhost:5432/payscope';
+const BASE = { SUPABASE_URL, DATABASE_URL };
 
 describe('loadConfig', () => {
   it('applies defaults', () => {
-    expect(loadConfig({ SUPABASE_URL })).toEqual({
+    expect(loadConfig(BASE)).toEqual({
       nodeEnv: 'development',
       port: 3001,
       host: '0.0.0.0',
@@ -16,12 +18,14 @@ describe('loadConfig', () => {
       jwksUrl: `${SUPABASE_URL}/auth/v1/.well-known/jwks.json`,
       jwtIssuer: `${SUPABASE_URL}/auth/v1`,
       jwtAudience: 'authenticated',
+      databaseUrl: DATABASE_URL,
+      dbPoolMax: 10,
     });
   });
 
   it('parses overrides', () => {
     const config = loadConfig({
-      SUPABASE_URL,
+      ...BASE,
       API_PORT: '8080',
       CORS_ORIGIN: 'https://a.test, https://b.test',
       TRUST_PROXY: 'true',
@@ -36,20 +40,33 @@ describe('loadConfig', () => {
   });
 
   it('rejects a bad API_PORT and names the key without the value', () => {
-    expect(() => loadConfig({ SUPABASE_URL, API_PORT: 'not-a-port' })).toThrow(/API_PORT/);
-    expect(() => loadConfig({ SUPABASE_URL, API_PORT: 'not-a-port' })).not.toThrow(/not-a-port/);
+    expect(() => loadConfig({ ...BASE, API_PORT: 'not-a-port' })).toThrow(/API_PORT/);
+    expect(() => loadConfig({ ...BASE, API_PORT: 'not-a-port' })).not.toThrow(/not-a-port/);
   });
 
   it('requires CORS_ORIGIN in production', () => {
-    expect(() => loadConfig({ SUPABASE_URL, NODE_ENV: 'production' })).toThrow(/CORS_ORIGIN/);
+    expect(() => loadConfig({ ...BASE, NODE_ENV: 'production' })).toThrow(/CORS_ORIGIN/);
   });
 
   it('requires SUPABASE_URL', () => {
-    expect(() => loadConfig({})).toThrow(/SUPABASE_URL/);
+    expect(() => loadConfig({ DATABASE_URL })).toThrow(/SUPABASE_URL/);
+  });
+
+  it('requires a postgres DATABASE_URL', () => {
+    expect(() => loadConfig({ SUPABASE_URL })).toThrow(/DATABASE_URL/);
+    expect(() => loadConfig({ SUPABASE_URL, DATABASE_URL: 'http://localhost/db' })).toThrow(
+      /DATABASE_URL/,
+    );
+  });
+
+  it('parses DB_POOL_MAX and rejects a non-integer', () => {
+    expect(loadConfig({ ...BASE, DB_POOL_MAX: '4' }).dbPoolMax).toBe(4);
+    expect(() => loadConfig({ ...BASE, DB_POOL_MAX: 'x' })).toThrow(/DB_POOL_MAX/);
   });
 
   it('honours a SUPABASE_JWKS_URL override and trims a trailing slash', () => {
     const config = loadConfig({
+      ...BASE,
       SUPABASE_URL: `${SUPABASE_URL}/`,
       SUPABASE_JWKS_URL: 'http://localhost:9999/jwks.json',
     });

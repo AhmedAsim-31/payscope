@@ -9,3 +9,4 @@ docs/provider-research.md
 CLAUDE.md
 IMPLEMENTATION_STATUS.md
 next-env.d.ts
+supabase/migrations/meta
