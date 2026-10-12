@@ -1,0 +1,30 @@
+{
+  "id": "evt_test_2",
+  "object": "event",
+  "api_version": "2025-09-30.clover",
+  "created": 1760000002,
+  "type": "payment_intent.payment_failed",
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "data": {
+    "object": {
+      "id": "pi_test_3Qa1b2c3d4",
+      "object": "payment_intent",
+      "amount": 4999,
+      "amount_received": 0,
+      "currency": "usd",
+      "customer": "cus_test_Nx81aB",
+      "status": "requires_payment_method",
+      "created": 1759999940,
+      "livemode": false,
+      "metadata": {},
+      "last_payment_error": {
+        "code": "card_declined"
+      }
+    }
+  }
+}

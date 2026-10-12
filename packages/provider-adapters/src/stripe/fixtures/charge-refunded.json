@@ -1,0 +1,29 @@
+{
+  "id": "evt_test_3",
+  "object": "event",
+  "api_version": "2025-09-30.clover",
+  "created": 1760000003,
+  "type": "charge.refunded",
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "data": {
+    "object": {
+      "id": "ch_test_3Qa1b2c3d4",
+      "object": "charge",
+      "amount": 4999,
+      "amount_captured": 4999,
+      "amount_refunded": 1500,
+      "currency": "usd",
+      "customer": "cus_test_Nx81aB",
+      "payment_intent": "pi_test_3Qa1b2c3d4",
+      "status": "succeeded",
+      "refunded": false,
+      "created": 1759999940,
+      "livemode": false
+    }
+  }
+}

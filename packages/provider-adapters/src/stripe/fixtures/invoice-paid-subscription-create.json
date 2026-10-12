@@ -1,0 +1,35 @@
+{
+  "id": "evt_test_11",
+  "object": "event",
+  "api_version": "2025-09-30.clover",
+  "created": 1760000011,
+  "type": "invoice.paid",
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "data": {
+    "object": {
+      "id": "in_test_1Su7vWy",
+      "object": "invoice",
+      "amount_due": 1999,
+      "amount_paid": 1999,
+      "currency": "usd",
+      "customer": "cus_test_Nx81aB",
+      "status": "paid",
+      "billing_reason": "subscription_create",
+      "created": 1760000011,
+      "livemode": false,
+      "parent": {
+        "type": "subscription_details",
+        "subscription_details": {
+          "subscription": "sub_test_1Pq9zXy",
+          "metadata": {}
+        },
+        "quote_details": null
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "evt_test_12",
+  "object": "event",
+  "api_version": "2025-09-30.clover",
+  "created": 1760000012,
+  "type": "customer.created",
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "data": {
+    "object": {
+      "id": "cus_test_Nx81aB",
+      "object": "customer",
+      "email": "jane.doe@example.test",
+      "created": 1760000012,
+      "livemode": false
+    }
+  }
+}
