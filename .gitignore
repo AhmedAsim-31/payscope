@@ -12,3 +12,4 @@ coverage/
 pnpm-lock.yaml
 supabase/.branches/
 supabase/.temp/
+graphify-out/
