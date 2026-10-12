@@ -1,0 +1,58 @@
+docs/database.md
+  h_78e539a96187c3 1-57
+packages/api/src/app.ts
+  h_78e539a96187c3 13-14,24,75
+packages/api/src/db/pg-errors.ts
+  h_78e539a96187c3 1-29
+packages/api/src/db/schema/identity.ts
+  h_78e539a96187c3 1-2,4-6,8-40
+packages/api/src/error-handler.ts
+  h_78e539a96187c3 6,33-35
+packages/api/src/http-error.ts
+  h_78e539a96187c3 1-11
+packages/api/src/orgs/identity-routes.ts
+  h_78e539a96187c3 1-16
+packages/api/src/orgs/member-routes.ts
+  h_78e539a96187c3 1-178
+packages/api/src/orgs/org-routes.ts
+  h_78e539a96187c3 1-98
+packages/api/src/orgs/orgs.integration.test.ts
+  h_78e539a96187c3 1-307
+packages/api/src/orgs/profile-service.ts
+  h_78e539a96187c3 1-16
+packages/api/src/orgs/request-context.ts
+  h_78e539a96187c3 1-20
+packages/api/src/orgs/require-org.ts
+  h_78e539a96187c3 1-34
+packages/api/src/server.ts
+  h_78e539a96187c3 8,21
+packages/api/src/test/identity-harness.ts
+  h_78e539a96187c3 1-46
+packages/api/src/test/reset-test-database.ts
+  h_78e539a96187c3 11
+packages/shared/src/permissions.test.ts
+  h_78e539a96187c3 1-40
+packages/shared/src/permissions.ts
+  h_78e539a96187c3 1-51
+supabase/migrations/20261012225041_identity.sql
+  h_78e539a96187c3 1-34
+supabase/migrations/20261012225042_identity_guards.sql
+  h_78e539a96187c3 1-53
+supabase/migrations/meta/20261012225041_snapshot.json
+  h_78e539a96187c3 1-234
+supabase/migrations/meta/20261012225042_snapshot.json
+  h_78e539a96187c3 1-234
+supabase/migrations/meta/_journal.json
+  h_78e539a96187c3 11-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "27d6d0b9e746cc68afce268b39be14e4ef49e230",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
