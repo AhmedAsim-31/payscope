@@ -1,4 +1,6 @@
+import { createRemoteJWKSet } from 'jose';
 import { buildApp } from './app';
+import { createTokenVerifier } from './auth/token-verifier';
 import { loadConfig } from './config';
 
 const config = loadConfig();
@@ -6,6 +8,11 @@ const app = await buildApp({
   corsOrigins: config.corsOrigins,
   logLevel: config.logLevel,
   trustProxy: config.trustProxy,
+  tokenVerifier: createTokenVerifier({
+    issuer: config.jwtIssuer,
+    audience: config.jwtAudience,
+    keySet: createRemoteJWKSet(new URL(config.jwksUrl)),
+  }),
 });
 
 for (const signal of ['SIGINT', 'SIGTERM'] as const) {
