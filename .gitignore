@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.next/
+.expo/
+.wrangler/
+coverage/
+*.env
+.env.*
+!.env.example
+*.local
+.DS_Store
+pnpm-lock.yaml
+supabase/.branches/
+supabase/.temp/
