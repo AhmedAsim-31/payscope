@@ -1,0 +1,18 @@
+packages/api/src/auth/authenticate.test.ts
+  h_78e539a96187c3 4,132-147
+packages/api/src/auth/token-verifier.ts
+  h_78e539a96187c3 4-5,35-44,64-66
+packages/api/src/error-handler.ts
+  h_78e539a96187c3 25-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "11261edf46a4b5a6e18dabe29c282ab1cd6e786e",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
