@@ -1,0 +1,20 @@
+.claude/settings.json
+  h_78e539a96187c3 1-5
+.gitignore
+  h_78e539a96187c3 1-14
+CLAUDE.md
+  h_78e539a96187c3 1-36
+docs/PRD.md
+  h_78e539a96187c3 1-930
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2f101d767449ba3fd71f958291cc89989a9adba1",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
