@@ -125,7 +125,13 @@ export async function buildApp(opts: BuildAppOptions = {}) {
     if (opts.db) await app.register(overviewRoutes, { db: opts.db });
     if (opts.db) await app.register(auditRoutes, { db: opts.db });
     if (opts.db) await app.register(incidentRoutes, { db: opts.db });
-    if (opts.db) await app.register(repairRoutes, { db: opts.db });
+    if (opts.db) {
+      await app.register(repairRoutes, {
+        db: opts.db,
+        cipher: opts.credentialsCipher,
+        adapters: opts.adapters ?? createDefaultAdapterRegistry(),
+      });
+    }
     if (opts.db) await app.register(scenarioRoutes, { db: opts.db });
     if (opts.db && opts.credentialsCipher) {
       await app.register(connectionRoutes, { db: opts.db, cipher: opts.credentialsCipher });
