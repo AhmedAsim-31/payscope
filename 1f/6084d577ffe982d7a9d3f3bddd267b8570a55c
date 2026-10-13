@@ -1,0 +1,33 @@
+packages/api/src/db/schema/records.ts
+  s_3bfb2e09c422d0::t_2adeb11d543419 67
+packages/api/src/events/entitlements.ts
+  s_3bfb2e09c422d0::t_6e54c54d50b1d7 78,82-84,89-93
+packages/api/src/events/payments.ts
+  s_3bfb2e09c422d0::t_4ad3d3c58283bc 7-12,38,49
+packages/api/src/events/refunds.ts
+  s_3bfb2e09c422d0::t_a479698ddc07bf 6-7,11-15,20-21,25,54,60,62
+packages/provider-adapters/src/paddle/paddle-normalize.test.ts
+  s_3bfb2e09c422d0::t_ddd8db8fc584b9 181-191
+packages/provider-adapters/src/paddle/paddle-normalize.ts
+  s_3bfb2e09c422d0::t_8e485ae68a9fbc 24,75,82,99,117-120
+packages/provider-adapters/src/paypal/paypal-normalize.test.ts
+  s_3bfb2e09c422d0::t_27dea5d37fea33 88-98
+packages/provider-adapters/src/paypal/paypal-normalize.ts
+  s_3bfb2e09c422d0::t_60da7a565c413c 121-123
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1f6084d577ffe982d7a9d3f3bddd267b8570a55c",
+  "prompts": {},
+  "sessions": {
+    "s_3bfb2e09c422d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3c00ef3d-597c-492a-bf23-7c65c0557e13",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
