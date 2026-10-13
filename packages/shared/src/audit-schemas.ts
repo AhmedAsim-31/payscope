@@ -14,6 +14,7 @@ export const auditQuerySchema = z
     actor: z.uuid().optional(),
     targetType: z.string().min(1).max(100).optional(),
     targetId: z.string().min(1).max(100).optional(),
+    customerId: z.uuid().optional(),
     from: z.iso.datetime({ offset: true }).optional(),
     to: z.iso.datetime({ offset: true }).optional(),
     q: z.string().trim().min(1).max(AUDIT_SEARCH_MAX).optional(),

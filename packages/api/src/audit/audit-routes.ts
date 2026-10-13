@@ -1,9 +1,14 @@
-import { and, desc, eq, gte, ilike, lt, or, sql } from 'drizzle-orm';
+import { and, desc, eq, gte, ilike, inArray, lt, or, sql } from 'drizzle-orm';
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import { auditPageSchema, auditQuerySchema } from '@payscope/shared/audit-schemas';
 import type { Db } from '../db/client';
 import { auditLogsTable as t } from '../db/schema/operations';
+import {
+  entitlementRecordsTable,
+  paymentRecordsTable,
+  subscriptionRecordsTable,
+} from '../db/schema/records';
 import { currentOrg } from '../orgs/request-context';
 import { requireOrg } from '../orgs/require-org';
 import { escapeLike } from '../records/escape-like';
@@ -18,6 +23,30 @@ function matchesText(text: string) {
     ilike(sql`${t.actorId}::text`, pattern),
     ilike(sql`${t.actorType}::text`, pattern),
     ilike(t.reason, pattern),
+  );
+}
+
+function touchesCustomer(db: Db, orgId: string, customerId: string) {
+  const owned = (
+    targetType: string,
+    table:
+      typeof paymentRecordsTable | typeof subscriptionRecordsTable | typeof entitlementRecordsTable,
+  ) =>
+    and(
+      eq(t.targetType, targetType),
+      inArray(
+        t.targetId,
+        db
+          .select({ id: sql<string>`${table.id}::text` })
+          .from(table)
+          .where(and(eq(table.orgId, orgId), eq(table.customerId, customerId))),
+      ),
+    );
+  return or(
+    and(eq(t.targetType, 'customer'), eq(t.targetId, customerId)),
+    owned('payment', paymentRecordsTable),
+    owned('subscription', subscriptionRecordsTable),
+    owned('entitlement', entitlementRecordsTable),
   );
 }
 
@@ -44,16 +73,18 @@ export const auditRoutes: FastifyPluginCallbackZod<{ db: Db }> = (app, { db }, d
     },
     async (request) => {
       const q = request.query;
+      const orgId = currentOrg(request).id;
       const rows = await db
         .select({ entry: t, cursorTs: cursorTsColumn(t.createdAt) })
         .from(t)
         .where(
           and(
-            eq(t.orgId, currentOrg(request).id),
+            eq(t.orgId, orgId),
             q.action === undefined ? undefined : eq(t.action, q.action),
             q.actor === undefined ? undefined : eq(t.actorId, q.actor),
             q.targetType === undefined ? undefined : eq(t.targetType, q.targetType),
             q.targetId === undefined ? undefined : eq(t.targetId, q.targetId),
+            q.customerId === undefined ? undefined : touchesCustomer(db, orgId, q.customerId),
             q.from === undefined ? undefined : gte(t.createdAt, new Date(q.from)),
             q.to === undefined ? undefined : lt(t.createdAt, new Date(q.to)),
             q.q === undefined ? undefined : matchesText(q.q),

@@ -135,11 +135,11 @@ export function CustomerDetail({ orgId, customerId }: { orgId: string; customerI
         listPath="audit"
         viewAllLabel="View all audit entries"
         schema={auditPageSchema}
-        params={{ targetType: 'customer', targetId: customer.id }}
+        params={{ customerId: customer.id }}
         columns={AUDIT_COLUMNS}
         empty={{
           title: 'No audit entries yet',
-          hint: 'Audited actions that target this customer appear here.',
+          hint: 'Audited actions on this customer, its payments, subscriptions and entitlements appear here.',
         }}
       />
     </div>
