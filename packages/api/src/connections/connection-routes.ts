@@ -8,6 +8,7 @@ import {
   type Credentials,
   type CredentialsCipher,
 } from '../crypto/credentials-cipher';
+import { audited, auditContext } from '../audit/audit-log';
 import type { Db } from '../db/client';
 import { rethrowPgError } from '../db/pg-errors';
 import { providerConnectionsTable } from '../db/schema/providers';
@@ -86,26 +87,40 @@ export const connectionRoutes: FastifyPluginCallbackZod<Options> = (app, { db, c
         },
         id,
       );
-      try {
-        const [row] = await db
-          .insert(providerConnectionsTable)
-          .values({
-            id,
-            orgId: currentOrg(request).id,
-            provider: body.provider,
-            mode: body.mode,
-            status: 'unverified',
-            displayName: body.displayName,
-            externalAccountId: body.externalAccountId,
-            credentialsCiphertext: ciphertext,
-            credentialsKeyVersion: keyVersion,
-          })
-          .returning(viewColumns);
-        if (!row) throw new Error('connection insert returned no row');
-        return reply.code(201).send(toConnectionView(row, cipher));
-      } catch (err) {
-        return rethrowPgError(err);
-      }
+      return audited(
+        db,
+        {
+          ...auditContext(request),
+          action: 'connection.create',
+          targetType: 'connection',
+          targetId: id,
+        },
+        async (tx) => {
+          try {
+            const [row] = await tx
+              .insert(providerConnectionsTable)
+              .values({
+                id,
+                orgId: currentOrg(request).id,
+                provider: body.provider,
+                mode: body.mode,
+                status: 'unverified',
+                displayName: body.displayName,
+                externalAccountId: body.externalAccountId,
+                credentialsCiphertext: ciphertext,
+                credentialsKeyVersion: keyVersion,
+              })
+              .returning(viewColumns);
+            if (!row) throw new Error('connection insert returned no row');
+            return {
+              value: toConnectionView(row, cipher),
+              resultingState: { provider: body.provider, mode: body.mode },
+            };
+          } catch (err) {
+            return rethrowPgError(err);
+          }
+        },
+      ).then((view) => reply.code(201).send(view));
     },
   );
 
@@ -165,11 +180,13 @@ export const connectionRoutes: FastifyPluginCallbackZod<Options> = (app, { db, c
       const orgId = currentOrg(request).id;
       const { connectionId } = request.params;
       const { webhookSecret, apiKey, entitlementMap } = request.body;
-      return db.transaction(async (tx) => {
+      const base = { ...auditContext(request), targetType: 'connection', targetId: connectionId };
+      return audited(db, { ...base, action: 'connection.update' }, async (tx) => {
         const [current] = await tx
           .select({
             provider: providerConnectionsTable.provider,
             ciphertext: providerConnectionsTable.credentialsCiphertext,
+            entitlementMap: providerConnectionsTable.entitlementMap,
           })
           .from(providerConnectionsTable)
           .where(
@@ -213,7 +230,15 @@ export const connectionRoutes: FastifyPluginCallbackZod<Options> = (app, { db, c
           .where(eq(providerConnectionsTable.id, connectionId))
           .returning(viewColumns);
         if (!row) throw notFound();
-        return toConnectionView(row, cipher);
+        return {
+          value: toConnectionView(row, cipher),
+          previousState: entitlementMap ? { entitlementMap: current.entitlementMap } : null,
+          resultingState: {
+            ...(entitlementMap ? { entitlementMap } : {}),
+            ...(webhookSecret !== undefined ? { webhookSecretRotated: true } : {}),
+            ...(apiKey !== undefined ? { apiKeyRotated: true } : {}),
+          },
+        };
       });
     },
   );

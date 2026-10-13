@@ -2,6 +2,7 @@ import { and, asc, eq, ne, sql } from 'drizzle-orm';
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import { ROLES, can, type Role } from '@payscope/shared/permissions';
+import { audited, auditContext } from '../audit/audit-log';
 import type { Db } from '../db/client';
 import { rethrowPgError } from '../db/pg-errors';
 import { membershipsTable, profilesTable } from '../db/schema/identity';
@@ -42,6 +43,14 @@ export const memberRoutes: FastifyPluginCallbackZod<{ db: Db }> = (app, { db }, 
       .where(and(eq(membershipsTable.orgId, orgId), eq(membershipsTable.userId, userId)))
       .limit(1);
     return member;
+  };
+
+  const roleOf = async (tx: Pick<Db, 'select'>, orgId: string, userId: string) => {
+    const [row] = await tx
+      .select({ role: membershipsTable.role })
+      .from(membershipsTable)
+      .where(and(eq(membershipsTable.orgId, orgId), eq(membershipsTable.userId, userId)));
+    return row?.role ?? null;
   };
 
   const ownerGuard = (callerRole: Role) =>
@@ -95,11 +104,23 @@ export const memberRoutes: FastifyPluginCallbackZod<{ db: Db }> = (app, { db }, 
         .orderBy(asc(profilesTable.createdAt))
         .limit(1);
       if (!profile) throw new ApiHttpError(404, 'NOT_FOUND', 'No user with that email');
-      try {
-        await db.insert(membershipsTable).values({ orgId: org.id, userId: profile.id, role });
-      } catch (err) {
-        rethrowPgError(err);
-      }
+      await audited(
+        db,
+        {
+          ...auditContext(request),
+          action: 'member.add',
+          targetType: 'member',
+          targetId: profile.id,
+        },
+        async (tx) => {
+          try {
+            await tx.insert(membershipsTable).values({ orgId: org.id, userId: profile.id, role });
+          } catch (err) {
+            rethrowPgError(err);
+          }
+          return { value: undefined, resultingState: { role } };
+        },
+      );
       const member = await findMember(org.id, profile.id);
       if (!member) throw memberNotFound();
       return reply.code(201).send(member);
@@ -119,23 +140,40 @@ export const memberRoutes: FastifyPluginCallbackZod<{ db: Db }> = (app, { db }, 
       if (role === 'OWNER' && org.role !== 'OWNER') {
         throw forbidden('Only an owner can grant the owner role');
       }
-      let updated: { userId: string }[] = [];
-      try {
-        updated = await db
-          .update(membershipsTable)
-          .set({ role, updatedAt: new Date() })
-          .where(
-            and(
-              eq(membershipsTable.orgId, org.id),
-              eq(membershipsTable.userId, userId),
-              ownerGuard(org.role),
-            ),
-          )
-          .returning({ userId: membershipsTable.userId });
-      } catch (err) {
-        rethrowPgError(err);
-      }
-      if (updated.length === 0) return missOrForbidden(org.id, userId);
+      await audited(
+        db,
+        {
+          ...auditContext(request),
+          action: 'member.role_change',
+          targetType: 'member',
+          targetId: userId,
+        },
+        async (tx) => {
+          const previousRole = await roleOf(tx, org.id, userId);
+          let updated: { userId: string }[] = [];
+          try {
+            updated = await tx
+              .update(membershipsTable)
+              .set({ role, updatedAt: new Date() })
+              .where(
+                and(
+                  eq(membershipsTable.orgId, org.id),
+                  eq(membershipsTable.userId, userId),
+                  ownerGuard(org.role),
+                ),
+              )
+              .returning({ userId: membershipsTable.userId });
+          } catch (err) {
+            rethrowPgError(err);
+          }
+          if (updated.length === 0) return missOrForbidden(org.id, userId);
+          return {
+            value: undefined,
+            previousState: { role: previousRole },
+            resultingState: { role },
+          };
+        },
+      );
       const member = await findMember(org.id, userId);
       if (!member) throw memberNotFound();
       return member;
@@ -154,22 +192,35 @@ export const memberRoutes: FastifyPluginCallbackZod<{ db: Db }> = (app, { db }, 
       if (userId !== currentUserId(request) && !can(org.role, 'members:manage')) {
         throw forbidden('Insufficient permissions');
       }
-      let removed: { userId: string }[] = [];
-      try {
-        removed = await db
-          .delete(membershipsTable)
-          .where(
-            and(
-              eq(membershipsTable.orgId, org.id),
-              eq(membershipsTable.userId, userId),
-              ownerGuard(org.role),
-            ),
-          )
-          .returning({ userId: membershipsTable.userId });
-      } catch (err) {
-        rethrowPgError(err);
-      }
-      if (removed.length === 0) return missOrForbidden(org.id, userId);
+      await audited(
+        db,
+        {
+          ...auditContext(request),
+          action: 'member.remove',
+          targetType: 'member',
+          targetId: userId,
+        },
+        async (tx) => {
+          const previousRole = await roleOf(tx, org.id, userId);
+          let removed: { userId: string }[] = [];
+          try {
+            removed = await tx
+              .delete(membershipsTable)
+              .where(
+                and(
+                  eq(membershipsTable.orgId, org.id),
+                  eq(membershipsTable.userId, userId),
+                  ownerGuard(org.role),
+                ),
+              )
+              .returning({ userId: membershipsTable.userId });
+          } catch (err) {
+            rethrowPgError(err);
+          }
+          if (removed.length === 0) return missOrForbidden(org.id, userId);
+          return { value: undefined, previousState: { role: previousRole }, resultingState: null };
+        },
+      );
       return reply.code(204).send();
     },
   );

@@ -1,6 +1,7 @@
 import { and, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { Db } from '../db/client';
+import { openIncidentsForFindings } from '../incidents/incident-open';
 import { reconciliationRunsTable as r } from '../db/schema/reconciliation';
 import { upsertFindings, type FindingDraft } from './finding-upsert';
 
@@ -49,6 +50,7 @@ export async function commitBatch(
 ): Promise<void> {
   await db.transaction(async (tx) => {
     await upsertFindings(tx, run.orgId, run.id, drafts);
+    await openIncidentsForFindings(tx, run.orgId, run.id, drafts);
     const updated = await tx
       .update(r)
       .set({

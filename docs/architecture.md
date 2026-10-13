@@ -199,3 +199,37 @@ The fingerprint is `type:subjectType:subjectId`, plus the entitlement key where 
 A partial unique index on `(org_id, fingerprint)` for `open` and `reviewed` findings makes re-detection an `INSERT ... ON CONFLICT DO UPDATE` that refreshes `last_seen_run_id`, `evidence`, and `updated_at`.
 Overlapping runs therefore cannot create duplicates.
 A dismissed finding that is detected again opens a new finding.
+
+## Repair and audit
+
+### Audit log
+
+Every mutation that changes org state writes an `audit_logs` row through `writeAudit(tx, ...)` inside the same transaction as the change.
+A rollback therefore removes the audit row with the mutation, and a committed change always has its row.
+`audited()` wraps a handler: success is audited in the work transaction, and a request that passed authorization but was rejected (an `ApiHttpError`) is audited afterwards with outcome `failure`.
+Audited actions: org create, member add, role change and remove, connection create and update (credential rotation, entitlement map), event retry, finding review and dismiss, reconciliation run start, incident actions, and the three repairs.
+Connection credentials are never stored in audit state, only flags such as `webhookSecretRotated`.
+
+### Repair center
+
+All repairs require `repairs:execute`, a `reason` of 10 to 500 characters, and an `Idempotency-Key` header.
+No repair writes to a provider.
+Each repair runs in one transaction that holds the idempotency claim, the state change, the finding update, the audit row, and the stored response.
+
+| Endpoint                            | Effect                                                                                                                                                                                                         |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /repairs/reprocess-event`     | Sets a stored event back to `pending` and re-queues its job. Apply-step guards prevent double effects.                                                                                                         |
+| `POST /repairs/correct-entitlement` | For `entitlement_missing_or_stale` grants the plan-mapped entitlements; for `expired_externally_active_locally` expires the entitlement. Source is `manual_repair`. Marks the finding resolved.                |
+| `POST /repairs/resolve-finding`     | Re-runs the finding's local rule scoped to its subject. Resolves only if the fingerprint is no longer detected, otherwise `409 STILL_DETECTED`. Provider-derived findings answer `422 NOT_LOCALLY_VERIFIABLE`. |
+
+Idempotency: the first request claims `(org_id, scope, key)` in `idempotency_records` with a SHA-256 of the request body.
+The same key and body replays the stored response and writes no second audit row; the same key with a different body answers `422 IDEMPOTENCY_KEY_REUSED`.
+Records expire after 24 hours and a stale claim is replaced.
+Every precondition (finding still open, entitlement still active, subscription still expired) lives in the `WHERE` clause of the write, so a concurrent change yields a `409` instead of a lost update.
+
+### Incidents
+
+When a reconciliation batch records a high or critical finding, `openIncidentsForFindings` upserts one incident per finding type, fingerprint `finding_type:<type>`.
+The partial unique index on `(org_id, fingerprint)` where status is not `resolved` deduplicates across runs; on conflict the count is recomputed from live findings and `last_seen_at` moves.
+Resolving an incident lets the next detection open a fresh one.
+Incident actions (`acknowledge`, `note`, `resolve`) require `findings:update` and are audited.

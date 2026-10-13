@@ -120,7 +120,7 @@ export async function listFindings(db: Db, orgId: string, q: FindingQuery) {
   );
 }
 
-export async function getFinding(db: Db, orgId: string, findingId: string) {
+export async function getFinding(db: Pick<Db, 'select'>, orgId: string, findingId: string) {
   const [row] = await db
     .select()
     .from(f)
@@ -130,7 +130,7 @@ export async function getFinding(db: Db, orgId: string, findingId: string) {
 
 /** Resolved is reserved for the repair flow, so only open or reviewed findings can be triaged. */
 export async function triageFinding(
-  db: Db,
+  db: Pick<Db, 'update'>,
   orgId: string,
   findingId: string,
   status: 'reviewed' | 'dismissed',

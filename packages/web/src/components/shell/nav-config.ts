@@ -1,6 +1,11 @@
 import {
   CreditCard,
   Inbox,
+  History,
+  Scale,
+  SearchCheck,
+  Siren,
+  Wrench,
   KeyRound,
   LayoutDashboard,
   ListChecks,
@@ -25,6 +30,11 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { title: 'Entitlements', path: '/entitlements', icon: KeyRound },
   { title: 'Events', path: '/events', icon: Inbox },
   { title: 'Jobs', path: '/jobs', icon: ListChecks },
+  { title: 'Reconciliation', path: '/reconciliation', icon: Scale },
+  { title: 'Findings', path: '/findings', icon: SearchCheck },
+  { title: 'Incidents', path: '/incidents', icon: Siren },
+  { title: 'Repair center', path: '/repairs', icon: Wrench },
+  { title: 'Audit', path: '/audit', icon: History },
   { title: 'Members', path: '/members', icon: Users },
 ];
 
