@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,6 +19,45 @@ type FilterBarProps = {
 const SELECT_CLASS =
   'border-input bg-background focus-visible:border-ring focus-visible:ring-ring/50 h-9 w-full rounded-md border px-2 text-sm shadow-xs outline-none focus-visible:ring-[3px]';
 
+const SEARCH_DEBOUNCE_MS = 300;
+
+type SearchInputProps = {
+  id: string;
+  name: string;
+  placeholder?: string;
+  value: string;
+  onChange: (value: string) => void;
+};
+
+function SearchInput({ id, name, placeholder, value, onChange }: SearchInputProps) {
+  const [draft, setDraft] = useState(value);
+  const [synced, setSynced] = useState(value);
+  if (value !== synced) {
+    setSynced(value);
+    if (draft.trim() !== value) setDraft(value);
+  }
+
+  useEffect(() => {
+    const next = draft.trim();
+    if (next === value) return;
+    const timer = setTimeout(() => onChange(next), SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [draft, value, onChange]);
+
+  return (
+    <Input
+      id={id}
+      name={name}
+      type="search"
+      autoComplete="off"
+      spellCheck={false}
+      placeholder={placeholder}
+      value={draft}
+      onChange={(event) => setDraft(event.target.value)}
+    />
+  );
+}
+
 export function FilterBar({ label, fields, read, isFiltered, onChange, onClear }: FilterBarProps) {
   return (
     <form
@@ -29,7 +69,7 @@ export function FilterBar({ label, fields, read, isFiltered, onChange, onClear }
         const data = new FormData(event.currentTarget);
         for (const field of fields) {
           const value = data.get(field.name);
-          if (field.kind === 'text' && typeof value === 'string')
+          if ((field.kind === 'text' || field.kind === 'search') && typeof value === 'string')
             onChange(field.name, value.trim());
         }
       }}
@@ -54,6 +94,14 @@ export function FilterBar({ label, fields, read, isFiltered, onChange, onClear }
                   </option>
                 ))}
               </select>
+            ) : field.kind === 'search' ? (
+              <SearchInput
+                id={id}
+                name={field.name}
+                placeholder={field.placeholder}
+                value={read(field.name)}
+                onChange={(value) => onChange(field.name, value)}
+              />
             ) : (
               <Input
                 id={id}

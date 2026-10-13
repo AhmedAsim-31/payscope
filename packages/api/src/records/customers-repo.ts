@@ -11,6 +11,7 @@ import { entitlementRecordsTable as e, subscriptionRecordsTable as s } from '../
 import { selectEntitlements, toEntitlement } from './entitlements-repo';
 import { cursorTsColumn, iso, keysetAfter, toPage } from './keyset';
 import { selectSubscriptions, toSubscription } from './subscriptions-repo';
+import { escapeLike } from './escape-like';
 
 const DETAIL_CHILD_LIMIT = 50;
 
@@ -25,10 +26,6 @@ const columns = {
   updatedAt: c.updatedAt,
   cursorTs: cursorTsColumn(c.createdAt),
 };
-
-function escapeLike(value: string): string {
-  return value.replace(/[\\%_]/g, (ch) => `\\${ch}`);
-}
 
 type CustomerRow = {
   id: string;

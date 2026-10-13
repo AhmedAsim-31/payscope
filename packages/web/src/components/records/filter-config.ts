@@ -15,7 +15,7 @@ import {
 export type FilterField = {
   name: string;
   label: string;
-  kind: 'select' | 'text' | 'date';
+  kind: 'select' | 'text' | 'search' | 'date';
   options?: readonly string[];
   placeholder?: string;
   toParam?: (value: string) => string | undefined;
@@ -85,9 +85,12 @@ export const INCIDENT_FILTERS: readonly FilterField[] = [
 ];
 
 export const AUDIT_FILTERS: readonly FilterField[] = [
+  { name: 'q', label: 'Search', kind: 'search', placeholder: 'Action, target, actor, reason' },
   { name: 'action', label: 'Action', kind: 'text', placeholder: 'repair.correct_entitlement' },
   { name: 'targetType', label: 'Target type', kind: 'text', placeholder: 'finding' },
   { name: 'targetId', label: 'Target id', kind: 'text', placeholder: 'uuid' },
+  { name: 'from', label: 'From', kind: 'date', toParam: startOfDay },
+  { name: 'to', label: 'To', kind: 'date', toParam: endExclusive },
 ];
 
 export function toApiParams(
