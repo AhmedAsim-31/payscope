@@ -8,7 +8,7 @@ import { findAdapter } from '../providers/adapter-registry';
 import type { FindingDraft } from './finding-upsert';
 import type { BatchDelta } from './run-store';
 
-const BASE_URLS: Record<ProviderName, AllowedBaseUrl> = {
+export const BASE_URLS: Record<ProviderName, AllowedBaseUrl> = {
   stripe: 'https://api.stripe.com',
   paddle: 'https://sandbox-api.paddle.com',
   paypal: 'https://api-m.sandbox.paypal.com',

@@ -2,28 +2,20 @@
 
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { z } from 'zod';
 import { runDetailSchema } from '@payscope/shared/reconciliation-schemas';
 import { can, type Role } from '@payscope/shared/permissions';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { apiFetch } from '@/lib/api-client';
+import { connectionsQueryOptions } from '@/lib/connection-queries';
 import { describeError } from '@/lib/api-messages';
-
-const connectionsSchema = z.object({
-  connections: z.array(z.object({ id: z.uuid(), displayName: z.string(), hasApiKey: z.boolean() })),
-});
 
 const selectClass =
   'border-input h-9 w-full rounded-md border bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50';
 
 export function StartRunForm({ orgId, role }: { orgId: string; role: Role }) {
   const queryClient = useQueryClient();
-  const { data } = useSuspenseQuery({
-    queryKey: ['orgs', orgId, 'connections'],
-    queryFn: async () =>
-      connectionsSchema.parse(await apiFetch(`/api/v1/orgs/${orgId}/connections`)).connections,
-  });
+  const { data } = useSuspenseQuery(connectionsQueryOptions(orgId));
   const [connectionId, setConnectionId] = useState('');
   const [mode, setMode] = useState<'local' | 'provider'>('local');
   const selected = data.find((c) => c.id === connectionId);

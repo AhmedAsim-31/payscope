@@ -11,7 +11,10 @@ export type ErrorContext =
   | 'incident-action'
   | 'repair'
   | 'run-scenario'
-  | 'reset-scenarios';
+  | 'reset-scenarios'
+  | 'create-connection'
+  | 'update-connection'
+  | 'verify-connection';
 
 const CONFLICT_MESSAGES: Record<string, string> = {
   SCENARIO_RUNNING: 'A scenario is already running. Wait for it to finish.',
@@ -24,6 +27,7 @@ const CONFLICT_MESSAGES: Record<string, string> = {
   SUBSCRIPTION_NOT_ACTIVE:
     'The subscription is no longer active, so the entitlement cannot be granted.',
   EVENT_IN_FLIGHT: 'This event is already pending or processing. Wait for it to finish.',
+  SIMULATED_CONNECTION: 'Simulated connections have no provider account to test.',
   INVALID_TRANSITION:
     'That action is no longer allowed for this incident. Refresh to see its state.',
 };
@@ -36,6 +40,9 @@ const UNPROCESSABLE_MESSAGES: Record<string, string> = {
   NOT_LOCALLY_VERIFIABLE: 'This finding came from the provider and cannot be re-checked locally.',
   NOT_CORRECTABLE: 'This finding type has no entitlement correction.',
   PROVIDER_MODE_UNAVAILABLE: 'This connection does not support provider-mode runs.',
+  LIVE_KEYS_NOT_ALLOWED: 'Only sandbox API keys are accepted. Use a test or sandbox key.',
+  NO_API_KEY: 'Add a sandbox API key before testing credentials.',
+  VALIDATION_UNSUPPORTED: 'This provider has no credential check yet.',
 };
 
 const TARGET_CONTEXTS: readonly ErrorContext[] = [
@@ -43,6 +50,12 @@ const TARGET_CONTEXTS: readonly ErrorContext[] = [
   'triage-finding',
   'incident-action',
   'repair',
+];
+
+const CONNECTION_CONTEXTS: readonly ErrorContext[] = [
+  'create-connection',
+  'update-connection',
+  'verify-connection',
 ];
 
 const FALLBACK = 'Something went wrong. Try again.';
@@ -63,9 +76,15 @@ export function describeError(error: unknown, context: ErrorContext): string {
     }
     if (error.status === 404) return 'That event no longer exists.';
   }
+  if (error.status === 429 && CONNECTION_CONTEXTS.includes(context)) {
+    return 'Too many credential changes or tests. Wait a minute and try again.';
+  }
   if (error.status === 429) return 'Too many scenario runs. Wait a few minutes and try again.';
   if (error.status === 403) return error.message || 'You do not have permission to do that.';
-  if (error.status === 404 && TARGET_CONTEXTS.includes(context)) {
+  if (
+    error.status === 404 &&
+    (TARGET_CONTEXTS.includes(context) || CONNECTION_CONTEXTS.includes(context))
+  ) {
     return 'That record no longer exists. Refresh and try again.';
   }
   if (error.status === 404) {
@@ -76,6 +95,9 @@ export function describeError(error: unknown, context: ErrorContext): string {
   if (error.status === 409) {
     if (context === 'create-org') return 'That slug is already taken. Choose another.';
     if (context === 'add-member') return 'That user is already a member.';
+    if (context === 'create-connection') {
+      return 'A connection for that provider account already exists.';
+    }
   }
   if (error.status === 400 || error.status === 422) return 'Check the values and try again.';
   return FALLBACK;

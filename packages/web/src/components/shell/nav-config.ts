@@ -10,6 +10,7 @@ import {
   KeyRound,
   LayoutDashboard,
   ListChecks,
+  Plug,
   Repeat,
   UserRound,
   Users,
@@ -37,6 +38,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { title: 'Repair center', path: '/repairs', icon: Wrench },
   { title: 'Scenario lab', path: '/scenarios', icon: FlaskConical },
   { title: 'Audit', path: '/audit', icon: History },
+  { title: 'Connections', path: '/connections', icon: Plug },
   { title: 'Members', path: '/members', icon: Users },
 ];
 

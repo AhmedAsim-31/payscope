@@ -19,6 +19,7 @@ import { authenticatePlugin } from './auth/authenticate';
 import { meRoutes } from './auth/me-routes';
 import type { TokenVerifier } from './auth/token-verifier';
 import { connectionRoutes } from './connections/connection-routes';
+import { connectionVerifyRoute } from './connections/connection-verify-route';
 import type { CredentialsCipher } from './crypto/credentials-cipher';
 import type { Db } from './db/client';
 import { pgRateLimitStore } from './rate-limit/pg-rate-limit-store';
@@ -124,6 +125,11 @@ export async function buildApp(opts: BuildAppOptions = {}) {
     if (opts.db) await app.register(scenarioRoutes, { db: opts.db });
     if (opts.db && opts.credentialsCipher) {
       await app.register(connectionRoutes, { db: opts.db, cipher: opts.credentialsCipher });
+      await app.register(connectionVerifyRoute, {
+        db: opts.db,
+        cipher: opts.credentialsCipher,
+        adapters: opts.adapters ?? createDefaultAdapterRegistry(),
+      });
       await app.register(reconciliationRoutes, {
         db: opts.db,
         cipher: opts.credentialsCipher,
