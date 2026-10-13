@@ -226,7 +226,9 @@ export function normalizeStripeEvent(payload: unknown): NormalizedEvent {
   }
   const envelope = parsed.data;
   if (envelope.livemode) {
-    throw new ProviderError('invalid_input', 'Live-mode Stripe events are not allowed');
+    throw new ProviderError('invalid_input', 'Live-mode Stripe events are not allowed', {
+      reason: 'live_mode',
+    });
   }
   return NormalizedEventSchema.parse({
     provider: 'stripe',

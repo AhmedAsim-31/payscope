@@ -18,6 +18,7 @@ export const RevenueCatEnvelopeSchema = z.object({
     period_type: z.string().nullish(),
     cancel_reason: z.string().nullish(),
     expiration_reason: z.string().nullish(),
+    expiration_at_ms: z.number().int().nonnegative().nullish(),
   }),
 });
 

@@ -1,10 +1,12 @@
 import { paddleAdapter } from '@payscope/provider-adapters/paddle/paddle-adapter';
 import type { ProviderAdapter } from '@payscope/provider-adapters/adapter';
 import { createAdapterRegistry, type AdapterRegistry } from '@payscope/provider-adapters/registry';
+import { paypalAdapter } from '@payscope/provider-adapters/paypal/paypal-adapter';
+import { revenueCatAdapter } from '@payscope/provider-adapters/revenuecat/revenuecat-adapter';
 import { stripeAdapter } from '@payscope/provider-adapters/stripe/stripe-adapter';
 
 export function createDefaultAdapterRegistry(): AdapterRegistry {
-  return createAdapterRegistry([stripeAdapter, paddleAdapter]);
+  return createAdapterRegistry([stripeAdapter, paddleAdapter, revenueCatAdapter, paypalAdapter]);
 }
 
 export function findAdapter(

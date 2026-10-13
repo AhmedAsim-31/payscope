@@ -2,6 +2,7 @@ import { and, eq, inArray, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { ProviderError } from '@payscope/provider-adapters/provider-error';
 import type { AdapterRegistry } from '@payscope/provider-adapters/registry';
+import { applyEvent, type ApplyResult } from '../../events/apply-event';
 import { eventProcessingAttemptsTable, providerEventsTable } from '../../db/schema/events';
 import { findAdapter } from '../../providers/adapter-registry';
 import { PermanentJobError, isRetryable, sanitizeError } from '../job-errors';
@@ -18,6 +19,19 @@ function failureCategoryOf(err: unknown): FailureCategory {
     return err.category;
   }
   return err instanceof PermanentJobError ? 'permanent' : 'transient';
+}
+
+function attemptFields(result: Exclude<ApplyResult, { kind: 'already_handled' }>) {
+  switch (result.kind) {
+    case 'unsupported':
+      return { outcome: 'skipped', failureCategory: 'unsupported_event' } as const;
+    case 'stale':
+      return { outcome: 'skipped', errorMessage: 'stale_event' } as const;
+    case 'noted':
+      return { outcome: 'succeeded', errorMessage: result.note } as const;
+    default:
+      return { outcome: 'succeeded' } as const;
+  }
 }
 
 export function createProcessProviderEventHandler(adapters: AdapterRegistry): JobHandler {
@@ -39,6 +53,7 @@ export function createProcessProviderEventHandler(adapters: AdapterRegistry): Jo
       )
       .returning({
         provider: providerEventsTable.provider,
+        connectionId: providerEventsTable.connectionId,
         payload: providerEventsTable.payload,
         attemptCount: providerEventsTable.attemptCount,
       });
@@ -52,35 +67,34 @@ export function createProcessProviderEventHandler(adapters: AdapterRegistry): Jo
       startedAt,
     };
     const eventWhere = eq(providerEventsTable.id, parsed.data.eventId);
+    const stored = { id: parsed.data.eventId, orgId, connectionId: event.connectionId };
 
     try {
       const adapter = findAdapter(adapters, event.provider);
       if (!adapter) throw new PermanentJobError('no_adapter_for_provider');
       const normalized = adapter.normalizeEvent(event.payload);
-      const ignored = normalized.normalizedType === 'unsupported';
       await db.transaction(async (tx) => {
-        await tx
-          .update(providerEventsTable)
-          .set({
-            status: ignored ? 'ignored' : 'processed',
-            normalizedType: normalized.normalizedType,
-            processedAt: new Date(),
-          })
-          .where(eventWhere);
+        const result = await applyEvent(tx, stored, normalized);
+        if (result.kind === 'already_handled') return;
         await tx.insert(eventProcessingAttemptsTable).values({
           ...base,
           endedAt: new Date(),
-          outcome: ignored ? 'skipped' : 'succeeded',
-          failureCategory: ignored ? 'unsupported_event' : null,
+          ...attemptFields(result),
         });
       });
     } catch (err) {
       const retryable = isRetryable(err);
+      const willRetry = retryable && job.attemptCount < job.maxAttempts;
       await db.transaction(async (tx) => {
         await tx
           .update(providerEventsTable)
-          .set({ status: retryable ? 'failed' : 'needs_attention' })
-          .where(eventWhere);
+          .set({ status: willRetry ? 'failed' : 'needs_attention' })
+          .where(
+            and(
+              eventWhere,
+              inArray(providerEventsTable.status, ['pending', 'processing', 'failed']),
+            ),
+          );
         await tx.insert(eventProcessingAttemptsTable).values({
           ...base,
           endedAt: new Date(),

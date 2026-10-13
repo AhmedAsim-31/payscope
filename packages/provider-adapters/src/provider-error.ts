@@ -24,16 +24,18 @@ export function classifyHttpStatus(status: number): ProviderErrorCategory {
 export class ProviderError extends Error {
   readonly category: ProviderErrorCategory;
   readonly status: number | undefined;
+  readonly reason: string | undefined;
 
   constructor(
     category: ProviderErrorCategory,
     message: string,
-    options: { status?: number; cause?: unknown } = {},
+    options: { status?: number; cause?: unknown; reason?: string } = {},
   ) {
     super(message, { cause: options.cause });
     this.name = 'ProviderError';
     this.category = category;
     this.status = options.status;
+    this.reason = options.reason;
   }
 
   get retryable(): boolean {

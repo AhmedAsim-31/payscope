@@ -56,7 +56,7 @@ const MAPPINGS: Readonly<Record<string, Mapping>> = {
 const REFUND: Mapping = {
   normalizedType: 'payment.refunded',
   objectType: 'payment',
-  entitlements: false,
+  entitlements: true,
 };
 
 const UNSUPPORTED: Mapping = {
@@ -84,7 +84,9 @@ export function normalizeRevenueCatEvent(payload: unknown): NormalizedEvent {
   }
   const { event } = parsed.data;
   if (event.environment !== 'SANDBOX') {
-    throw new ProviderError('invalid_input', 'RevenueCat adapter is sandbox-only');
+    throw new ProviderError('invalid_input', 'RevenueCat adapter is sandbox-only', {
+      reason: 'live_mode',
+    });
   }
   const mapping = mappingFor(event.type, event.cancel_reason);
   const currency = currencyOf(event.currency);
@@ -96,6 +98,7 @@ export function normalizeRevenueCatEvent(payload: unknown): NormalizedEvent {
     if (amountMinor === null) metadata['priceRaw'] = String(price);
     else if (mapping === REFUND && amountMinor < 0n) amountMinor = -amountMinor;
   }
+  if (event.expiration_at_ms != null) metadata['expirationAtMs'] = event.expiration_at_ms;
   for (const key of ['store', 'product_id', 'period_type', 'cancel_reason', 'expiration_reason']) {
     const value = event[key];
     if (typeof value === 'string') metadata[key] = value;

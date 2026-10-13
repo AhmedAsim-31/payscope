@@ -151,6 +151,7 @@ export const entitlementRecordsTable = pgTable(
     expiresAt: timestamp('expires_at', { withTimezone: true }),
     revokedAt: timestamp('revoked_at', { withTimezone: true }),
     reconciliationStatus: text('reconciliation_status'),
+    lastEventAt: timestamp('last_event_at', { withTimezone: true }),
     version: integer('version').notNull().default(0),
     ...timestamps(),
   },
