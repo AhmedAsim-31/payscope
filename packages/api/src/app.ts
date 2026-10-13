@@ -14,6 +14,8 @@ import type { TokenVerifier } from './auth/token-verifier';
 import { connectionRoutes } from './connections/connection-routes';
 import type { CredentialsCipher } from './crypto/credentials-cipher';
 import type { Db } from './db/client';
+import { tickRoutes } from './jobs/tick-routes';
+import type { Worker } from './jobs/worker';
 import { identityRoutes } from './orgs/identity-routes';
 import { createDefaultAdapterRegistry } from './providers/adapter-registry';
 import { webhookRoutes } from './webhooks/webhook-routes';
@@ -29,6 +31,8 @@ export type BuildAppOptions = {
   db?: Db;
   credentialsCipher?: CredentialsCipher;
   adapters?: AdapterRegistry;
+  worker?: Worker;
+  internalTickToken?: string;
 };
 
 const BODY_LIMIT_BYTES = 1024 * 1024;
@@ -90,6 +94,9 @@ export async function buildApp(opts: BuildAppOptions = {}) {
       cipher: opts.credentialsCipher,
       adapters: opts.adapters ?? createDefaultAdapterRegistry(),
     });
+  }
+  if (opts.worker && opts.internalTickToken) {
+    await app.register(tickRoutes, { worker: opts.worker, token: opts.internalTickToken });
   }
 
   return app;

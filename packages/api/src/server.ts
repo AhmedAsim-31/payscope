@@ -4,10 +4,23 @@ import { createTokenVerifier } from './auth/token-verifier';
 import { loadConfig } from './config';
 import { createCredentialsCipher } from './crypto/credentials-cipher';
 import { createDb } from './db/client';
+import { createDefaultHandlers } from './jobs/default-handlers';
+import { createJsonLogger } from './jobs/json-logger';
+import { createWorker } from './jobs/worker';
+import { createDefaultAdapterRegistry } from './providers/adapter-registry';
 
 const config = loadConfig();
 const { db, sql } = createDb(config.databaseUrl, { max: config.dbPoolMax });
+const adapters = createDefaultAdapterRegistry();
+const worker = createWorker({
+  db,
+  handlers: createDefaultHandlers(adapters),
+  logger: createJsonLogger(),
+});
 const app = await buildApp({
+  adapters,
+  worker,
+  internalTickToken: config.internalTickToken,
   corsOrigins: config.corsOrigins,
   logLevel: config.logLevel,
   trustProxy: config.trustProxy,
@@ -37,8 +50,9 @@ if (!config.credentialsKey) {
 for (const signal of ['SIGINT', 'SIGTERM'] as const) {
   process.once(signal, () => {
     app.log.info({ signal }, 'shutting down');
-    app
-      .close()
+    worker
+      .stop()
+      .then(() => app.close())
       .then(() => sql.end())
       .then(
         () => process.exit(0),
@@ -51,6 +65,7 @@ for (const signal of ['SIGINT', 'SIGTERM'] as const) {
 }
 
 try {
+  if (config.runWorkerInProcess) worker.start();
   await app.listen({ port: config.port, host: config.host });
 } catch (err) {
   app.log.error({ err }, 'failed to start');
