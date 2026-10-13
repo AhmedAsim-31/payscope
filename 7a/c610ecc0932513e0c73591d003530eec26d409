@@ -1,0 +1,48 @@
+.env.example
+  h_78e539a96187c3 30-32
+docs/security.md
+  h_78e539a96187c3 18-78
+packages/api/package.json
+  h_78e539a96187c3 16-17
+packages/api/src/app.ts
+  h_78e539a96187c3 11,41,52,93-104
+packages/api/src/config.test.ts
+  h_78e539a96187c3 24-25,103-121
+packages/api/src/config.ts
+  h_78e539a96187c3 2,26-32,47-57,77-78,113-116
+packages/api/src/crypto/credentials-cipher.test.ts
+  h_78e539a96187c3 6,56-94
+packages/api/src/crypto/credentials-cipher.ts
+  h_78e539a96187c3 4-5,29-53,55-60,69,74,77-79,86
+packages/api/src/crypto/rotate-cli.ts
+  h_78e539a96187c3 1-23
+packages/api/src/crypto/rotate-credentials.integration.test.ts
+  h_78e539a96187c3 1-54
+packages/api/src/crypto/rotate-credentials.ts
+  h_78e539a96187c3 1-52
+packages/api/src/security/api-hardening.test.ts
+  h_78e539a96187c3 1-115
+packages/api/src/security/api-hardening.ts
+  h_78e539a96187c3 1-48
+packages/api/src/security/log-redaction.integration.test.ts
+  h_78e539a96187c3 1-104
+packages/api/src/server.ts
+  h_78e539a96187c3 27,39-42
+packages/api/src/webhooks/webhook-replay.integration.test.ts
+  h_78e539a96187c3 1-114
+packages/api/src/worker-main.ts
+  h_78e539a96187c3 16-21
+packages/provider-adapters/src/ssrf-base-url.test.ts
+  h_78e539a96187c3 1-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7ac610ecc0932513e0c73591d003530eec26d409",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
