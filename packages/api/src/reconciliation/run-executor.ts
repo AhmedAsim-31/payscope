@@ -5,6 +5,7 @@ import type { Db } from '../db/client';
 import { providerConnectionsTable } from '../db/schema/providers';
 import { paymentRecordsTable as pay, subscriptionRecordsTable as sub } from '../db/schema/records';
 import { LOCAL_RULES } from './local-rules';
+import { findMissingLocally, listPage, listWindowFor } from './provider-listing';
 import {
   checkBatch,
   resolveProviderTarget,
@@ -44,6 +45,9 @@ export type ExecutorDeps = {
 };
 
 type RunRef = { id: string; orgId: string; connectionId: string | null };
+
+// Stored as the cursor once the last page commits so a resumed run does not relist.
+const LISTING_DONE = 'listing_done';
 type PhaseEnd = 'done' | Outcome;
 
 async function runLocalPhase(
@@ -135,6 +139,37 @@ async function runProviderPhase(
   }
 }
 
+async function runListingPhase(
+  deps: ExecutorDeps,
+  run: RunRef & { connectionId: string },
+  target: ProviderTarget,
+  startedAt: Date,
+  state: Checkpoint,
+): Promise<PhaseEnd> {
+  const { db, options } = deps;
+  const window = listWindowFor(startedAt);
+  const empty = { examined: 0, matched: 0, mismatched: 0, unavailable: 0, failed: 0 };
+  while (state.after !== LISTING_DONE) {
+    if (state.requests >= options.requestCap) {
+      return { status: 'partial', error: 'request_cap_reached' };
+    }
+    const listed = await listPage(target, window, state.after);
+    state.requests += 1;
+    if (listed.kind !== 'ok') {
+      state.after = LISTING_DONE;
+      const delta = { ...empty, [listed.kind === 'unavailable' ? 'unavailable' : 'failed']: 1 };
+      await commitBatch(db, run, [], delta, state);
+      if (listed.kind === 'auth') return { status: 'partial', error: 'provider_auth_failed' };
+      return 'done';
+    }
+    const { drafts, delta } = await findMissingLocally(db, run, window, listed.page);
+    state.after = listed.page.nextCursor ?? LISTING_DONE;
+    await commitBatch(db, run, drafts, delta, state);
+    await options.onBatchCommitted?.();
+  }
+  return 'done';
+}
+
 async function resolveTarget(deps: ExecutorDeps, run: RunRef) {
   if (!run.connectionId) return { ok: false, reason: 'connection_required' } as const;
   const [connection] = await deps.db
@@ -190,6 +225,13 @@ export async function executeRun(deps: ExecutorDeps, orgId: string, runId: strin
           go: (s) => runProviderPhase(deps, ref, target, kind, s),
         });
       }
+    }
+    const { connectionId } = ref;
+    if (target.adapter.listPayments && connectionId) {
+      phases.push({
+        name: 'provider_payment_listing',
+        go: (s) => runListingPhase(deps, { ...ref, connectionId }, target, run.startedAt, s),
+      });
     }
   }
 

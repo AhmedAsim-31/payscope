@@ -5,6 +5,7 @@ import { paymentRecordsTable, subscriptionRecordsTable } from '../db/schema/reco
 export type ProviderOverride = { down: true } | { status: string };
 
 const PATH = /\/v1\/(payment_intents|subscriptions)\/([^/?]+)/;
+const LIST_PATH = /\/v1\/payment_intents\?/;
 
 const json = (body: object, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
@@ -12,7 +13,10 @@ const json = (body: object, status = 200) =>
 /** A provider that mirrors local state, except where the scenario overrides it. */
 export function createMirrorFetch(db: Db, overrides: Map<string, ProviderOverride>): typeof fetch {
   return async (input) => {
-    const match = PATH.exec(input instanceof Request ? input.url : input.toString());
+    const url = input instanceof Request ? input.url : input.toString();
+    // A mirror holds only local payments, so its listing can never surface one missing locally.
+    if (LIST_PATH.test(url)) return json({ object: 'list', data: [], has_more: false });
+    const match = PATH.exec(url);
     if (!match?.[1] || !match[2]) return json({}, 404);
     const [, kind, id] = match;
     const override = overrides.get(id);

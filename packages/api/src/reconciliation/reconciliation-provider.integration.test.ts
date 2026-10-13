@@ -13,9 +13,11 @@ import { createHarness, TEST_CREDENTIALS_KEY, type TestUser } from '../test/iden
 import {
   addPayment,
   createFakeAdapter,
+  LIST_BEHAVIOR_KEY,
   reconJob,
   seedConnection,
   type FakeBehavior,
+  type FakeListed,
   type Org,
 } from '../test/reconciliation-fixtures';
 
@@ -32,6 +34,8 @@ const registry = createAdapterRegistry([
       current.adapter.fetchPayment?.(ctx, id) ?? Promise.reject(new Error('unset')),
     fetchSubscription: (ctx, id) =>
       current.adapter.fetchSubscription?.(ctx, id) ?? Promise.reject(new Error('unset')),
+    listPayments: (ctx, window, cursor) =>
+      current.adapter.listPayments?.(ctx, window, cursor) ?? Promise.reject(new Error('unset')),
   },
 ]);
 
@@ -54,9 +58,9 @@ async function newOrg(): Promise<Org> {
   return seedConnection(sql, res.json<{ id: string }>().id);
 }
 
-function useFake(onCall?: (id: string) => Promise<void> | void) {
+function useFake(onCall?: (id: string) => Promise<void> | void, listed: FakeListed[][] = []) {
   behaviors.clear();
-  current = createFakeAdapter(behaviors, onCall);
+  current = createFakeAdapter(behaviors, onCall, listed);
   return current;
 }
 
@@ -189,8 +193,73 @@ describe('provider-mode reconciliation', () => {
     for (let i = 0; i < 3; i++) await addPayment(sql, o, {});
     const runId = await startProviderRun(o);
     await execute(o, runId, { batchSize: 2 });
-    expect(openTransactions).toHaveLength(3);
+    expect(openTransactions).toHaveLength(4);
     expect(openTransactions.every((n) => n === 0)).toBe(true);
+  });
+
+  it('flags listed provider payments with no local record on the same org and connection', async () => {
+    const o = await newOrg();
+    const sibling = await seedConnection(sql, o.orgId);
+    const otherOrg = await newOrg();
+    const known = await addPayment(sql, o, { status: 'succeeded' });
+    const onSibling = await addPayment(sql, sibling, {});
+    const onOtherOrg = await addPayment(sql, otherOrg, {});
+    const orphan = 'pi_orphan_' + randomUUID();
+    const fake = useFake(undefined, [
+      [{ id: known.providerId }, { id: orphan, amountMinor: 4200n }],
+      [{ id: onSibling.providerId }, { id: onOtherOrg.providerId }],
+    ]);
+    behaviors.set(known.providerId, { kind: 'ok', status: 'succeeded' });
+
+    const runId = await startProviderRun(o);
+    await execute(o, runId);
+    const rerunId = await startProviderRun(o);
+    await execute(o, rerunId);
+
+    const run = await getRun(o, rerunId);
+    expect(run.status).toBe('completed');
+    expect(run.counts).toMatchObject({ examined: 5, matched: 2, mismatched: 3 });
+    const [started] = await sql<{ endsBeforeStart: boolean }[]>`
+      select ${fake.listWindows.at(-1)?.to.toISOString() ?? null}::timestamptz < started_at as "endsBeforeStart"
+      from reconciliation_runs where id = ${rerunId}`;
+    expect(started?.endsBeforeStart).toBe(true);
+    const rows = await sql<
+      {
+        subjectType: string;
+        subjectId: string;
+        severity: string;
+        evidence: { providerPaymentId: string; provider: { amountMinor: string | null } };
+        lastSeenRunId: string;
+      }[]
+    >`
+      select subject_type as "subjectType", subject_id as "subjectId", severity, evidence,
+        last_seen_run_id as "lastSeenRunId"
+      from reconciliation_findings
+      where org_id = ${o.orgId} and type = 'provider_payment_missing_locally'`;
+    expect(rows.map((r) => r.evidence.providerPaymentId).sort()).toEqual(
+      [orphan, onSibling.providerId, onOtherOrg.providerId].sort(),
+    );
+    expect(
+      rows.every((r) => r.subjectType === 'connection' && r.subjectId === o.connectionId),
+    ).toBe(true);
+    expect(rows.every((r) => r.severity === 'high' && r.lastSeenRunId === rerunId)).toBe(true);
+    expect(
+      rows.find((r) => r.evidence.providerPaymentId === orphan)?.evidence.provider.amountMinor,
+    ).toBe('4200');
+  });
+
+  it('never reports payments missing when the provider listing is unavailable', async () => {
+    useFake(undefined, [[{ id: 'pi_never_' + randomUUID() }]]);
+    behaviors.set(LIST_BEHAVIOR_KEY, { kind: 'error', category: 'unavailable' });
+    const o = await newOrg();
+    const runId = await startProviderRun(o);
+    await execute(o, runId);
+    const run = await getRun(o, runId);
+    expect(run.status).toBe('partial');
+    expect(run.counts).toMatchObject({ unavailable: 1, mismatched: 0 });
+    expect(
+      (await findings(o)).filter((f) => f.type === 'provider_payment_missing_locally'),
+    ).toEqual([]);
   });
 
   it('enqueues the run job under the run idempotency key', async () => {

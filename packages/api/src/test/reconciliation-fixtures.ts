@@ -2,7 +2,10 @@ import { randomUUID } from 'node:crypto';
 import type postgres from 'postgres';
 import type { ProviderAdapter } from '@payscope/provider-adapters/adapter';
 import { ProviderError } from '@payscope/provider-adapters/provider-error';
-import type { ProviderObjectSnapshot } from '@payscope/provider-adapters/provider-object';
+import type {
+  ListWindow,
+  ProviderObjectSnapshot,
+} from '@payscope/provider-adapters/provider-object';
 import { createCredentialsCipher } from '../crypto/credentials-cipher';
 import type { Job } from '../jobs/job-queue';
 import { RUN_RECONCILIATION_JOB_KIND } from '../jobs/handlers/run-reconciliation';
@@ -118,25 +121,47 @@ export type FakeBehavior =
   | { kind: 'ok'; status: string; amountMinor?: bigint }
   | { kind: 'error'; category: ConstructorParameters<typeof ProviderError>[0] };
 
+export type FakeListed = { id: string; status?: string; amountMinor?: bigint };
+
+export const LIST_BEHAVIOR_KEY = '__list__';
+
+function snapshot(id: string, status: string, amountMinor?: bigint): ProviderObjectSnapshot {
+  return {
+    provider: 'stripe',
+    objectId: id,
+    status,
+    amountMinor: amountMinor ?? null,
+    currency: null,
+    fetchedAt: new Date(),
+    raw: {},
+  };
+}
+
 export function createFakeAdapter(
   behaviors: Map<string, FakeBehavior>,
   onCall: (id: string) => Promise<void> | void = () => undefined,
+  listed: FakeListed[][] = [],
 ) {
   const calls: string[] = [];
+  const listWindows: ListWindow[] = [];
   async function fetchObject(_ctx: unknown, id: string): Promise<ProviderObjectSnapshot> {
     calls.push(id);
     await onCall(id);
     const b = behaviors.get(id);
     if (!b) throw new ProviderError('not_found', 'missing');
     if (b.kind === 'error') throw new ProviderError(b.category, 'fake failure');
+    return snapshot(id, b.status, b.amountMinor);
+  }
+  async function listPayments(_ctx: unknown, window: ListWindow, cursor: string | null) {
+    listWindows.push(window);
+    await onCall(LIST_BEHAVIOR_KEY);
+    const b = behaviors.get(LIST_BEHAVIOR_KEY);
+    if (b?.kind === 'error') throw new ProviderError(b.category, 'fake failure');
+    const index = cursor ? Number(cursor) : 0;
+    const page = listed[index] ?? [];
     return {
-      provider: 'stripe',
-      objectId: id,
-      status: b.status,
-      amountMinor: b.amountMinor ?? null,
-      currency: null,
-      fetchedAt: new Date(),
-      raw: {},
+      items: page.map((p) => snapshot(p.id, p.status ?? 'succeeded', p.amountMinor)),
+      nextCursor: index + 1 < listed.length ? String(index + 1) : null,
     };
   }
   const adapter: ProviderAdapter = {
@@ -155,6 +180,7 @@ export function createFakeAdapter(
     },
     fetchPayment: fetchObject,
     fetchSubscription: fetchObject,
+    listPayments,
   };
-  return { adapter, calls };
+  return { adapter, calls, listWindows };
 }
