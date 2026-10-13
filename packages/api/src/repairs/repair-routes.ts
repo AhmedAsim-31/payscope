@@ -15,8 +15,9 @@ import { requireOrg } from '../orgs/require-org';
 import { runRepair } from './idempotent-repair';
 import { correctEntitlement, reprocessEvent, resolveFinding } from './repair-actions';
 import {
-  applyPaymentRefresh,
+  applyRefresh,
   planPaymentRefresh,
+  planSubscriptionRefresh,
   type ProviderDeps,
 } from './refresh-from-provider';
 
@@ -141,28 +142,30 @@ export const repairRoutes: FastifyPluginCallbackZod<{ db: Db } & ProviderDeps> =
       },
     },
     async (request) => {
-      const { paymentId, reason } = request.body;
-      const orgId = currentOrg(request).id;
+      const { body } = request;
+      const ctx = context(request);
+      const [targetType, targetId, plan] =
+        'paymentId' in body
+          ? (['payment', body.paymentId, planPaymentRefresh] as const)
+          : (['subscription', body.subscriptionId, planSubscriptionRefresh] as const);
       // The provider read happens outside the transaction; the write re-checks the version it saw.
-      const plan = await planPaymentRefresh(db, providers, orgId, paymentId).catch(
-        (err: unknown) => {
-          if (err instanceof ApiHttpError) return err;
-          throw err;
-        },
-      );
+      const planned = await plan(db, providers, ctx.orgId, targetId).catch((err: unknown) => {
+        if (err instanceof ApiHttpError) return err;
+        throw err;
+      });
       return runRepair(
         db,
         {
-          ...context(request),
+          ...ctx,
           action: 'refresh_from_provider',
-          targetType: 'payment',
-          targetId: paymentId,
-          reason,
-          body: request.body,
+          targetType,
+          targetId,
+          reason: body.reason,
+          body,
         },
         async (tx) => {
-          if (plan instanceof ApiHttpError) throw plan;
-          return applyPaymentRefresh(tx, orgId, plan);
+          if (planned instanceof ApiHttpError) throw planned;
+          return applyRefresh(tx, { ...ctx, reason: body.reason }, planned);
         },
       );
     },

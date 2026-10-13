@@ -16,10 +16,10 @@ export const repairHeadersSchema = z.object({
 export const reprocessEventBodySchema = z.object({ eventId: z.uuid(), reason: reasonSchema });
 export const correctEntitlementBodySchema = z.object({ findingId: z.uuid(), reason: reasonSchema });
 export const resolveFindingBodySchema = z.object({ findingId: z.uuid(), reason: reasonSchema });
-export const refreshFromProviderBodySchema = z.object({
-  paymentId: z.uuid(),
-  reason: reasonSchema,
-});
+export const refreshFromProviderBodySchema = z.union([
+  z.strictObject({ paymentId: z.uuid(), reason: reasonSchema }),
+  z.strictObject({ subscriptionId: z.uuid(), reason: reasonSchema }),
+]);
 
 export const repairResultSchema = z.object({
   action: z.enum([
