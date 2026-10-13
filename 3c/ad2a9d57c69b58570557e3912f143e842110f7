@@ -1,0 +1,24 @@
+packages/api/src/records/payments-repo.ts
+  h_78e539a96187c3 105-116,138
+packages/api/src/records/records.integration.test.ts
+  h_78e539a96187c3 328-342
+packages/shared/src/records-schemas.ts
+  h_78e539a96187c3 74
+packages/web/src/components/records/entitlement-detail.tsx
+  h_78e539a96187c3 4-5,7-16,18,93-130
+packages/web/src/components/records/payment-detail.tsx
+  h_78e539a96187c3 5,16,60-71,113-127
+packages/web/src/components/records/record-detail-related.test.tsx
+  h_78e539a96187c3 7,24,115-121,136-189
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3cad2a9d57c69b58570557e3912f143e842110f7",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
