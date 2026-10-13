@@ -7,7 +7,8 @@ import {
   type ExecutorOptions,
 } from '../../reconciliation/run-executor';
 import { finishRun } from '../../reconciliation/run-store';
-import { PermanentJobError, isRetryable, sanitizeError } from '../job-errors';
+import { PermanentJobError } from '../permanent-job-error';
+import { isRetryable, sanitizeError } from '../job-errors';
 import type { JobHandler } from '../worker';
 
 export const RUN_RECONCILIATION_JOB_KIND = 'run_reconciliation';

@@ -5,7 +5,8 @@ import type { AdapterRegistry } from '@payscope/provider-adapters/registry';
 import { applyEvent, type ApplyResult } from '../../events/apply-event';
 import { eventProcessingAttemptsTable, providerEventsTable } from '../../db/schema/events';
 import { findAdapter } from '../../providers/adapter-registry';
-import { PermanentJobError, isRetryable, sanitizeError } from '../job-errors';
+import { PermanentJobError } from '../permanent-job-error';
+import { isRetryable, sanitizeError } from '../job-errors';
 import type { JobHandler } from '../worker';
 
 type FailureCategory = typeof eventProcessingAttemptsTable.$inferInsert.failureCategory;

@@ -6,7 +6,8 @@ import { createLab } from '../../scenarios/lab';
 import { RUN_SCENARIO_JOB_KIND } from '../../scenarios/scenario-job';
 import { SCENARIO_IMPLEMENTATIONS } from '../../scenarios/scenario-registry';
 import { finishScenarioRun, getScenarioRun } from '../../scenarios/scenario-run-repo';
-import { PermanentJobError, sanitizeError } from '../job-errors';
+import { PermanentJobError } from '../permanent-job-error';
+import { sanitizeError } from '../job-errors';
 import type { JobHandler } from '../worker';
 
 export { RUN_SCENARIO_JOB_KIND };

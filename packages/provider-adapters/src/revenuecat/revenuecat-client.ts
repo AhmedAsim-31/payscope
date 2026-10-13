@@ -103,7 +103,7 @@ export async function fetchRevenueCatSubscription(
   };
 }
 
-/** Offerings read: unlike GET /v1/subscribers/{id}, it does not create the customer it is asked about. */
+/** Offerings read: documented without the create-if-missing behavior of GET /v1/subscribers/{id}, though not promised side-effect free. */
 export async function validateRevenueCatCredentials(ctx: ProviderContext): Promise<void> {
   await getJson(ctx, CREDENTIAL_CHECK_USER_ID, '/offerings');
 }
