@@ -1,0 +1,52 @@
+docs/backend-performance.md
+  h_78e539a96187c3 1-60
+packages/api/package.json
+  h_78e539a96187c3 20
+packages/api/src/app.ts
+  h_78e539a96187c3 17-19,39,86-89
+packages/api/src/auth/me-routes.ts
+  h_78e539a96187c3 9-12
+packages/api/src/config.test.ts
+  h_78e539a96187c3 3,25,29-36
+packages/api/src/config.ts
+  h_78e539a96187c3 3,61,66-69,95
+packages/api/src/connections/connection-routes.ts
+  h_78e539a96187c3 60,67,149
+packages/api/src/db/schema/rate-limits.ts
+  h_78e539a96187c3 1-7
+packages/api/src/jobs/tick-routes.ts
+  h_78e539a96187c3 12
+packages/api/src/orgs/identity-routes.ts
+  h_78e539a96187c3 10
+packages/api/src/rate-limit/pg-rate-limit-store.ts
+  h_78e539a96187c3 1-80
+packages/api/src/rate-limit/policies.test.ts
+  h_78e539a96187c3 1-113
+packages/api/src/rate-limit/policies.ts
+  h_78e539a96187c3 1-85
+packages/api/src/rate-limit/rate-limit-plugin.ts
+  h_78e539a96187c3 1-65
+packages/api/src/rate-limit/rate-limit.integration.test.ts
+  h_78e539a96187c3 1-229
+packages/api/src/server.ts
+  h_78e539a96187c3 27
+packages/api/src/webhooks/webhook-routes.ts
+  h_78e539a96187c3 57
+supabase/migrations/20261013013643_rate_limits.sql
+  h_78e539a96187c3 1-7
+supabase/migrations/meta/20261013013643_snapshot.json
+  h_78e539a96187c3 1-1966
+supabase/migrations/meta/_journal.json
+  h_78e539a96187c3 39-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2bb39913107c7f7d9a45f429434af1822694eb41",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
