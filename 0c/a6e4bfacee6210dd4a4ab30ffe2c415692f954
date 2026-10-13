@@ -1,0 +1,50 @@
+docs/architecture.md
+  h_78e539a96187c3 115-120
+docs/database.md
+  h_78e539a96187c3 60
+packages/api/src/connections/connection-routes.ts
+  h_78e539a96187c3 17,34-44,57,159,166,183,191-199,203-209
+packages/api/src/connections/connection-view.ts
+  h_78e539a96187c3 5,17,32,52
+packages/api/src/connections/connections.integration.test.ts
+  h_78e539a96187c3 107-132
+packages/api/src/connections/entitlement-map.ts
+  h_78e539a96187c3 1-14
+packages/api/src/db/schema/providers.ts
+  h_78e539a96187c3 43
+packages/api/src/events/apply-event.ts
+  h_78e539a96187c3 6,25-29
+packages/api/src/events/derived-entitlements.integration.test.ts
+  h_78e539a96187c3 1-137
+packages/api/src/events/derived-entitlements.ts
+  h_78e539a96187c3 1-54
+packages/api/src/events/entitlements.ts
+  h_78e539a96187c3 3,16-29,34,41,43-44,58,61,70-90
+packages/provider-adapters/src/paddle/paddle-normalize.test.ts
+  h_78e539a96187c3 161-166
+packages/provider-adapters/src/paddle/paddle-normalize.ts
+  h_78e539a96187c3 35-37,143-148
+packages/provider-adapters/src/stripe/stripe-normalize.test.ts
+  h_78e539a96187c3 165-169
+packages/provider-adapters/src/stripe/stripe-normalize.ts
+  h_78e539a96187c3 55-62,164
+supabase/migrations/20261013014525_connection_entitlement_map.sql
+  h_78e539a96187c3 1
+supabase/migrations/20261013014525_connection_entitlement_map_grant.sql
+  h_78e539a96187c3 1
+supabase/migrations/meta/20261013014525_snapshot.json
+  h_78e539a96187c3 1-1948
+supabase/migrations/meta/_journal.json
+  h_78e539a96187c3 46-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0ca6e4bfacee6210dd4a4ab30ffe2c415692f954",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
