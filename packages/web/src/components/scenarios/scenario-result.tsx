@@ -76,8 +76,8 @@ export function ScenarioResult({ orgId, run }: { orgId: string; run: ScenarioRun
       {evidence ? (
         <div className="grid gap-1">
           <p className="font-medium">Evidence</p>
-          {evidence.http.map((h) => (
-            <p key={h.request} className="text-muted-foreground font-mono text-xs">
+          {evidence.http.map((h, i) => (
+            <p key={`${i}-${h.request}`} className="text-muted-foreground font-mono text-xs">
               {h.request} returned {h.status}
               {h.code ? ` ${h.code}` : ''}
             </p>

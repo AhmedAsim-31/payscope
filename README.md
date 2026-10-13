@@ -18,6 +18,25 @@ The provider adapters are written against official docs but not verified against
 - Multi-tenant orgs with OWNER, ADMIN, OPERATOR, and VIEWER roles.
 - A scenario lab with 17 repeatable simulations on the real pipeline (see [docs/demo.md](docs/demo.md)).
 
+See [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) for what is real, simulated, planned, or blocked.
+
+## Screenshots
+
+Captured from the running app on seeded demo data by the Playwright visual sweep.
+
+| Overview                                                   | Overview, dark                                                     |
+| ---------------------------------------------------------- | ------------------------------------------------------------------ |
+| ![Overview](docs/screenshots/overview-light-1280.png)      | ![Overview in dark mode](docs/screenshots/overview-dark-1280.png)  |
+| Payments                                                   | Events                                                             |
+| ![Payments](docs/screenshots/payments-light-1280.png)      | ![Event inbox](docs/screenshots/events-light-1280.png)             |
+| Scenario lab                                               | Payments, mobile                                                   |
+| ![Scenario lab](docs/screenshots/scenarios-light-1280.png) | ![Payments at 375 pixels](docs/screenshots/payments-light-375.png) |
+
+## Demo
+
+[docs/demo-script.md](docs/demo-script.md) is a five-minute walkthrough of the guided case and the scenario lab.
+Reset the local demo before each run with `pnpm demo:reset`.
+
 ## Local setup
 
 Needs Node 24 (`.nvmrc`), pnpm 12, and a local PostgreSQL 17 or newer (Homebrew or `docker compose up -d`).
@@ -50,6 +69,7 @@ Their password is not in the repo; see [docs/demo.md](docs/demo.md).
 | ------------------------------------------- | -------------------------------------------------------------- |
 | `pnpm test`                                 | Unit and integration tests (needs `TEST_DATABASE_URL`)         |
 | `pnpm lint`, `pnpm typecheck`, `pnpm build` | Same gates as CI                                               |
+| `pnpm demo:reset`                           | Migrate, then delete and re-seed only the two demo orgs        |
 | `pnpm db:reset-demo`                        | Delete and re-seed only the two demo orgs                      |
 | `pnpm --filter @payscope/api worker`        | Standalone worker (set `RUN_WORKER_IN_PROCESS=false`)          |
 | `pnpm e2e`                                  | Playwright suite, see [docs/operations.md](docs/operations.md) |
@@ -59,7 +79,7 @@ Their password is not in the repo; see [docs/demo.md](docs/demo.md).
 - [docs/architecture.md](docs/architecture.md): packages, request and worker flow, tenancy, money.
 - [docs/api.md](docs/api.md): routes, auth, errors.
 - [docs/deployment.md](docs/deployment.md): hosting plan, env vars, what is not configured yet.
-- [docs/database.md](docs/database.md), [docs/security.md](docs/security.md), [docs/backend-performance.md](docs/backend-performance.md), [docs/operations.md](docs/operations.md), [docs/demo.md](docs/demo.md), [docs/provider-research.md](docs/provider-research.md).
+- [docs/database.md](docs/database.md), [docs/security.md](docs/security.md), [docs/backend-performance.md](docs/backend-performance.md), [docs/operations.md](docs/operations.md), [docs/demo.md](docs/demo.md), [docs/demo-script.md](docs/demo-script.md), [docs/provider-research.md](docs/provider-research.md).
 
 ## Limitations
 

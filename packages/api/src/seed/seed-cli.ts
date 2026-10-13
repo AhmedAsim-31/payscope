@@ -1,5 +1,6 @@
 import { createCredentialsCipher, decodeCredentialsKey } from '../crypto/credentials-cipher';
 import { createDb } from '../db/client';
+import { runMigrations } from '../db/migrate';
 import { runSeed } from './run-seed';
 import { assertSeedAllowed } from './seed-guard';
 
@@ -14,6 +15,7 @@ if (!databaseUrl || !key) {
 const { db, sql } = createDb(databaseUrl, { max: 3 });
 try {
   assertSeedAllowed(databaseUrl, process.env);
+  if (process.argv.includes('--migrate')) await runMigrations(databaseUrl);
   const reset = process.argv.includes('--reset');
   const summary = await runSeed(db, createCredentialsCipher(key), { reset });
   console.log(`demo seed complete${reset ? ' (reset first)' : ''}`);
