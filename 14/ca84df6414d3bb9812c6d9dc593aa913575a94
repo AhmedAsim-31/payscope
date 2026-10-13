@@ -1,0 +1,62 @@
+packages/api/src/jobs/default-handlers.ts
+  h_78e539a96187c3 2,5-8,11-18
+packages/api/src/reconciliation/finding-upsert.ts
+  h_78e539a96187c3 1-53
+packages/api/src/reconciliation/run-executor.ts
+  h_78e539a96187c3 1-212
+  h_78e539a96187c3 213-221
+packages/api/src/reconciliation/reconciliation-routes.ts
+  h_78e539a96187c3 1-205
+packages/api/src/test/reconciliation-fixtures.ts
+  h_78e539a96187c3 1-160
+packages/api/src/reconciliation/local-rules.ts
+  h_78e539a96187c3 1-200
+packages/api/src/jobs/handlers/run-reconciliation.ts
+  h_78e539a96187c3 1-39
+  h_78e539a96187c3 40-43
+packages/api/src/reconciliation/run-store.ts
+  h_78e539a96187c3 1-83
+packages/api/src/db/schema/reconciliation.ts
+  h_78e539a96187c3 1-113
+packages/api/src/reconciliation/reconciliation-repo.ts
+  h_78e539a96187c3 1-145
+packages/api/src/reconciliation/reconciliation-local.integration.test.ts
+  h_78e539a96187c3 1-219
+  h_78e539a96187c3 220-226
+packages/api/src/app.ts
+  h_78e539a96187c3 22,94-98
+packages/shared/src/reconciliation-schemas.ts
+  h_78e539a96187c3 1-99
+packages/api/src/worker-main.ts
+  h_78e539a96187c3 2,14-17
+packages/api/src/reconciliation/provider-checks.ts
+  h_78e539a96187c3 1-185
+  h_78e539a96187c3 186-204
+docs/architecture.md
+  h_78e539a96187c3 148-201
+docs/database.md
+  h_78e539a96187c3 117-128
+packages/api/src/reconciliation/reconciliation-provider.integration.test.ts
+  h_78e539a96187c3 1-204
+supabase/migrations/20261013061128_reconciliation.sql
+  h_78e539a96187c3 1-58
+supabase/migrations/20261013061130_reconciliation_rls.sql
+  h_78e539a96187c3 1-7
+supabase/migrations/meta/20261013061128_snapshot.json
+  h_78e539a96187c3 1-2449
+supabase/migrations/meta/20261013061130_snapshot.json
+  h_78e539a96187c3 1-2449
+supabase/migrations/meta/_journal.json
+  h_78e539a96187c3 60-73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "14ca84df6414d3bb9812c6d9dc593aa913575a94",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
