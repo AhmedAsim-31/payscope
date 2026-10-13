@@ -54,6 +54,7 @@ export const webhookRoutes: FastifyPluginCallbackZod<Options> = (
     '/webhooks/:provider/:connectionId',
     {
       bodyLimit: WEBHOOK_BODY_LIMIT_BYTES,
+      onRequest: app.rateLimitFor('webhookIngress'),
       schema: {
         params,
         response: { 200: z.object({ received: z.literal(true), duplicate: z.boolean() }) },

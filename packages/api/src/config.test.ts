@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { loadConfig } from './config';
+import { DEFAULT_POLICIES } from './rate-limit/policies';
 
 const SUPABASE_URL = 'https://abc.supabase.co';
 const DATABASE_URL = 'postgresql://postgres@localhost:5432/payscope';
@@ -21,7 +22,16 @@ describe('loadConfig', () => {
       databaseUrl: DATABASE_URL,
       dbPoolMax: 10,
       runWorkerInProcess: true,
+      rateLimits: DEFAULT_POLICIES,
     });
+  });
+
+  it('applies rate limit overrides and names bad keys', () => {
+    const config = loadConfig({ ...BASE, RATE_LIMIT_CREDENTIAL_TEST_MAX: '2' });
+    expect(config.rateLimits.credentialTest).toEqual({ max: 2, windowSec: 60 });
+    expect(() => loadConfig({ ...BASE, RATE_LIMIT_SEARCH_WINDOW_SEC: '0' })).toThrow(
+      /RATE_LIMIT_SEARCH_WINDOW_SEC/,
+    );
   });
 
   it('parses overrides', () => {

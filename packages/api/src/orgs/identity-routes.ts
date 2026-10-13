@@ -7,6 +7,7 @@ import { memberRoutes } from './member-routes';
 export const identityRoutes: FastifyPluginCallbackZod<{ db: Db }> = (app, { db }, done) => {
   app.decorateRequest('org', undefined);
   app.addHook('onRequest', app.authenticate);
+  app.addHook('onRequest', app.rateLimitByMethod());
   app.addHook('preHandler', async (request) => {
     if (request.auth) await ensureProfile(db, request.auth);
   });

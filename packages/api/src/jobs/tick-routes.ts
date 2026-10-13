@@ -9,7 +9,7 @@ const digest = (value: string) => createHash('sha256').update(value).digest();
 
 export const tickRoutes: FastifyPluginCallbackZod<Options> = (app, { worker, token }, done) => {
   const expected = digest(token);
-  app.post('/internal/tick', async (request) => {
+  app.post('/internal/tick', { onRequest: app.rateLimitFor('internalTick') }, async (request) => {
     const provided = request.headers['x-internal-token'];
     if (typeof provided !== 'string' || !timingSafeEqual(digest(provided), expected)) {
       throw new ApiHttpError(401, 'UNAUTHORIZED', 'Invalid internal token');

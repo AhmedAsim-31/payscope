@@ -65,13 +65,14 @@ type Options = { db: Db; cipher: CredentialsCipher };
 export const connectionRoutes: FastifyPluginCallbackZod<Options> = (app, { db, cipher }, done) => {
   app.decorateRequest('org', undefined);
   app.addHook('onRequest', app.authenticate);
+  app.addHook('onRequest', app.rateLimitByMethod());
 
   const notFound = () => new ApiHttpError(404, 'NOT_FOUND', 'Connection not found');
 
   app.post(
     '/api/v1/orgs/:orgId/connections',
     {
-      preHandler: requireOrg(db, 'connections:manage'),
+      preHandler: [requireOrg(db, 'connections:manage'), app.rateLimitFor('credentialTest')],
       schema: { params: orgParams, body: createBody, response: { 201: connectionViewSchema } },
     },
     async (request, reply) => {
@@ -153,7 +154,7 @@ export const connectionRoutes: FastifyPluginCallbackZod<Options> = (app, { db, c
   app.patch(
     '/api/v1/orgs/:orgId/connections/:connectionId',
     {
-      preHandler: requireOrg(db, 'connections:manage'),
+      preHandler: [requireOrg(db, 'connections:manage'), app.rateLimitFor('credentialTest')],
       schema: {
         params: connectionParams,
         body: patchBody,
