@@ -1,0 +1,19 @@
+{
+  "id": "WH-SANDBOX-0007",
+  "event_version": "1.0",
+  "create_time": "2026-10-01T10:00:00Z",
+  "resource_type": "subscription",
+  "event_type": "BILLING.SUBSCRIPTION.CREATED",
+  "summary": "Fictional sandbox event BILLING.SUBSCRIPTION.CREATED",
+  "resource": {
+    "id": "I-SANDBOX0000001",
+    "status": "APPROVAL_PENDING",
+    "plan_id": "P-SANDBOXPLAN001",
+    "subscriber": {
+      "payer_id": "PAYERSANDBOX001"
+    },
+    "billing_info": {
+      "next_billing_time": "2026-11-01T10:00:00Z"
+    }
+  }
+}

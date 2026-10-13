@@ -1,0 +1,21 @@
+{
+  "id": "WH-SANDBOX-0001",
+  "event_version": "1.0",
+  "create_time": "2026-10-01T10:00:00Z",
+  "resource_type": "capture",
+  "event_type": "PAYMENT.CAPTURE.COMPLETED",
+  "summary": "Fictional sandbox event PAYMENT.CAPTURE.COMPLETED",
+  "resource": {
+    "id": "5SANDBOXCAPTURE001",
+    "status": "COMPLETED",
+    "amount": {
+      "currency_code": "USD",
+      "value": "24.99"
+    },
+    "supplementary_data": {
+      "related_ids": {
+        "order_id": "7SANDBOXORDER001"
+      }
+    }
+  }
+}

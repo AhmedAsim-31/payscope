@@ -1,0 +1,21 @@
+{
+  "id": "WH-SANDBOX-0005",
+  "event_version": "1.0",
+  "create_time": "2026-10-01T10:00:00Z",
+  "resource_type": "dispute",
+  "event_type": "CUSTOMER.DISPUTE.CREATED",
+  "summary": "Fictional sandbox event CUSTOMER.DISPUTE.CREATED",
+  "resource": {
+    "dispute_id": "PP-D-SANDBOX001",
+    "status": "WAITING_FOR_SELLER_RESPONSE",
+    "dispute_amount": {
+      "currency_code": "USD",
+      "value": "24.99"
+    },
+    "disputed_transactions": [
+      {
+        "seller_transaction_id": "5SANDBOXCAPTURE001"
+      }
+    ]
+  }
+}

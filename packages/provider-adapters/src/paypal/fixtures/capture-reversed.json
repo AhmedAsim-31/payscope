@@ -1,0 +1,23 @@
+{
+  "id": "WH-SANDBOX-0004",
+  "event_version": "1.0",
+  "create_time": "2026-10-01T10:00:00Z",
+  "resource_type": "refund",
+  "event_type": "PAYMENT.CAPTURE.REVERSED",
+  "summary": "Fictional sandbox event PAYMENT.CAPTURE.REVERSED",
+  "resource": {
+    "id": "2SANDBOXREVERSAL01",
+    "status": "COMPLETED",
+    "amount": {
+      "currency_code": "USD",
+      "value": "10.50"
+    },
+    "links": [
+      {
+        "rel": "up",
+        "href": "https://api.sandbox.paypal.com/v2/payments/captures/5SANDBOXCAPTURE001",
+        "method": "GET"
+      }
+    ]
+  }
+}
