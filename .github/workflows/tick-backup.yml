@@ -1,0 +1,32 @@
+name: Tick backup
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: tick-backup
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: POST /internal/tick
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          INTERNAL_TICK_TOKEN: ${{ secrets.INTERNAL_TICK_TOKEN }}
+        run: |
+          if [ -z "$API_BASE_URL" ] || [ -z "$INTERNAL_TICK_TOKEN" ]; then
+            echo "::notice::API_BASE_URL or INTERNAL_TICK_TOKEN secret is unset; skipping tick."
+            exit 0
+          fi
+          # Retries cover the Render Free cold start.
+          curl --fail-with-body --silent --show-error \
+            --max-time 90 --retry 3 --retry-delay 20 --retry-all-errors \
+            -X POST "${API_BASE_URL%/}/internal/tick" \
+            -H "x-internal-token: $INTERNAL_TICK_TOKEN"
