@@ -15,6 +15,7 @@
     "zod": "^4.6.6"
   },
   "devDependencies": {
+    "@paddle/paddle-node-sdk": "^3.10.0",
     "@types/node": "^26.6.5",
     "stripe": "^23.0.0",
     "vitest": "5.0.4"

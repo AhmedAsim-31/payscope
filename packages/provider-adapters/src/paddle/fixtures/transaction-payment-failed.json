@@ -1,0 +1,28 @@
+{
+  "event_id": "evt_01k00000000000000000000005",
+  "event_type": "transaction.payment_failed",
+  "occurred_at": "2026-10-01T10:00:06.123456Z",
+  "notification_id": "ntf_01k00000000000000000000105",
+  "data": {
+    "id": "txn_01k00000000000000000000001",
+    "status": "past_due",
+    "customer_id": "ctm_01k00000000000000000000001",
+    "address_id": "add_01k00000000000000000000001",
+    "subscription_id": null,
+    "origin": "web",
+    "currency_code": "USD",
+    "collection_mode": "automatic",
+    "created_at": "2026-10-01T10:00:00.000000Z",
+    "updated_at": "2026-10-01T10:00:05.000000Z",
+    "details": {
+      "totals": {
+        "subtotal": "2499",
+        "tax": "0",
+        "discount": "0",
+        "total": "2499",
+        "grand_total": "2499",
+        "currency_code": "USD"
+      }
+    }
+  }
+}

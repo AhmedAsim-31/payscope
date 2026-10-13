@@ -1,0 +1,27 @@
+{
+  "event_id": "evt_01k00000000000000000000009",
+  "event_type": "adjustment.created",
+  "occurred_at": "2026-10-03T09:00:01.000000Z",
+  "notification_id": "ntf_01k00000000000000000000109",
+  "data": {
+    "id": "adj_01k00000000000000000000001",
+    "action": "chargeback",
+    "type": "full",
+    "transaction_id": "txn_01k00000000000000000000001",
+    "subscription_id": null,
+    "customer_id": "ctm_01k00000000000000000000001",
+    "reason": "goodwill gesture",
+    "currency_code": "USD",
+    "status": "approved",
+    "totals": {
+      "subtotal": "2499",
+      "tax": "0",
+      "total": "2499",
+      "fee": "0",
+      "earnings": "2499",
+      "currency_code": "USD"
+    },
+    "created_at": "2026-10-02T09:00:00.000000Z",
+    "updated_at": "2026-10-02T09:05:00.000000Z"
+  }
+}
