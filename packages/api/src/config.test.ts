@@ -20,6 +20,7 @@ describe('loadConfig', () => {
       jwtAudience: 'authenticated',
       databaseUrl: DATABASE_URL,
       dbPoolMax: 10,
+      runWorkerInProcess: true,
     });
   });
 
@@ -85,5 +86,18 @@ describe('loadConfig', () => {
     const prod = { ...BASE, NODE_ENV: 'production', CORS_ORIGIN: 'https://a.test' };
     expect(() => loadConfig(prod)).toThrow(/CREDENTIALS_ENCRYPTION_KEY/);
     expect(loadConfig({ ...prod, CREDENTIALS_ENCRYPTION_KEY: key }).credentialsKey).toBeDefined();
+  });
+
+  it('parses worker settings and rejects a short tick token', () => {
+    const config = loadConfig({
+      ...BASE,
+      RUN_WORKER_IN_PROCESS: 'false',
+      INTERNAL_TICK_TOKEN: 'a'.repeat(16),
+    });
+    expect(config.runWorkerInProcess).toBe(false);
+    expect(config.internalTickToken).toBe('a'.repeat(16));
+    expect(() => loadConfig({ ...BASE, INTERNAL_TICK_TOKEN: 'short' })).toThrow(
+      /INTERNAL_TICK_TOKEN/,
+    );
   });
 });

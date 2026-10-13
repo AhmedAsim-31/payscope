@@ -6,7 +6,7 @@ import {
   localKeySet,
   signTestToken,
 } from '@payscope/test-utils/test-jwt';
-import { buildApp } from '../app';
+import { buildApp, type BuildAppOptions } from '../app';
 import { createTokenVerifier } from '../auth/token-verifier';
 import { createCredentialsCipher } from '../crypto/credentials-cipher';
 import { createDb } from '../db/client';
@@ -20,7 +20,7 @@ export function createHarness() {
   const { db, sql } = createDb(TEST_DATABASE_URL, { max: 5 });
   let app: FastifyInstance | undefined;
 
-  async function start() {
+  async function start(extra: BuildAppOptions = {}) {
     app = await buildApp({
       logger: false,
       db,
@@ -30,6 +30,7 @@ export function createHarness() {
         audience: TEST_AUDIENCE,
         keySet: localKeySet,
       }),
+      ...extra,
     });
     return app;
   }

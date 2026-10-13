@@ -22,6 +22,11 @@ const envSchema = z
         error: 'must be base64 that decodes to 32 bytes',
       })
       .optional(),
+    RUN_WORKER_IN_PROCESS: z
+      .enum(['true', 'false'])
+      .default('true')
+      .transform((v) => v === 'true'),
+    INTERNAL_TICK_TOKEN: z.string().min(16).optional(),
     TRUST_PROXY: z
       .enum(['true', 'false'])
       .default('false')
@@ -50,6 +55,8 @@ export type Config = {
   databaseUrl: string;
   dbPoolMax: number;
   credentialsKey: Buffer | undefined;
+  runWorkerInProcess: boolean;
+  internalTickToken: string | undefined;
 };
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
@@ -79,5 +86,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     credentialsKey: e.CREDENTIALS_ENCRYPTION_KEY
       ? decodeCredentialsKey(e.CREDENTIALS_ENCRYPTION_KEY)
       : undefined,
+    runWorkerInProcess: e.RUN_WORKER_IN_PROCESS,
+    internalTickToken: e.INTERNAL_TICK_TOKEN,
   };
 }
