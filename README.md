@@ -44,20 +44,18 @@ Needs Node 24 (`.nvmrc`), pnpm 12, and a local PostgreSQL 17 or newer (Homebrew 
 ```bash
 createdb payscope
 cp .env.example .env.local
-pnpm install && set -a && . ./.env.local && set +a
+pnpm install
 pnpm --filter @payscope/api db:migrate && pnpm db:seed
-pnpm dev --env-mode=loose
+pnpm dev
 ```
 
-Before step 3, edit `.env.local`:
+Before step 4, edit `.env.local`:
 
 - `DATABASE_URL`: on Homebrew Postgres there is no `postgres` role, so use `postgresql://localhost:5432/payscope` (your OS user).
 - `CREDENTIALS_ENCRYPTION_KEY`: generate with `openssl rand -base64 32`; the seed, webhook, and connection routes need it.
 - `SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: a real Supabase project URL and publishable key, since the API refuses to start with the placeholder URL.
 
-The scripts do not load `.env.local` themselves, which is why step 3 exports it into the shell.
-`--env-mode=loose` is required because Turbo's default strict mode strips undeclared variables such as `DATABASE_URL` from the dev tasks.
-Run steps 4 and 5 in the same shell as step 3.
+The API scripts and the web app read the repo-root `.env.local` themselves; variables already set in the shell take precedence.
 
 The web app runs on http://localhost:3000 and the API on http://localhost:3001 (`/health`, `/ready`).
 Signing in uses Supabase Auth, so the four demo users must exist in your Supabase project with the ids in `packages/api/src/seed/seed-identity.ts`.

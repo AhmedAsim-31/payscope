@@ -8,7 +8,22 @@
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "passThroughEnv": [
+        "NODE_ENV",
+        "DATABASE_URL",
+        "DB_POOL_MAX",
+        "SUPABASE_*",
+        "NEXT_PUBLIC_*",
+        "API_*",
+        "CORS_ORIGIN",
+        "LOG_LEVEL",
+        "TRUST_PROXY",
+        "RUN_WORKER_IN_PROCESS",
+        "INTERNAL_TICK_TOKEN",
+        "CREDENTIALS_ENCRYPTION_*",
+        "RATE_LIMIT_*"
+      ]
     },
     "lint": {},
     "typecheck": {},
