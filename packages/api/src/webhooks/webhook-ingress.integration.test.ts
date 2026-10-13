@@ -230,6 +230,15 @@ describe('webhook ingress', () => {
     expect(row?.normalized_type).toBe('unsupported');
   });
 
+  it('rejects live-mode events with 422 and persists nothing', async () => {
+    const before = await counts(stripeConnectionId);
+    const body = JSON.stringify(stripeEvent('livemode-payment-intent-succeeded'));
+    const res = await post('stripe', stripeConnectionId, body, stripeHeaders(body));
+    expect(res.statusCode).toBe(422);
+    expect(res.json()).toMatchObject({ error: { code: 'WEBHOOK_LIVE_MODE_REJECTED' } });
+    expect(await counts(stripeConnectionId)).toEqual(before);
+  });
+
   it('rejects a validly signed non-object payload without persisting', async () => {
     const before = await counts(stripeConnectionId);
     const body = JSON.stringify([1, 2]);

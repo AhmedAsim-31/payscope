@@ -39,6 +39,7 @@ A duplicate delivery writes nothing, enqueues nothing, and still returns 200.
 No event processing runs in the request handler; the worker owns it.
 No external HTTP call happens inside the database transaction.
 Unsupported event types are persisted with `normalized_type` set to `unsupported` so the worker can mark them ignored.
+Live-mode or otherwise invalid-input events get a 422 and persist nothing.
 Logs carry the provider, connection id, and failure reason only; never the body, headers, signature, or secrets.
 
 ## Credentials at rest

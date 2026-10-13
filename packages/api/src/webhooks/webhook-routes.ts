@@ -110,6 +110,16 @@ export const webhookRoutes: FastifyPluginCallbackZod<Options> = (
         );
       }
 
+      let identity;
+      try {
+        identity = identifyEvent(adapter, payload, verification.occurredAt, now);
+      } catch (err) {
+        if (err instanceof ApiHttpError) {
+          request.log.warn({ provider, connectionId, code: err.code }, 'webhook payload rejected');
+        }
+        throw err;
+      }
+
       try {
         return {
           received: true as const,
@@ -119,7 +129,7 @@ export const webhookRoutes: FastifyPluginCallbackZod<Options> = (
             provider,
             providerEventId: verification.providerEventId,
             payload,
-            identity: identifyEvent(adapter, payload, verification.occurredAt, now),
+            identity,
           })),
         };
       } catch (err) {

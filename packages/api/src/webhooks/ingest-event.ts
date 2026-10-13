@@ -1,7 +1,9 @@
 import type { ProviderAdapter } from '@payscope/provider-adapters/adapter';
+import { ProviderError } from '@payscope/provider-adapters/provider-error';
 import type { ProviderName } from '@payscope/provider-adapters/provider-name';
 import type { Db } from '../db/client';
 import { providerEventsTable } from '../db/schema/events';
+import { ApiHttpError } from '../http-error';
 import { backgroundJobsTable } from '../db/schema/jobs';
 
 export const PROCESS_EVENT_JOB_KIND = 'process_provider_event';
@@ -36,13 +38,16 @@ export function identifyEvent(
       occurredAt: validDate(event.occurredAt) ?? verifiedOccurredAt ?? now,
       objectRef: event.objectId,
     };
-  } catch {
-    return {
-      eventType: 'unknown',
-      normalizedType: null,
-      occurredAt: validDate(verifiedOccurredAt) ?? now,
-      objectRef: null,
-    };
+  } catch (err) {
+    if (err instanceof ProviderError && err.category === 'invalid_input') {
+      const liveMode = /live-?mode|production/i.test(err.message);
+      throw new ApiHttpError(
+        422,
+        liveMode ? 'WEBHOOK_LIVE_MODE_REJECTED' : 'WEBHOOK_PAYLOAD_INVALID',
+        liveMode ? 'Live-mode events are not accepted' : 'Webhook payload failed validation',
+      );
+    }
+    throw err;
   }
 }
 
