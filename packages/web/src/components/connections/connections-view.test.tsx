@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Role } from '@payscope/shared/permissions';
@@ -107,6 +107,25 @@ describe('ConnectionsView', () => {
     );
   });
 
+  it('removes a configured credential only after confirmation', async () => {
+    serve('ADMIN');
+    renderWithQuery(<ConnectionsView orgId={ORG_ID} />);
+
+    expect(screen.queryByRole('button', { name: 'Remove API key' })).not.toBeInTheDocument();
+    await userEvent.click(await screen.findByRole('button', { name: 'Remove webhook secret' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(mockedFetch).not.toHaveBeenCalledWith(
+      expect.stringContaining('/credentials/'),
+      expect.anything(),
+    );
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Remove webhook secret' }));
+
+    expect(mockedFetch).toHaveBeenCalledWith(
+      `/api/v1/orgs/${ORG_ID}/connections/${SANDBOX_ID}/credentials/webhookSecret`,
+      expect.objectContaining({ method: 'DELETE' }),
+    );
+  });
+
   it('gives a VIEWER a read-only page', async () => {
     serve('VIEWER');
     renderWithQuery(<ConnectionsView orgId={ORG_ID} />);
@@ -115,5 +134,6 @@ describe('ConnectionsView', () => {
     expect(screen.queryByText('Add a connection')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Test credentials' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Edit credentials' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^Remove/ })).not.toBeInTheDocument();
   });
 });

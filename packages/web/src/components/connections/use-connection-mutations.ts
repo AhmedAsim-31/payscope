@@ -14,6 +14,7 @@ export type CreateConnectionInput = {
 };
 
 export type UpdateCredentialsInput = { webhookSecret?: string; apiKey?: string };
+export type CredentialName = 'webhookSecret' | 'apiKey';
 
 const jsonInit = (method: string, body: unknown): RequestInit => ({
   method,
@@ -44,5 +45,13 @@ export function useConnectionMutations(orgId: string) {
     onSettled: refresh,
   });
 
-  return { create, update, verify };
+  const removeCredential = useMutation({
+    mutationFn: async ({ id, credential }: { id: string; credential: CredentialName }) =>
+      connectionSchema.parse(
+        await apiFetch(`${base}/${id}/credentials/${credential}`, { method: 'DELETE' }),
+      ),
+    onSuccess: refresh,
+  });
+
+  return { create, update, verify, removeCredential };
 }

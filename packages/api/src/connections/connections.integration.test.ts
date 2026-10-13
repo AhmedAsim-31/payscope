@@ -3,6 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 import { createHarness, type TestUser } from '../test/identity-harness';
 import { DEFAULT_POLICIES } from '../rate-limit/policies';
+import { STRIPE_SECRET, stripeEvent, stripeHeaders } from '../test/webhook-fixtures';
 
 const harness = createHarness();
 let app: FastifyInstance;
@@ -175,5 +176,60 @@ describe('connections API', () => {
       headers: stranger.headers,
     });
     expect(cross.statusCode).toBe(404);
+  });
+
+  it('removes stored credentials with an audit entry and fails webhook verification after', async () => {
+    const created = await create(owner, base({ webhookSecrets: [STRIPE_SECRET] }));
+    const id = created.json<{ id: string }>().id;
+    const remove = (user: TestUser, credential: string) =>
+      app.inject({
+        method: 'DELETE',
+        url: `/api/v1/orgs/${orgId}/connections/${id}/credentials/${credential}`,
+        headers: user.headers,
+      });
+    const viewer = await addMember('VIEWER');
+    expect((await remove(viewer, 'apiKey')).statusCode).toBe(403);
+    expect((await remove(owner, 'password')).statusCode).toBe(400);
+
+    await harness.sql`update provider_connections set status = 'active' where id = ${id}`;
+    const apiKey = await remove(owner, 'apiKey');
+    expect(apiKey.statusCode).toBe(200);
+    expect(apiKey.json()).toMatchObject({
+      hasApiKey: false,
+      hasWebhookSecret: true,
+      status: 'unverified',
+    });
+    const secret = await remove(owner, 'webhookSecret');
+    expect(secret.json()).toMatchObject({ hasApiKey: false, hasWebhookSecret: false });
+    const again = await remove(owner, 'webhookSecret');
+    expect(again.statusCode).toBe(200);
+    expect(again.json()).toMatchObject({ hasWebhookSecret: false });
+    for (const body of [apiKey.body, secret.body]) {
+      expect(body).not.toContain('whsec_');
+      expect(body).not.toContain('sk_test_leak_check_1');
+    }
+
+    const body = JSON.stringify(stripeEvent());
+    const hook = await app.inject({
+      method: 'POST',
+      url: `/webhooks/stripe/${id}`,
+      headers: stripeHeaders(body),
+      payload: body,
+    });
+    expect(hook.statusCode).toBe(400);
+    expect(hook.json()).toMatchObject({ error: { code: 'WEBHOOK_SIGNATURE_INVALID' } });
+
+    const audits = await harness.sql<
+      { action: string; outcome: string; previous_state: unknown; resulting_state: unknown }[]
+    >`
+      select action, outcome, previous_state, resulting_state from audit_logs
+      where target_id = ${id} and action = 'connection.credential_remove' order by created_at`;
+    expect(audits.map((a) => a.outcome)).toEqual(['success', 'success', 'success']);
+    expect(audits.map((a) => a.resulting_state)).toEqual([
+      { apiKeyRemoved: true },
+      { webhookSecretRemoved: true },
+      { webhookSecretRemoved: false },
+    ]);
+    expect(JSON.stringify(audits)).not.toContain('whsec_');
   });
 });

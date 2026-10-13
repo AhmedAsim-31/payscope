@@ -15,7 +15,8 @@ export type ErrorContext =
   | 'reset-scenarios'
   | 'create-connection'
   | 'update-connection'
-  | 'verify-connection';
+  | 'verify-connection'
+  | 'remove-credential';
 
 const CONFLICT_MESSAGES: Record<string, string> = {
   SCENARIO_RUNNING: 'A scenario is already running. Wait for it to finish.',
@@ -63,6 +64,7 @@ const CONNECTION_CONTEXTS: readonly ErrorContext[] = [
   'create-connection',
   'update-connection',
   'verify-connection',
+  'remove-credential',
 ];
 
 const FALLBACK = 'Something went wrong. Try again.';
