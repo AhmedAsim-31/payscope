@@ -1,0 +1,24 @@
+.gitignore
+  h_78e539a96187c3 21
+.prettierignore
+  h_78e539a96187c3 13
+docs/architecture.md
+  h_78e539a96187c3 42
+packages/api/src/webhooks/ingest-event.ts
+  h_78e539a96187c3 2,6,41-50
+packages/api/src/webhooks/webhook-ingress.integration.test.ts
+  h_78e539a96187c3 233-241
+packages/api/src/webhooks/webhook-routes.ts
+  h_78e539a96187c3 113-122,132
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e992fd399c7911cf73c294ef349e7aa5260c424b",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
