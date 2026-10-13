@@ -24,6 +24,7 @@ describe('loadConfig', () => {
       credentialsKeyVersion: 1,
       credentialsPreviousKeys: new Map(),
       runWorkerInProcess: true,
+      reconciliationIntervalHours: 24,
       rateLimits: DEFAULT_POLICIES,
     });
   });
@@ -127,6 +128,13 @@ describe('loadConfig', () => {
     });
     expect(config.runWorkerInProcess).toBe(false);
     expect(config.internalTickToken).toBe('a'.repeat(16));
+    expect(
+      loadConfig({ ...BASE, RECONCILIATION_SCHEDULE_INTERVAL_HOURS: '0' })
+        .reconciliationIntervalHours,
+    ).toBe(0);
+    expect(() => loadConfig({ ...BASE, RECONCILIATION_SCHEDULE_INTERVAL_HOURS: '-1' })).toThrow(
+      /RECONCILIATION_SCHEDULE_INTERVAL_HOURS/,
+    );
     expect(() => loadConfig({ ...BASE, INTERNAL_TICK_TOKEN: 'short' })).toThrow(
       /INTERNAL_TICK_TOKEN/,
     );

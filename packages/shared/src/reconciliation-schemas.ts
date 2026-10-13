@@ -3,6 +3,7 @@ import { DEFAULT_PAGE_LIMIT, MAX_PAGE_LIMIT } from './records-schemas';
 
 export const RUN_STATUSES = ['running', 'completed', 'failed', 'partial'] as const;
 export const RUN_MODES = ['local', 'provider'] as const;
+export const RUN_TRIGGERS = ['manual', 'scheduled'] as const;
 export const FINDING_TYPES = [
   'provider_payment_missing_locally',
   'status_mismatch',
@@ -35,6 +36,7 @@ export const runSchema = z.object({
   id: z.uuid(),
   connectionId: z.uuid().nullable(),
   mode: z.enum(RUN_MODES),
+  trigger: z.enum(RUN_TRIGGERS),
   status: z.enum(RUN_STATUSES),
   counts: runCountsSchema,
   error: z.string().nullable(),

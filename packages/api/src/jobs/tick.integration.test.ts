@@ -2,11 +2,12 @@ import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 import { createHarness } from '../test/identity-harness';
+import { seedConnection } from '../test/reconciliation-fixtures';
 import { parkQueuedJobs } from '../test/job-fixtures';
 import { STRIPE_SECRET, stripeEvent, stripeHeaders } from '../test/webhook-fixtures';
 import { createDefaultAdapterRegistry } from '../providers/adapter-registry';
 import { createDefaultHandlers } from './default-handlers';
-import { createWorker } from './worker';
+import { createWorker, type Worker } from './worker';
 
 const TOKEN = 'tick-token-0123456789';
 const silent = { info: () => undefined, warn: () => undefined, error: () => undefined };
@@ -14,15 +15,16 @@ const harness = createHarness();
 let app: FastifyInstance;
 let connectionId: string;
 let orgId: string;
+let worker: Worker;
 
 beforeAll(async () => {
   await parkQueuedJobs(harness.sql);
-  const worker = createWorker({
+  worker = createWorker({
     db: harness.db,
     handlers: createDefaultHandlers(createDefaultAdapterRegistry()),
     logger: silent,
   });
-  app = await harness.start({ worker, internalTickToken: TOKEN });
+  app = await harness.start({ worker, internalTickToken: TOKEN, reconciliationIntervalHours: 0 });
   const owner = await harness.newUser();
   const org = await app.inject({
     method: 'POST',
@@ -124,6 +126,22 @@ describe('POST /internal/tick', () => {
       normalized_type: 'unsupported',
       outcomes: ['skipped'],
     });
+  });
+
+  it('starts a scheduled reconciliation run for an org with an active connection', async () => {
+    await seedConnection(harness.sql, orgId);
+    const scheduling = createHarness();
+    const schedulingApp = await scheduling.start({ worker, internalTickToken: TOKEN });
+    const res = await schedulingApp.inject({
+      method: 'POST',
+      url: '/internal/tick',
+      headers: { 'x-internal-token': TOKEN },
+    });
+    expect(res.json<{ scheduled: number }>().scheduled).toBeGreaterThanOrEqual(1);
+    const runs = await harness.sql<{ trigger: string; triggered_by: string | null }[]>`
+      select trigger, triggered_by from reconciliation_runs where org_id = ${orgId}`;
+    expect(runs).toEqual([{ trigger: 'scheduled', triggered_by: null }]);
+    await scheduling.stop();
   });
 
   it('is not registered when no token is configured', async () => {

@@ -89,25 +89,26 @@ These need the repo owner's accounts; none have been done.
 Names only; values belong in the host's secret store, never in the repo.
 `.env.example` has placeholders and comments for each.
 
-| Variable                               | API | Web | Notes                                             |
-| -------------------------------------- | --- | --- | ------------------------------------------------- |
-| `SUPABASE_URL`                         | yes |     | Required; JWT issuer and JWKS are derived from it |
-| `SUPABASE_JWKS_URL`                    | opt |     | Overrides the derived JWKS URL                    |
-| `NEXT_PUBLIC_SUPABASE_URL`             |     | yes |                                                   |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` |     | yes |                                                   |
-| `DATABASE_URL`                         | yes |     | Supabase pooler string in deployed envs           |
-| `DB_POOL_MAX`                          | opt |     | Default 10                                        |
-| `TEST_DATABASE_URL`                    |     |     | Tests only                                        |
-| `API_PORT`, `API_HOST`                 | opt |     | Defaults 3001 and 0.0.0.0                         |
-| `CORS_ORIGIN`                          | yes |     | Comma-separated; required in production           |
-| `LOG_LEVEL`                            | opt |     | Default `info`                                    |
-| `TRUST_PROXY`                          | opt |     | `true` behind a proxy                             |
-| `RUN_WORKER_IN_PROCESS`                | opt |     | Default `true`                                    |
-| `INTERNAL_TICK_TOKEN`                  | opt |     | Enables `/internal/tick`                          |
-| `NEXT_PUBLIC_API_URL`                  |     | yes | Public API base URL                               |
-| `CREDENTIALS_ENCRYPTION_KEY`           | yes |     | 32-byte base64; required in production            |
-| `CREDENTIALS_ENCRYPTION_KEY_VERSION`   | opt |     | Default 1, see [security.md](security.md)         |
-| `CREDENTIALS_ENCRYPTION_KEYS_PREVIOUS` | opt |     | Retired keys during a rotation                    |
+| Variable                                 | API | Web | Notes                                             |
+| ---------------------------------------- | --- | --- | ------------------------------------------------- |
+| `SUPABASE_URL`                           | yes |     | Required; JWT issuer and JWKS are derived from it |
+| `SUPABASE_JWKS_URL`                      | opt |     | Overrides the derived JWKS URL                    |
+| `NEXT_PUBLIC_SUPABASE_URL`               |     | yes |                                                   |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`   |     | yes |                                                   |
+| `DATABASE_URL`                           | yes |     | Supabase pooler string in deployed envs           |
+| `DB_POOL_MAX`                            | opt |     | Default 10                                        |
+| `TEST_DATABASE_URL`                      |     |     | Tests only                                        |
+| `API_PORT`, `API_HOST`                   | opt |     | Defaults 3001 and 0.0.0.0                         |
+| `CORS_ORIGIN`                            | yes |     | Comma-separated; required in production           |
+| `LOG_LEVEL`                              | opt |     | Default `info`                                    |
+| `TRUST_PROXY`                            | opt |     | `true` behind a proxy                             |
+| `RUN_WORKER_IN_PROCESS`                  | opt |     | Default `true`                                    |
+| `INTERNAL_TICK_TOKEN`                    | opt |     | Enables `/internal/tick`                          |
+| `RECONCILIATION_SCHEDULE_INTERVAL_HOURS` | opt |     | Default 24; `0` turns scheduled runs off          |
+| `NEXT_PUBLIC_API_URL`                    |     | yes | Public API base URL                               |
+| `CREDENTIALS_ENCRYPTION_KEY`             | yes |     | 32-byte base64; required in production            |
+| `CREDENTIALS_ENCRYPTION_KEY_VERSION`     | opt |     | Default 1, see [security.md](security.md)         |
+| `CREDENTIALS_ENCRYPTION_KEYS_PREVIOUS`   | opt |     | Retired keys during a rotation                    |
 
 Provider credentials are stored per connection, encrypted in the database, through the connections API.
 

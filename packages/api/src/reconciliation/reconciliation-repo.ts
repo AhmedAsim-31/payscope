@@ -20,6 +20,7 @@ function toRun(row: RunRow) {
     id: row.id,
     connectionId: row.connectionId,
     mode: row.mode,
+    trigger: row.trigger,
     status: row.status,
     counts: {
       examined: row.examinedCount,

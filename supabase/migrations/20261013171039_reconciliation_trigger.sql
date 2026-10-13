@@ -1,0 +1,2 @@
+CREATE TYPE "public"."reconciliation_trigger" AS ENUM('manual', 'scheduled');--> statement-breakpoint
+ALTER TABLE "reconciliation_runs" ADD COLUMN "trigger" "reconciliation_trigger" DEFAULT 'manual' NOT NULL;
