@@ -1,0 +1,16 @@
+docs/api.md
+  h_78e539a96187c3 78-89,103-107,131-133,143-144,159-169,184,202-210
+docs/architecture.md
+  h_78e539a96187c3 265-266,273-280
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3690890f44d1d6d5cb371fefa0e967cea60fee3e",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
