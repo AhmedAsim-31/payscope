@@ -35,8 +35,8 @@ const CONFLICT_MESSAGES: Record<string, string> = {
     'The provider connection is not verified. Verify its credentials on the connections page first.',
   PROVIDER_NOT_CONFIGURED:
     'This connection cannot read records from the provider. Add sandbox credentials first.',
-  PROVIDER_OBJECT_NOT_FOUND: 'The provider has no record of this payment. Nothing was changed.',
-  CONCURRENT_UPDATE: 'The payment changed while the provider was being read. Try again.',
+  PROVIDER_OBJECT_NOT_FOUND: 'The provider has no record of this object. Nothing was changed.',
+  CONCURRENT_UPDATE: 'The record changed while the provider was being read. Try again.',
   REFUND_EXCEEDS_AMOUNT:
     'The provider amount is below what was refunded locally. Review the payment by hand.',
   SIMULATED_CONNECTION: 'Simulated connections have no provider account to test.',
@@ -55,6 +55,8 @@ const UNPROCESSABLE_MESSAGES: Record<string, string> = {
     'The subscription plan has no entitlement mapping. Map it on the connection first.',
   NOT_LOCALLY_VERIFIABLE: 'This finding came from the provider and cannot be re-checked locally.',
   NOT_CORRECTABLE: 'This finding type has no entitlement correction.',
+  PROVIDER_FETCH_UNSUPPORTED:
+    'This provider cannot be read for that record type yet. Nothing was changed.',
   PROVIDER_STATUS_UNMAPPED:
     'The provider reported a status PayScope cannot map. Nothing was changed.',
   PROVIDER_MODE_UNAVAILABLE: 'This connection does not support provider-mode runs.',

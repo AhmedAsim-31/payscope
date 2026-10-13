@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ApiClientError, apiFetch } from '@/lib/api-client';
 import type * as ApiClient from '@/lib/api-client';
 import { renderWithQuery } from '@/test/render';
-import { RefreshPaymentForm } from './refresh-payment-form';
+import { RefreshRecordForm } from './refresh-record-form';
 
 vi.mock('@/lib/api-client', async (importOriginal) => ({
   ...(await importOriginal<typeof ApiClient>()),
@@ -15,17 +15,20 @@ const mockedFetch = vi.mocked(apiFetch);
 const ORG = '11111111-1111-4111-8111-111111111111';
 const PAYMENT = '22222222-2222-4222-8222-222222222222';
 
-async function submit() {
+async function submit(kind: 'payment' | 'subscription' = 'payment') {
   const user = userEvent.setup();
-  renderWithQuery(<RefreshPaymentForm orgId={ORG} />);
-  await user.type(screen.getByLabelText('Payment id'), PAYMENT);
+  renderWithQuery(<RefreshRecordForm orgId={ORG} kind={kind} />);
+  await user.type(
+    screen.getByLabelText(kind === 'payment' ? 'Payment id' : 'Subscription id'),
+    PAYMENT,
+  );
   await user.click(screen.getByRole('button', { name: 'Refresh from provider' }));
   await user.type(screen.getByLabelText('Reason'), 'Provider shows it settled');
   const buttons = screen.getAllByRole('button', { name: 'Refresh from provider' });
   await user.click(buttons[buttons.length - 1]!);
 }
 
-describe('RefreshPaymentForm', () => {
+describe('RefreshRecordForm', () => {
   beforeEach(() => {
     mockedFetch.mockReset();
   });
@@ -46,6 +49,28 @@ describe('RefreshPaymentForm', () => {
       `/api/v1/orgs/${ORG}/repairs/refresh-from-provider`,
       expect.objectContaining({
         body: JSON.stringify({ paymentId: PAYMENT, reason: 'Provider shows it settled' }),
+      }),
+    );
+  });
+
+  it('posts a subscription id and shows the resolved finding count', async () => {
+    mockedFetch.mockResolvedValue({
+      action: 'refresh_from_provider',
+      targetId: PAYMENT,
+      previousState: { status: 'active' },
+      resultingState: { status: 'canceled', resolvedFindingIds: [ORG] },
+    });
+    await submit('subscription');
+
+    await waitFor(() =>
+      expect(
+        screen.getByText('Subscription refreshed: now canceled. Resolved 1 finding.'),
+      ).toBeInTheDocument(),
+    );
+    expect(mockedFetch).toHaveBeenCalledWith(
+      `/api/v1/orgs/${ORG}/repairs/refresh-from-provider`,
+      expect.objectContaining({
+        body: JSON.stringify({ subscriptionId: PAYMENT, reason: 'Provider shows it settled' }),
       }),
     );
   });
