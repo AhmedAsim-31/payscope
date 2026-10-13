@@ -1,0 +1,36 @@
+packages/api/src/app.ts
+  h_78e539a96187c3 15,74
+packages/api/src/jobs/job-errors.ts
+  h_78e539a96187c3 2,20
+packages/api/src/logger.ts
+  h_78e539a96187c3 1,16-72,74
+packages/api/src/rate-limit/pg-rate-limit-store.ts
+  h_78e539a96187c3 54,70
+packages/api/src/security/db-error-redaction.integration.test.ts
+  h_78e539a96187c3 1-76
+packages/api/src/worker-main.ts
+  h_78e539a96187c3 35
+packages/provider-adapters/src/paypal/paypal-signature.test.ts
+  h_78e539a96187c3 127-137,153-161
+packages/provider-adapters/src/paypal/paypal-signature.ts
+  h_78e539a96187c3 27,32,34,39-40,61-62,64-65
+packages/provider-adapters/src/provider-error.test.ts
+  h_78e539a96187c3 39-46
+packages/provider-adapters/src/provider-error.ts
+  h_78e539a96187c3 14-17,31,36
+packages/provider-adapters/src/revenuecat/revenuecat-client.test.ts
+  h_78e539a96187c3 82-85,87-90,92-97
+packages/provider-adapters/src/revenuecat/revenuecat-client.ts
+  h_78e539a96187c3 46,53,62,84,106,108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "21fe175a08eb16a763f430294da9b03f903a6f9a",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
