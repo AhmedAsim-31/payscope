@@ -1,0 +1,46 @@
+docs/demo.md
+  h_78e539a96187c3 1-65
+package.json
+  h_78e539a96187c3 16-18
+packages/api/package.json
+  h_78e539a96187c3 15-16
+packages/api/src/seed/run-seed.ts
+  h_78e539a96187c3 1-80
+packages/api/src/seed/seed-cli.ts
+  h_78e539a96187c3 1-26
+packages/api/src/seed/seed-deliver.ts
+  h_78e539a96187c3 1-146
+packages/api/src/seed/seed-directory.ts
+  h_78e539a96187c3 1-117
+packages/api/src/seed/seed-guard.test.ts
+  h_78e539a96187c3 1-21
+packages/api/src/seed/seed-guard.ts
+  h_78e539a96187c3 1-14
+packages/api/src/seed/seed-identity.ts
+  h_78e539a96187c3 1-69
+packages/api/src/seed/seed-ids.ts
+  h_78e539a96187c3 1-13
+packages/api/src/seed/seed-payloads.ts
+  h_78e539a96187c3 1-220
+packages/api/src/seed/seed-people.ts
+  h_78e539a96187c3 1-117
+packages/api/src/seed/seed-providers.ts
+  h_78e539a96187c3 1-148
+packages/api/src/seed/seed-situations.ts
+  h_78e539a96187c3 1-144
+packages/api/src/seed/seed-stripe.ts
+  h_78e539a96187c3 1-115
+packages/api/src/seed/seed.integration.test.ts
+  h_78e539a96187c3 1-84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "348d2eb4806b62e88763c3e987d63deef05480f8",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
