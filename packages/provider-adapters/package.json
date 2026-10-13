@@ -12,6 +12,7 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
+    "@payscope/shared": "workspace:*",
     "zod": "^4.6.6"
   },
   "devDependencies": {
