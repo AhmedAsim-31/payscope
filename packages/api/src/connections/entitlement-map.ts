@@ -1,9 +1,8 @@
 import { z } from 'zod';
+import { entitlementKeySchema } from '@payscope/shared/entitlement-ingest-schemas';
 
 const MAX_PLANS = 100;
 const MAX_KEYS_PER_PLAN = 20;
-
-export const entitlementKeySchema = z.string().regex(/^[a-z0-9_.:-]{1,64}$/);
 
 export const entitlementMapSchema = z
   .record(z.string().min(1).max(200), z.array(entitlementKeySchema).max(MAX_KEYS_PER_PLAN))

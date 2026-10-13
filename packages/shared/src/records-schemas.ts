@@ -24,6 +24,7 @@ export const ENTITLEMENT_SOURCES = [
   'reconciliation',
   'manual_repair',
   'scenario',
+  'ingestion_api',
 ] as const;
 
 export const DEFAULT_PAGE_LIMIT = 25;

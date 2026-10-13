@@ -21,12 +21,12 @@ A missing, malformed, or invalid token answers `401` with `www-authenticate: Bea
 Org routes resolve the caller's membership for `:orgId`.
 Not a member, or a malformed id, answers `404 NOT_FOUND`; a member without the permission answers `403 FORBIDDEN`.
 
-| Permission                                                                                | Roles                  |
-| ----------------------------------------------------------------------------------------- | ---------------------- |
-| read permissions                                                                          | all roles              |
-| `jobs:retry`, `reconciliation:run`, `findings:update`, `repairs:execute`, `scenarios:run` | OWNER, ADMIN, OPERATOR |
-| `members:manage`, `connections:manage`, `org:update`                                      | OWNER, ADMIN           |
-| `org:delete`, `ownership:transfer`                                                        | OWNER                  |
+| Permission                                                                                                       | Roles                  |
+| ---------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| read permissions                                                                                                 | all roles              |
+| `jobs:retry`, `reconciliation:run`, `findings:update`, `repairs:execute`, `scenarios:run`, `entitlements:ingest` | OWNER, ADMIN, OPERATOR |
+| `members:manage`, `connections:manage`, `org:update`                                                             | OWNER, ADMIN           |
+| `org:delete`, `ownership:transfer`                                                                               | OWNER                  |
 
 Webhooks authenticate by provider signature, and `/internal/tick` by the `x-internal-token` header.
 
@@ -94,6 +94,20 @@ All need `records:read`.
 | GET    | `{org}/subscriptions`, `{org}/subscriptions/:subscriptionId` |
 | GET    | `{org}/customers`, `{org}/customers/:customerId`             |
 | GET    | `{org}/entitlements`, `{org}/entitlements/:entitlementId`    |
+
+### Entitlement ingestion
+
+| Method | Path                 | Permission            | Notes                                                     |
+| ------ | -------------------- | --------------------- | --------------------------------------------------------- |
+| POST   | `{org}/entitlements` | `entitlements:ingest` | Upserts one entitlement snapshot; needs `Idempotency-Key` |
+
+This is how an application reports entitlement state that PayScope cannot see in its own provider events.
+The body is `{ customerId, entitlementKey, state, observedAt, subscriptionId?, grantedAt?, expiresAt?, revokedAt? }`, where `state` is `active`, `expired`, or `revoked` and `customerId` must belong to the org.
+Rows are keyed by customer and entitlement key, and an ingested row has `source: "ingestion_api"`.
+The body is a full snapshot: `expiresAt` and `revokedAt` are replaced, `grantedAt` defaults to `observedAt` on first grant, and `revokedAt` defaults to `observedAt` for `revoked`.
+`observedAt` orders writes against each other and against provider events: a snapshot older than the row's last update answers `200` with `applied: false` and the current row.
+An `observedAt` more than five minutes in the future answers `422 OBSERVED_AT_IN_FUTURE`, and an unknown customer or subscription answers `404 NOT_FOUND`.
+Each applied or ignored write is audited as `entitlement.ingest`; reusing a key with a different body answers `422 IDEMPOTENCY_KEY_REUSED`.
 
 ### Events and jobs
 
