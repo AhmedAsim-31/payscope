@@ -1,0 +1,69 @@
+import {
+  ENTITLEMENT_STATES,
+  PAYMENT_STATUSES,
+  RECORD_PROVIDERS,
+  SUBSCRIPTION_STATUSES,
+} from '@payscope/shared/records-schemas';
+
+export type FilterField = {
+  name: string;
+  label: string;
+  kind: 'select' | 'text' | 'date';
+  options?: readonly string[];
+  placeholder?: string;
+  toParam?: (value: string) => string | undefined;
+};
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+function startOfDay(value: string): string | undefined {
+  return DATE_PATTERN.test(value) ? `${value}T00:00:00.000Z` : undefined;
+}
+
+function endExclusive(value: string): string | undefined {
+  return DATE_PATTERN.test(value)
+    ? new Date(Date.parse(`${value}T00:00:00.000Z`) + DAY_MS).toISOString()
+    : undefined;
+}
+
+function currencyCode(value: string): string | undefined {
+  const upper = value.trim().toUpperCase();
+  return /^[A-Z]{3}$/.test(upper) ? upper : undefined;
+}
+
+export const PAYMENT_FILTERS: readonly FilterField[] = [
+  { name: 'status', label: 'Status', kind: 'select', options: PAYMENT_STATUSES },
+  { name: 'provider', label: 'Provider', kind: 'select', options: RECORD_PROVIDERS },
+  { name: 'currency', label: 'Currency', kind: 'text', placeholder: 'USD', toParam: currencyCode },
+  { name: 'from', label: 'From', kind: 'date', toParam: startOfDay },
+  { name: 'to', label: 'To', kind: 'date', toParam: endExclusive },
+];
+
+export const SUBSCRIPTION_FILTERS: readonly FilterField[] = [
+  { name: 'status', label: 'Status', kind: 'select', options: SUBSCRIPTION_STATUSES },
+  { name: 'provider', label: 'Provider', kind: 'select', options: RECORD_PROVIDERS },
+];
+
+export const CUSTOMER_FILTERS: readonly FilterField[] = [
+  { name: 'email', label: 'Email starts with', kind: 'text', placeholder: 'name@example.com' },
+];
+
+export const ENTITLEMENT_FILTERS: readonly FilterField[] = [
+  { name: 'state', label: 'State', kind: 'select', options: ENTITLEMENT_STATES },
+  { name: 'key', label: 'Key', kind: 'text', placeholder: 'pro_access' },
+];
+
+export function toApiParams(
+  fields: readonly FilterField[],
+  read: (name: string) => string | null,
+): Record<string, string> {
+  const params: Record<string, string> = {};
+  for (const field of fields) {
+    const raw = read(field.name);
+    if (!raw) continue;
+    const value = field.toParam ? field.toParam(raw) : raw;
+    if (value) params[field.name] = value;
+  }
+  return params;
+}

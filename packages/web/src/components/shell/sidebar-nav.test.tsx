@@ -22,7 +22,14 @@ describe('SidebarNav', () => {
   it('links only to routes that exist', () => {
     renderNav(`/app/${ORG_ID}`);
     const hrefs = screen.getAllByRole('link').map((link) => link.getAttribute('href'));
-    expect(hrefs).toEqual([`/app/${ORG_ID}`, `/app/${ORG_ID}/members`]);
+    expect(hrefs).toEqual([
+      `/app/${ORG_ID}`,
+      `/app/${ORG_ID}/payments`,
+      `/app/${ORG_ID}/subscriptions`,
+      `/app/${ORG_ID}/customers`,
+      `/app/${ORG_ID}/entitlements`,
+      `/app/${ORG_ID}/members`,
+    ]);
     expect(hrefs).toHaveLength(NAV_ITEMS.length);
   });
 
