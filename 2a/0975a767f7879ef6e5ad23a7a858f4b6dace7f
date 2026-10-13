@@ -1,0 +1,33 @@
+docs/api.md
+  s_3bfb2e09c422d0::t_34def44749965e 68-74
+packages/api/src/orgs/member-routes.ts
+  s_3bfb2e09c422d0::t_edf7857982cc4b 228-295
+packages/api/src/orgs/ownership-transfer.integration.test.ts
+  s_3bfb2e09c422d0::t_fa0ee474effb80 1-142
+packages/web/src/components/members/members-table.tsx
+  s_3bfb2e09c422d0::t_1c2525f404d186 3,23,27,32,36,87-110
+packages/web/src/components/members/members-view.test.tsx
+  s_3bfb2e09c422d0::t_7023ea51561b03 115-147
+packages/web/src/components/members/members-view.tsx
+  s_3bfb2e09c422d0::t_e6f8ff7f3df63b 23,26,33-35,39,55,59-67,72-74,98,102,133-146
+packages/web/src/components/members/use-member-mutations.ts
+  s_3bfb2e09c422d0::t_0d0f7436e4f1f8 40-48
+packages/web/src/lib/api-messages.ts
+  s_3bfb2e09c422d0::t_46e3622733f9ac 8,32-34,40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2a0975a767f7879ef6e5ad23a7a858f4b6dace7f",
+  "prompts": {},
+  "sessions": {
+    "s_3bfb2e09c422d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3c00ef3d-597c-492a-bf23-7c65c0557e13",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
