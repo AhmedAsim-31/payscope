@@ -55,7 +55,13 @@ export const recordsRoutes: FastifyPluginCallbackZod<Options> = (app, { db }, do
         response: { 200: paymentPageSchema },
       },
     },
-    (request) => listPayments(db, currentOrg(request).id, request.query),
+    (request) => {
+      const { minAmount, maxAmount } = request.query;
+      if (minAmount !== undefined && maxAmount !== undefined && minAmount > maxAmount) {
+        throw new ApiHttpError(422, 'INVALID_AMOUNT_RANGE', 'minAmount must not exceed maxAmount');
+      }
+      return listPayments(db, currentOrg(request).id, request.query);
+    },
   );
 
   app.get(

@@ -58,6 +58,25 @@ describe('PaymentsList', () => {
     expect(path).toContain('from=2026-03-01T00%3A00%3A00.000Z');
   });
 
+  it('sends a valid amount range and drops a non-integer amount', async () => {
+    search = 'minAmount=500&maxAmount=1.5';
+    mockedFetch.mockResolvedValue({ items: [], nextCursor: null });
+    renderWithQuery(<PaymentsList orgId={ORG_ID} />);
+    await screen.findByText('No payments match these filters');
+    const path = String(mockedFetch.mock.calls[0]?.[0]);
+    expect(path).toContain('minAmount=500');
+    expect(path).not.toContain('maxAmount');
+  });
+
+  it('applies an amount filter typed into the bar', async () => {
+    mockedFetch.mockResolvedValue({ items: [], nextCursor: null });
+    renderWithQuery(<PaymentsList orgId={ORG_ID} />);
+    await screen.findByText('No payments yet');
+    await userEvent.type(screen.getByLabelText('Min amount (minor units)'), '250');
+    await userEvent.click(screen.getByRole('button', { name: 'Apply' }));
+    expect(replace).toHaveBeenCalledWith('/app/org/payments?minAmount=250');
+  });
+
   it('writes a changed filter to the URL', async () => {
     mockedFetch.mockResolvedValue({ items: [], nextCursor: null });
     renderWithQuery(<PaymentsList orgId={ORG_ID} />);

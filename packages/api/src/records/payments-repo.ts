@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, lt, type SQL } from 'drizzle-orm';
+import { and, desc, eq, gte, lt, lte, type SQL } from 'drizzle-orm';
 import type { z } from 'zod';
 import type { paymentQuerySchema } from '@payscope/shared/records-schemas';
 import type { Db } from '../db/client';
@@ -75,6 +75,8 @@ export async function listPayments(db: Db, orgId: string, q: PaymentQuery) {
     q.connectionId === undefined ? undefined : eq(p.connectionId, q.connectionId),
     q.from === undefined ? undefined : gte(p.createdAt, new Date(q.from)),
     q.to === undefined ? undefined : lt(p.createdAt, new Date(q.to)),
+    q.minAmount === undefined ? undefined : gte(p.amountMinor, q.minAmount),
+    q.maxAmount === undefined ? undefined : lte(p.amountMinor, q.maxAmount),
     keysetAfter(p.createdAt, p.id, q.cursor),
   );
   const rows = await selectRows(db, where, q.limit + 1);
