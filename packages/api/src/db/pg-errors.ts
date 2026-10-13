@@ -17,6 +17,10 @@ function pgError(err: unknown): { code?: string; message?: string } | undefined 
   return undefined;
 }
 
+export function pgErrorCode(err: unknown): string | undefined {
+  return pgError(err)?.code;
+}
+
 export function rethrowPgError(err: unknown): never {
   const pg = pgError(err);
   if (pg?.code === UNIQUE_VIOLATION) {

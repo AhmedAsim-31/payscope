@@ -73,4 +73,17 @@ describe('loadConfig', () => {
     expect(config.jwksUrl).toBe('http://localhost:9999/jwks.json');
     expect(config.jwtIssuer).toBe(`${SUPABASE_URL}/auth/v1`);
   });
+
+  it('validates CREDENTIALS_ENCRYPTION_KEY length and requires it in production', () => {
+    const key = Buffer.alloc(32, 7).toString('base64');
+    expect(loadConfig({ ...BASE, CREDENTIALS_ENCRYPTION_KEY: key }).credentialsKey).toHaveLength(
+      32,
+    );
+    expect(() =>
+      loadConfig({ ...BASE, CREDENTIALS_ENCRYPTION_KEY: Buffer.alloc(16).toString('base64') }),
+    ).toThrow(/CREDENTIALS_ENCRYPTION_KEY/);
+    const prod = { ...BASE, NODE_ENV: 'production', CORS_ORIGIN: 'https://a.test' };
+    expect(() => loadConfig(prod)).toThrow(/CREDENTIALS_ENCRYPTION_KEY/);
+    expect(loadConfig({ ...prod, CREDENTIALS_ENCRYPTION_KEY: key }).credentialsKey).toBeDefined();
+  });
 });
