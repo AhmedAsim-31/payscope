@@ -1,0 +1,12 @@
+{
+  "id": "WH-SANDBOX-0016",
+  "event_version": "1.0",
+  "create_time": "2026-10-01T10:00:00Z",
+  "resource_type": "checkout-order",
+  "event_type": "CHECKOUT.ORDER.APPROVED",
+  "summary": "Fictional sandbox event CHECKOUT.ORDER.APPROVED",
+  "resource": {
+    "id": "7SANDBOXORDER001",
+    "status": "APPROVED"
+  }
+}
