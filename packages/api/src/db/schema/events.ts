@@ -68,7 +68,13 @@ export const providerEventsTable = pgTable(
     check('provider_events_payload_size_check', sql`pg_column_size(${t.payload}) <= 262144`),
     index('provider_events_org_received_idx').on(t.orgId, t.receivedAt, t.id),
     index('provider_events_org_status_idx').on(t.orgId, t.status, t.receivedAt, t.id),
-    index('provider_events_object_ref_idx').on(t.orgId, t.connectionId, t.objectRef, t.receivedAt, t.id),
+    index('provider_events_object_ref_idx').on(
+      t.orgId,
+      t.connectionId,
+      t.objectRef,
+      t.receivedAt,
+      t.id,
+    ),
   ],
 ).enableRLS();
 
