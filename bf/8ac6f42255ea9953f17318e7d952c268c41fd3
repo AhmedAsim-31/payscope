@@ -1,0 +1,62 @@
+packages/api/src/db/schema/operations.ts
+  h_78e539a96187c3 49-55
+packages/api/src/db/schema/reconciliation.ts
+  h_78e539a96187c3 115
+packages/api/src/db/schema/records.ts
+  h_78e539a96187c3 101-106,145
+packages/api/src/events/event-inbox-repo.ts
+  h_78e539a96187c3 1,7-8,14-26,47-48
+packages/api/src/reconciliation/reconciliation-repo.ts
+  h_78e539a96187c3 109-110
+packages/api/src/records/payments-repo.ts
+  h_78e539a96187c3 1,7,80-95
+packages/api/src/records/records.integration.test.ts
+  h_78e539a96187c3 284-361
+packages/shared/src/events-schemas.ts
+  h_78e539a96187c3 83-84
+packages/shared/src/reconciliation-schemas.ts
+  h_78e539a96187c3 70-71
+packages/shared/src/records-schemas.ts
+  h_78e539a96187c3 179-180
+packages/web/src/components/audit/audit-list.tsx
+  h_78e539a96187c3 10,63
+packages/web/src/components/events/events-list.tsx
+  h_78e539a96187c3 11
+packages/web/src/components/records/customer-detail.tsx
+  h_78e539a96187c3 4-8,18-19,100-144
+packages/web/src/components/records/filter-bar.tsx
+  h_78e539a96187c3 77-124
+packages/web/src/components/records/filter-config.ts
+  h_78e539a96187c3 18-19,48-51,72-73,101-103,110-111
+packages/web/src/components/records/payment-detail.tsx
+  h_78e539a96187c3 4,14,16,98-112
+packages/web/src/components/records/payments-list.test.tsx
+  h_78e539a96187c3 71-80
+packages/web/src/components/records/payments-list.tsx
+  h_78e539a96187c3 11
+packages/web/src/components/records/record-detail-related.test.tsx
+  h_78e539a96187c3 1-178
+packages/web/src/components/records/records-list.tsx
+  h_78e539a96187c3 4,40-41,54,120-124
+packages/web/src/components/records/related-records.tsx
+  h_78e539a96187c3 1-55
+packages/web/src/components/records/subscription-detail.tsx
+  h_78e539a96187c3 4-8,18-19,96-140
+supabase/migrations/20261013221749_related_record_indexes.sql
+  h_78e539a96187c3 1-5
+supabase/migrations/meta/20261013221749_snapshot.json
+  h_78e539a96187c3 1-3503
+supabase/migrations/meta/_journal.json
+  h_78e539a96187c3 151-157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bf8ac6f42255ea9953f17318e7d952c268c41fd3",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
