@@ -109,6 +109,7 @@ export const FINDING_FILTERS: readonly FilterField[] = [
   { name: 'type', label: 'Type', kind: 'select', options: FINDING_TYPES },
   scope('subjectType'),
   scope('subjectId'),
+  scope('runId'),
 ];
 
 export const INCIDENT_FILTERS: readonly FilterField[] = [

@@ -3,7 +3,7 @@
 import { PageHeader } from '@/components/page-header';
 import Link from 'next/link';
 import { runPageSchema, type ReconciliationRun } from '@payscope/shared/reconciliation-schemas';
-import { formatTimestamp, humanize } from '@/components/records/format';
+import { formatTimestamp, humanize, recordHref } from '@/components/records/format';
 import { RecordsList, type Column } from '@/components/records/records-list';
 import { StatusBadge } from '@/components/records/status-badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -11,8 +11,18 @@ import { useCurrentOrg } from '@/hooks/use-current-org';
 import { Suspense } from 'react';
 import { StartRunForm } from './start-run-form';
 
-const COLUMNS: Column<ReconciliationRun>[] = [
-  { header: 'Started', cell: (r) => formatTimestamp(r.startedAt) },
+export const runColumns = (orgId: string): Column<ReconciliationRun>[] => [
+  {
+    header: 'Started',
+    cell: (r) => (
+      <Link
+        href={recordHref(orgId, 'reconciliation', r.id)}
+        className="underline-offset-4 hover:underline"
+      >
+        {formatTimestamp(r.startedAt)}
+      </Link>
+    ),
+  },
   { header: 'Mode', cell: (r) => humanize(r.mode) },
   { header: 'Trigger', cell: (r) => humanize(r.trigger) },
   { header: 'Status', cell: (r) => <StatusBadge status={r.status} /> },
@@ -52,7 +62,7 @@ export function RunsView({ orgId }: { orgId: string }) {
           resource="reconciliation/runs"
           schema={runPageSchema}
           params={{}}
-          columns={COLUMNS}
+          columns={runColumns(orgId)}
           caption="Reconciliation runs"
           pollWhile={(run) => run.status === 'running'}
           isFiltered={false}

@@ -113,5 +113,7 @@ export const reconciliationFindingsTable = pgTable(
     index('reconciliation_findings_org_created_idx').on(t.orgId, t.createdAt, t.id),
     index('reconciliation_findings_org_status_idx').on(t.orgId, t.status, t.createdAt, t.id),
     index('reconciliation_findings_org_subject_idx').on(t.orgId, t.subjectType, t.subjectId),
+    index('reconciliation_findings_org_first_run_idx').on(t.orgId, t.firstSeenRunId),
+    index('reconciliation_findings_org_last_run_idx').on(t.orgId, t.lastSeenRunId),
   ],
 ).enableRLS();
