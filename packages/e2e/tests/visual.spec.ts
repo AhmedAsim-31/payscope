@@ -1,6 +1,12 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
-import { authFile, expectNoHorizontalOverflow, orgIds, requirePassword } from './support';
+import {
+  authFile,
+  expectNoHorizontalOverflow,
+  expectSidebarSpansDocument,
+  orgIds,
+  requirePassword,
+} from './support';
 
 requirePassword();
 test.use({ storageState: authFile('owner') });
@@ -35,6 +41,7 @@ for (const [name, path] of PAGES) {
         await expect(page.getByRole('main').getByRole('heading', { level: 1 })).toBeVisible();
         await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
         if (width === 375) await expectNoHorizontalOverflow(page);
+        else await expectSidebarSpansDocument(page);
         await page.screenshot({
           path: info.outputPath(`${name}-${scheme}-${width}.png`),
           fullPage: true,

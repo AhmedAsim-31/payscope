@@ -37,3 +37,11 @@ export async function expectNoHorizontalOverflow(page: Page) {
   );
   expect(overflow, 'page overflows horizontally').toBeLessThanOrEqual(0);
 }
+
+export async function expectSidebarSpansDocument(page: Page) {
+  const gap = await page.evaluate(() => {
+    const rect = document.querySelector('[data-slot="sidebar-gap"]')!.getBoundingClientRect();
+    return document.documentElement.scrollHeight - (rect.bottom + window.scrollY);
+  });
+  expect(gap, 'sidebar column stops short of the document bottom').toBeLessThanOrEqual(1);
+}
