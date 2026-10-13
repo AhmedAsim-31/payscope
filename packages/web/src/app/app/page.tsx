@@ -1,26 +1,13 @@
-import { redirect } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { createClient } from '@/lib/supabase/server';
+import { OrgRedirect } from '@/components/orgs/org-redirect';
+import { PageSkeleton } from '@/components/page-skeleton';
+import { QuerySuspense } from '@/components/query-suspense';
 
-export default async function AppPage() {
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
-  if (!data?.claims) redirect('/login?next=%2Fapp');
-
+export default function AppPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center p-6">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl">Signed in</CardTitle>
-          <CardDescription>{data.claims.email ?? 'Unknown email'}</CardDescription>
-        </CardHeader>
-        <form action="/auth/sign-out" method="post" className="px-6">
-          <Button type="submit" variant="outline">
-            Sign out
-          </Button>
-        </form>
-      </Card>
+    <main className="mx-auto max-w-md p-6">
+      <QuerySuspense fallback={<PageSkeleton />}>
+        <OrgRedirect />
+      </QuerySuspense>
     </main>
   );
 }
