@@ -1,0 +1,38 @@
+.env.example
+  h_78e539a96187c3 33-41
+README.md
+  h_78e539a96187c3 47,49,52,58
+docs/api.md
+  h_78e539a96187c3 5
+docs/demo-script.md
+  h_78e539a96187c3 9,13
+docs/deployment.md
+  h_78e539a96187c3 56-75,78
+packages/api/package.json
+  h_78e539a96187c3 7,10,15-16,33
+packages/api/src/app.test.ts
+  h_78e539a96187c3 23-31
+packages/api/src/app.ts
+  h_78e539a96187c3 6-11,15,73,107-111
+packages/api/src/logger.ts
+  h_78e539a96187c3 1-17
+packages/api/src/server.ts
+  h_78e539a96187c3 9,24
+packages/api/src/worker-main.ts
+  h_78e539a96187c3 6,10
+packages/web/next.config.ts
+  h_78e539a96187c3 1-2,5-8
+turbo.json
+  h_78e539a96187c3 11-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0c43fb8fb63baf43aa06a47486590d355b38b28f",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
