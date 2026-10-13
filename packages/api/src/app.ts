@@ -8,6 +8,7 @@ import type { AdapterRegistry } from '@payscope/provider-adapters/registry';
 import { z } from 'zod';
 import { errorHandler, notFoundHandler } from './error-handler';
 import { healthRoutes, type ReadinessCheck } from './health-routes';
+import { apiHardeningPlugin } from './security/api-hardening';
 import { authenticatePlugin } from './auth/authenticate';
 import { meRoutes } from './auth/me-routes';
 import type { TokenVerifier } from './auth/token-verifier';
@@ -37,6 +38,7 @@ export type BuildAppOptions = {
   logLevel?: string;
   logStream?: { write: (msg: string) => void };
   trustProxy?: boolean;
+  hsts?: boolean;
   readinessChecks?: ReadinessCheck[];
   tokenVerifier?: TokenVerifier;
   db?: Db;
@@ -47,7 +49,7 @@ export type BuildAppOptions = {
   rateLimits?: RatePolicies;
 };
 
-const BODY_LIMIT_BYTES = 1024 * 1024;
+const BODY_LIMIT_BYTES = 64 * 1024;
 
 const REDACT_PATHS = [
   'req.headers.authorization',
@@ -88,8 +90,18 @@ export async function buildApp(opts: BuildAppOptions = {}) {
     reply.header('x-request-id', request.id);
   });
 
-  await app.register(helmet);
-  await app.register(cors, { origin: opts.corsOrigins ?? [], credentials: true });
+  await app.register(helmet, {
+    contentSecurityPolicy: false,
+    frameguard: { action: 'deny' },
+    referrerPolicy: { policy: 'no-referrer' },
+    hsts: opts.hsts ? { maxAge: 63072000, includeSubDomains: true } : false,
+  });
+  await app.register(apiHardeningPlugin);
+  await app.register(cors, {
+    origin: opts.corsOrigins ?? [],
+    credentials: true,
+    methods: ['GET', 'HEAD', 'POST', 'PATCH', 'DELETE'],
+  });
   await app.register(sensible);
   await app.register(rateLimitPlugin, {
     policies: opts.rateLimits ?? DEFAULT_POLICIES,

@@ -21,6 +21,8 @@ describe('loadConfig', () => {
       jwtAudience: 'authenticated',
       databaseUrl: DATABASE_URL,
       dbPoolMax: 10,
+      credentialsKeyVersion: 1,
+      credentialsPreviousKeys: new Map(),
       runWorkerInProcess: true,
       rateLimits: DEFAULT_POLICIES,
     });
@@ -96,6 +98,25 @@ describe('loadConfig', () => {
     const prod = { ...BASE, NODE_ENV: 'production', CORS_ORIGIN: 'https://a.test' };
     expect(() => loadConfig(prod)).toThrow(/CREDENTIALS_ENCRYPTION_KEY/);
     expect(loadConfig({ ...prod, CREDENTIALS_ENCRYPTION_KEY: key }).credentialsKey).toBeDefined();
+  });
+
+  it('parses previous credential keys and rejects bad or conflicting entries', () => {
+    const key = Buffer.alloc(32, 7).toString('base64');
+    const old = Buffer.alloc(32, 3).toString('base64');
+    const rotated = {
+      ...BASE,
+      CREDENTIALS_ENCRYPTION_KEY: key,
+      CREDENTIALS_ENCRYPTION_KEY_VERSION: '2',
+    };
+    const config = loadConfig({ ...rotated, CREDENTIALS_ENCRYPTION_KEYS_PREVIOUS: `1:${old}` });
+    expect(config.credentialsKeyVersion).toBe(2);
+    expect([...config.credentialsPreviousKeys.keys()]).toEqual([1]);
+    expect(() =>
+      loadConfig({ ...rotated, CREDENTIALS_ENCRYPTION_KEYS_PREVIOUS: `2:${old}` }),
+    ).toThrow(/CREDENTIALS_ENCRYPTION_KEYS_PREVIOUS/);
+    expect(() => loadConfig({ ...rotated, CREDENTIALS_ENCRYPTION_KEYS_PREVIOUS: old })).toThrow(
+      /CREDENTIALS_ENCRYPTION_KEYS_PREVIOUS/,
+    );
   });
 
   it('parses worker settings and rejects a short tick token', () => {
