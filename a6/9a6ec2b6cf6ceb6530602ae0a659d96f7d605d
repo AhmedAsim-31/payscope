@@ -1,0 +1,30 @@
+packages/api/src/repairs/refresh-from-provider.integration.test.ts
+  h_78e539a96187c3 4,9,11,23-31,59-61,71-101,231-404
+packages/api/src/repairs/refresh-from-provider.ts
+  h_78e539a96187c3 6,8-13,15,19,35-48,50,54-73,81-83,85-87,91,93-96,113-128,130,138-161,164-165,179-180,183,189-191,193-242,245-246,249-258,263,266-272
+packages/api/src/repairs/repair-routes.ts
+  h_78e539a96187c3 18,20,145-150,152-155,159,161-164,167-168
+packages/api/src/repairs/resolve-refreshed-findings.ts
+  h_78e539a96187c3 1-52
+packages/shared/src/repair-schemas.ts
+  h_78e539a96187c3 19-22
+packages/web/src/components/repairs/refresh-record-form.test.tsx
+  h_78e539a96187c3 7,18,20-24,31,56-77
+packages/web/src/components/repairs/refresh-record-form.tsx
+  h_78e539a96187c3 12-43,45,47-48,53,55-56,59-60,75,78-81,88,92
+packages/web/src/components/repairs/repair-center.tsx
+  h_78e539a96187c3 12,58-66
+packages/web/src/lib/api-messages.ts
+  h_78e539a96187c3 38-39,58-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a69a6ec2b6cf6ceb6530602ae0a659d96f7d605d",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
