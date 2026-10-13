@@ -1,0 +1,14 @@
+packages/api/src/db/schema/events.ts
+  h_78e539a96187c3 71-77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b590fdab5ae886f0fb75dd6a0c3c0d6907729943",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
