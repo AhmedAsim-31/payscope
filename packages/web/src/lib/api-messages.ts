@@ -1,6 +1,7 @@
 import { ApiClientError } from '@/lib/api-client';
 
-export type ErrorContext = 'create-org' | 'add-member' | 'change-role' | 'remove-member';
+export type ErrorContext =
+  'create-org' | 'add-member' | 'change-role' | 'remove-member' | 'retry-event';
 
 const FALLBACK = 'Something went wrong. Try again.';
 
@@ -8,6 +9,12 @@ export function describeError(error: unknown, context: ErrorContext): string {
   if (!(error instanceof ApiClientError)) return FALLBACK;
   if (error.code === 'LAST_OWNER') {
     return 'An organization must keep at least one owner. Make another member an owner first.';
+  }
+  if (context === 'retry-event') {
+    if (error.status === 409) {
+      return 'This event can no longer be retried. It may already have been retried. Refresh to see its current state.';
+    }
+    if (error.status === 404) return 'That event no longer exists.';
   }
   if (error.status === 403) return error.message || 'You do not have permission to do that.';
   if (error.status === 404) {

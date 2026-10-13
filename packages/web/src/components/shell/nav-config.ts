@@ -1,7 +1,9 @@
 import {
   CreditCard,
+  Inbox,
   KeyRound,
   LayoutDashboard,
+  ListChecks,
   Repeat,
   UserRound,
   Users,
@@ -21,6 +23,8 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { title: 'Subscriptions', path: '/subscriptions', icon: Repeat },
   { title: 'Customers', path: '/customers', icon: UserRound },
   { title: 'Entitlements', path: '/entitlements', icon: KeyRound },
+  { title: 'Events', path: '/events', icon: Inbox },
+  { title: 'Jobs', path: '/jobs', icon: ListChecks },
   { title: 'Members', path: '/members', icon: Users },
 ];
 
