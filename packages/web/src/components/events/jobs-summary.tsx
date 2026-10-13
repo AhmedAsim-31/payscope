@@ -1,0 +1,61 @@
+'use client';
+
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { jobSummarySchema } from '@payscope/shared/events-schemas';
+import { formatAge } from '@/components/records/format';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { apiFetch } from '@/lib/api-client';
+
+function StatCard({ title, value, hint }: { title: string; value: string; hint: string }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-muted-foreground text-sm font-medium">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-1">
+        <p className="text-3xl font-semibold tabular-nums">{value}</p>
+        <p className="text-muted-foreground text-xs">{hint}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+export function JobsSummary({ orgId }: { orgId: string }) {
+  const { data } = useSuspenseQuery({
+    queryKey: ['orgs', orgId, 'jobs', 'summary'],
+    queryFn: async () =>
+      jobSummarySchema.parse(await apiFetch(`/api/v1/orgs/${orgId}/jobs/summary`)),
+  });
+  const { counts, oldestQueuedAgeSeconds } = data;
+  const total = Object.values(counts).reduce((sum, n) => sum + n, 0);
+
+  return (
+    <div className="grid gap-6">
+      <div className="grid gap-1">
+        <h1 className="text-2xl font-semibold tracking-tight">Jobs</h1>
+        <p className="text-muted-foreground text-sm">
+          Background work that processes incoming provider events.
+        </p>
+      </div>
+      {total === 0 ? (
+        <div className="rounded-lg border border-dashed p-8 text-center">
+          <h2 className="text-base font-medium">No jobs yet</h2>
+          <p className="text-muted-foreground mx-auto mt-1 max-w-md text-sm">
+            A job is created for every webhook event received through a connection.
+          </p>
+        </div>
+      ) : null}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <StatCard title="Queued" value={String(counts.queued)} hint="Waiting for the worker" />
+        <StatCard title="Running" value={String(counts.running)} hint="Being processed now" />
+        <StatCard title="Failed" value={String(counts.failed)} hint="Stopped, can be retried" />
+        <StatCard title="Dead" value={String(counts.dead)} hint="Out of attempts, can be retried" />
+        <StatCard
+          title="Oldest queued"
+          value={oldestQueuedAgeSeconds === null ? 'None' : formatAge(oldestQueuedAgeSeconds)}
+          hint={oldestQueuedAgeSeconds === null ? 'Nothing is waiting' : 'Time since it was due'}
+        />
+      </div>
+    </div>
+  );
+}

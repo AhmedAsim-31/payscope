@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatMoney, formatTimestamp, humanize } from './format';
+import { formatAge, formatDuration, formatMoney, formatTimestamp, humanize } from './format';
 
 describe('formatMoney', () => {
   it('formats a bigint string beyond 2^53 exactly', () => {
@@ -31,5 +31,15 @@ describe('formatTimestamp', () => {
 describe('humanize', () => {
   it('turns enum values into sentence case', () => {
     expect(humanize('partially_refunded')).toBe('Partially refunded');
+  });
+});
+
+describe('formatDuration and formatAge', () => {
+  it('formats short and long spans', () => {
+    expect(formatDuration(240)).toBe('240 ms');
+    expect(formatDuration(1500)).toBe('1.5 s');
+    expect(formatAge(45)).toBe('45s');
+    expect(formatAge(125)).toBe('2m 5s');
+    expect(formatAge(7500)).toBe('2h 5m');
   });
 });

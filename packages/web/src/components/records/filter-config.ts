@@ -1,3 +1,4 @@
+import { EVENT_STATUSES } from '@payscope/shared/events-schemas';
 import {
   ENTITLEMENT_STATES,
   PAYMENT_STATUSES,
@@ -52,6 +53,19 @@ export const CUSTOMER_FILTERS: readonly FilterField[] = [
 export const ENTITLEMENT_FILTERS: readonly FilterField[] = [
   { name: 'state', label: 'State', kind: 'select', options: ENTITLEMENT_STATES },
   { name: 'key', label: 'Key', kind: 'text', placeholder: 'pro_access' },
+];
+
+export const EVENT_FILTERS: readonly FilterField[] = [
+  { name: 'status', label: 'Status', kind: 'select', options: EVENT_STATUSES },
+  { name: 'provider', label: 'Provider', kind: 'select', options: RECORD_PROVIDERS },
+  {
+    name: 'normalizedType',
+    label: 'Normalized type',
+    kind: 'text',
+    placeholder: 'payment.succeeded',
+  },
+  { name: 'from', label: 'From', kind: 'date', toParam: startOfDay },
+  { name: 'to', label: 'To', kind: 'date', toParam: endExclusive },
 ];
 
 export function toApiParams(

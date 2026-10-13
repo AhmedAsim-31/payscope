@@ -17,6 +17,7 @@ import type { Db } from './db/client';
 import { tickRoutes } from './jobs/tick-routes';
 import type { Worker } from './jobs/worker';
 import { identityRoutes } from './orgs/identity-routes';
+import { eventInboxRoutes } from './events/event-inbox-routes';
 import { recordsRoutes } from './records/records-routes';
 import { createDefaultAdapterRegistry } from './providers/adapter-registry';
 import { webhookRoutes } from './webhooks/webhook-routes';
@@ -86,6 +87,7 @@ export async function buildApp(opts: BuildAppOptions = {}) {
     await app.register(meRoutes, { prefix: '/api/v1' });
     if (opts.db) await app.register(identityRoutes, { db: opts.db });
     if (opts.db) await app.register(recordsRoutes, { db: opts.db });
+    if (opts.db) await app.register(eventInboxRoutes, { db: opts.db });
     if (opts.db && opts.credentialsCipher) {
       await app.register(connectionRoutes, { db: opts.db, cipher: opts.credentialsCipher });
     }
