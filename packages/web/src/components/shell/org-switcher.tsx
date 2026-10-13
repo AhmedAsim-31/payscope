@@ -24,7 +24,7 @@ export function OrgSwitcher({ orgId }: { orgId: string }) {
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="max-w-56 justify-between"
+          className="max-w-36 justify-between sm:max-w-56"
           aria-label="Switch organization"
         >
           <span className="truncate">{current?.name ?? 'Select organization'}</span>

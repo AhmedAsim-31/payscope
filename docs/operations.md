@@ -36,3 +36,28 @@ from background_jobs where status = 'dead' order by updated_at desc;
 
 After fixing the cause, re-queue one by setting `status = 'queued'`, `attempt_count = 0`, and `available_at = now()`.
 For `process_provider_event`, the matching event row shows `failed` or `needs_attention`, and `event_processing_attempts` lists each attempt with its failure category.
+
+## End-to-end tests
+
+The Playwright suite in `packages/e2e` drives the real web app, API, worker, local Postgres and Supabase Auth.
+It covers sign in and out, org switching and cross-tenant access, payment investigation, event retry, reconciliation and repair, the scenario lab, viewer restrictions, and a smoke pass over every page at 1280 and 375 pixels wide.
+
+Run it locally:
+
+```bash
+pnpm --filter @payscope/e2e exec playwright install chromium   # once
+pnpm e2e                                                       # or pnpm e2e:headed
+```
+
+Needs:
+
+- `DEMO_USER_PASSWORD` and the usual API and web variables in the repo-root `.env.local`; the specs skip with a message when the password is missing.
+- A local Postgres at `DATABASE_URL` (the seed refuses remote hosts).
+- Playwright starts the API (`:3001`) and web (`:3000`) unless they are already running.
+
+Every run starts with `db:reset-demo`, so the specs are deterministic against the seed.
+Never point it at a database you care about.
+Traces are kept on the first retry in `packages/e2e/test-results`; `playwright-report` and `.auth` (signed-in session files) are gitignored.
+
+E2E is not part of CI or `pnpm test`.
+Running it in GitHub Actions needs the repo owner to add `DEMO_USER_PASSWORD` plus the Supabase URL and publishable key as secrets, and a job with a Postgres service that runs migrations before `pnpm e2e`.
