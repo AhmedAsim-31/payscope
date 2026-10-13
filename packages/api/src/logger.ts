@@ -1,5 +1,5 @@
-import { DrizzleQueryError } from 'drizzle-orm/errors';
 import { pino } from 'pino';
+import { safeErrorMessage } from './safe-error-message';
 
 export const LOG_REDACT = {
   paths: [
@@ -27,32 +27,15 @@ const SAFE_ERROR_FIELDS = [
   'reason',
 ] as const;
 const MAX_CAUSE_DEPTH = 3;
-
-function sqlState(err: Error): string | undefined {
-  return 'code' in err && typeof err.code === 'string' && err.code.length === 5
-    ? err.code
-    : undefined;
-}
-
-/** Drops bound parameters and Postgres data-exception (class 22) messages, which quote input values. */
-export function safeErrorMessage(err: Error, depth = 0): string {
-  if (err instanceof DrizzleQueryError) {
-    return err.cause instanceof Error && depth < MAX_CAUSE_DEPTH
-      ? `Failed query: ${safeErrorMessage(err.cause, depth + 1)}`
-      : 'Failed query';
-  }
-  const code = sqlState(err);
-  if (code?.startsWith('22')) return `Postgres data exception ${code}`;
-  return err.message;
-}
+const WITHHELD = '[message withheld]';
 
 type SerializedError = { type: string; message: string; stack: string; [key: string]: unknown };
 
 function serializeError(err: unknown, depth = 0): SerializedError {
-  if (!(err instanceof Error)) return { type: typeof err, message: String(err), stack: '' };
+  if (!(err instanceof Error)) return { type: typeof err, message: WITHHELD, stack: '' };
   const out: SerializedError = {
     type: err.name,
-    message: safeErrorMessage(err),
+    message: safeErrorMessage(err) ?? WITHHELD,
     stack: (err.stack ?? '')
       .split('\n')
       .filter((line) => /^\s+at /.test(line))

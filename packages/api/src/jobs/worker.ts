@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import type { Db } from '../db/client';
 import { computeBackoffMs } from './backoff';
 import { isRetryable, sanitizeError } from './job-errors';
+import { PermanentJobError } from './permanent-job-error';
 import {
   claimJobs,
   completeJob,
@@ -67,8 +68,7 @@ export function createWorker(opts: WorkerOptions) {
           (held) => {
             if (!held) logger.warn({ jobId: job.id, kind: job.kind }, 'job_lease_lost');
           },
-          (err: unknown) =>
-            logger.error({ jobId: job.id, err: sanitizeError(err) }, 'job_heartbeat_failed'),
+          (err: unknown) => logger.error({ jobId: job.id, err }, 'job_heartbeat_failed'),
         );
       },
       Math.max(10, (leaseSeconds * 1000) / 2),
@@ -109,7 +109,7 @@ export function createWorker(opts: WorkerOptions) {
       const handler = handlers[job.kind];
       let err: unknown;
       if (!handler) {
-        err = new Error('unsupported_job_kind');
+        err = new PermanentJobError('unsupported_job_kind');
       } else {
         try {
           await withHeartbeat(job, () => handler(job, ctx));
@@ -119,10 +119,7 @@ export function createWorker(opts: WorkerOptions) {
       }
       await finalize(job, err, started);
     } catch (err) {
-      logger.error(
-        { jobId: job.id, kind: job.kind, err: sanitizeError(err) },
-        'job_finalize_failed',
-      );
+      logger.error({ jobId: job.id, kind: job.kind, err }, 'job_finalize_failed');
     }
   }
 
@@ -163,7 +160,7 @@ export function createWorker(opts: WorkerOptions) {
         const { claimed } = await drainOnce();
         if (claimed === 0 && !stopping) await sleep(pollIntervalMs);
       } catch (err) {
-        logger.error({ err: sanitizeError(err) }, 'worker_poll_failed');
+        logger.error({ err }, 'worker_poll_failed');
         if (!stopping) await sleep(pollIntervalMs);
       }
     }

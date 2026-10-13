@@ -4,7 +4,7 @@ import { createDb } from '../db/client';
 import { expireLease, insertJobs, jobRow, parkQueuedJobs, uniqueKind } from '../test/job-fixtures';
 import { TEST_DATABASE_URL } from '../test/test-database-url';
 import { recoverExpiredLeases } from './job-queue';
-import { PermanentJobError } from './job-errors';
+import { PermanentJobError } from './permanent-job-error';
 import { createWorker, type JobHandler } from './worker';
 
 const { db, sql } = createDb(TEST_DATABASE_URL, { max: 10 });
