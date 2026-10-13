@@ -25,6 +25,7 @@ import type { Db } from './db/client';
 import { pgRateLimitStore } from './rate-limit/pg-rate-limit-store';
 import { DEFAULT_POLICIES, type RatePolicies } from './rate-limit/policies';
 import { rateLimitPlugin } from './rate-limit/rate-limit-plugin';
+import { DEFAULT_RECONCILIATION_INTERVAL_HOURS } from './config';
 import { tickRoutes } from './jobs/tick-routes';
 import type { Worker } from './jobs/worker';
 import { identityRoutes } from './orgs/identity-routes';
@@ -53,6 +54,7 @@ export type BuildAppOptions = {
   adapters?: AdapterRegistry;
   worker?: Worker;
   internalTickToken?: string;
+  reconciliationIntervalHours?: number;
   rateLimits?: RatePolicies;
 };
 
@@ -145,7 +147,13 @@ export async function buildApp(opts: BuildAppOptions = {}) {
     });
   }
   if (opts.worker && opts.internalTickToken) {
-    await app.register(tickRoutes, { worker: opts.worker, token: opts.internalTickToken });
+    await app.register(tickRoutes, {
+      worker: opts.worker,
+      token: opts.internalTickToken,
+      db: opts.db,
+      reconciliationIntervalHours:
+        opts.reconciliationIntervalHours ?? DEFAULT_RECONCILIATION_INTERVAL_HOURS,
+    });
   }
 
   return app;

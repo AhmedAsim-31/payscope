@@ -112,6 +112,8 @@ All need `records:read`.
 | GET    | `{org}/reconciliation/findings`, `.../findings/:findingId` | `records:read`       |                                                  |
 | PATCH  | `{org}/reconciliation/findings/:findingId`                 | `findings:update`    | Status `reviewed` or `dismissed` only            |
 
+Each run carries `trigger`: `manual` for runs started through this API, `scheduled` for runs the internal tick starts (see [operations.md](operations.md#scheduled-reconciliation)).
+
 ### Incidents
 
 | Method | Path                                             | Permission        | Notes                               |
@@ -144,10 +146,10 @@ Reusing a key with a different body answers `422 IDEMPOTENCY_KEY_REUSED`; see [a
 
 ### Machine routes
 
-| Method | Path                                | Auth               | Notes                                                     |
-| ------ | ----------------------------------- | ------------------ | --------------------------------------------------------- |
-| POST   | `/webhooks/:provider/:connectionId` | Provider signature | `stripe`, `paypal`, `paddle`, `revenuecat`; 256 KiB limit |
-| POST   | `/internal/tick`                    | `x-internal-token` | Registered only when `INTERNAL_TICK_TOKEN` is set         |
+| Method | Path                                | Auth               | Notes                                                                                 |
+| ------ | ----------------------------------- | ------------------ | ------------------------------------------------------------------------------------- |
+| POST   | `/webhooks/:provider/:connectionId` | Provider signature | `stripe`, `paypal`, `paddle`, `revenuecat`; 256 KiB limit                             |
+| POST   | `/internal/tick`                    | `x-internal-token` | Registered only when `INTERNAL_TICK_TOKEN` is set; also schedules reconciliation runs |
 
 The connections, reconciliation, and webhook routes are registered only when `CREDENTIALS_ENCRYPTION_KEY` is set.
 

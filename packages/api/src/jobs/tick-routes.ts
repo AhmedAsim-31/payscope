@@ -1,13 +1,19 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
+import type { Db } from '../db/client';
 import { ApiHttpError } from '../http-error';
+import { scheduleDueRuns } from '../reconciliation/run-scheduler';
 import type { Worker } from './worker';
 
-type Options = { worker: Worker; token: string };
+type Options = { worker: Worker; token: string; db?: Db; reconciliationIntervalHours: number };
 
 const digest = (value: string) => createHash('sha256').update(value).digest();
 
-export const tickRoutes: FastifyPluginCallbackZod<Options> = (app, { worker, token }, done) => {
+export const tickRoutes: FastifyPluginCallbackZod<Options> = (
+  app,
+  { worker, token, db, reconciliationIntervalHours },
+  done,
+) => {
   const expected = digest(token);
   app.post('/internal/tick', { onRequest: app.rateLimitFor('internalTick') }, async (request) => {
     const provided = request.headers['x-internal-token'];
@@ -15,8 +21,12 @@ export const tickRoutes: FastifyPluginCallbackZod<Options> = (app, { worker, tok
       throw new ApiHttpError(401, 'UNAUTHORIZED', 'Invalid internal token');
     }
     const recovered = await worker.recover();
+    const scheduled =
+      db && reconciliationIntervalHours > 0
+        ? await scheduleDueRuns(db, reconciliationIntervalHours)
+        : 0;
     const { claimed } = await worker.drainOnce();
-    return { claimed, recovered };
+    return { claimed, recovered, scheduled };
   });
   done();
 };

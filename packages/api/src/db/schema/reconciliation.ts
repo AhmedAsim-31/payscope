@@ -19,12 +19,14 @@ import {
   FINDING_TYPES,
   RUN_MODES,
   RUN_STATUSES,
+  RUN_TRIGGERS,
 } from '@payscope/shared/reconciliation-schemas';
 import { organizationsTable } from './identity';
 import { providerConnectionsTable } from './providers';
 
 export const reconciliationRunStatus = pgEnum('reconciliation_run_status', RUN_STATUSES);
 export const reconciliationMode = pgEnum('reconciliation_mode', RUN_MODES);
+export const reconciliationTrigger = pgEnum('reconciliation_trigger', RUN_TRIGGERS);
 export const findingType = pgEnum('finding_type', FINDING_TYPES);
 export const findingSeverity = pgEnum('finding_severity', FINDING_SEVERITIES);
 export const findingStatus = pgEnum('finding_status', FINDING_STATUSES);
@@ -42,6 +44,7 @@ export const reconciliationRunsTable = pgTable(
     connectionId: uuid('connection_id'),
     status: reconciliationRunStatus('status').notNull().default('running'),
     mode: reconciliationMode('mode').notNull(),
+    trigger: reconciliationTrigger('trigger').notNull().default('manual'),
     scope: jsonb('scope').notNull().default({}),
     checkpoint: jsonb('checkpoint').notNull().default({}),
     examinedCount: integer('examined_count').notNull().default(0),

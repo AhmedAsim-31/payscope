@@ -14,6 +14,7 @@ import { StartRunForm } from './start-run-form';
 const COLUMNS: Column<ReconciliationRun>[] = [
   { header: 'Started', cell: (r) => formatTimestamp(r.startedAt) },
   { header: 'Mode', cell: (r) => humanize(r.mode) },
+  { header: 'Trigger', cell: (r) => humanize(r.trigger) },
   { header: 'Status', cell: (r) => <StatusBadge status={r.status} /> },
   { header: 'Examined', align: 'right', cell: (r) => r.counts.examined },
   { header: 'Mismatched', align: 'right', cell: (r) => r.counts.mismatched },

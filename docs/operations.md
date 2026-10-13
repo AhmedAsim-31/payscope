@@ -18,9 +18,18 @@ Call it from a scheduler or keep-alive when the host sleeps between requests.
 curl -X POST "$API_URL/internal/tick" -H "x-internal-token: $INTERNAL_TICK_TOKEN"
 ```
 
-The response is `{"claimed": <jobs run>, "recovered": <expired leases re-queued>}`.
+The response is `{"claimed": <jobs run>, "recovered": <expired leases re-queued>, "scheduled": <reconciliation runs started>}`.
 One tick runs at most one concurrency-sized batch, so call it again while `claimed` is not zero.
 A missing or wrong token returns 401.
+
+## Scheduled reconciliation
+
+Each tick starts a local reconciliation run for every org that has at least one `active` provider connection and no run, manual or scheduled, started within the last `RECONCILIATION_SCHEDULE_INTERVAL_HOURS` (default 24).
+An org with a run still `running` is skipped.
+Scheduled runs have `trigger = 'scheduled'` and no `triggered_by`; the runs page shows the trigger.
+Concurrent ticks are serialized by a transaction-scoped advisory lock, so overlapping calls start at most one run per org.
+Set `RECONCILIATION_SCHEDULE_INTERVAL_HOURS=0` to turn scheduling off.
+Provider-mode runs are still started by hand.
 
 ## Dead jobs
 

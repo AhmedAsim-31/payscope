@@ -3,6 +3,7 @@ import { decodeCredentialsKey, parsePreviousKeys } from './crypto/credentials-ci
 import { rateLimitEnvSchema, resolvePolicies, type RatePolicies } from './rate-limit/policies';
 
 const DEFAULT_CORS_ORIGIN = 'http://localhost:3000';
+export const DEFAULT_RECONCILIATION_INTERVAL_HOURS = 24;
 
 const envSchema = z
   .object({
@@ -35,6 +36,12 @@ const envSchema = z
       .default('true')
       .transform((v) => v === 'true'),
     INTERNAL_TICK_TOKEN: z.string().min(16).optional(),
+    RECONCILIATION_SCHEDULE_INTERVAL_HOURS: z.coerce
+      .number()
+      .int()
+      .min(0)
+      .max(8760)
+      .default(DEFAULT_RECONCILIATION_INTERVAL_HOURS),
     TRUST_PROXY: z
       .enum(['true', 'false'])
       .default('false')
@@ -78,6 +85,7 @@ export type Config = {
   credentialsPreviousKeys: Map<number, Buffer>;
   runWorkerInProcess: boolean;
   internalTickToken: string | undefined;
+  reconciliationIntervalHours: number;
   rateLimits: RatePolicies;
 };
 
@@ -116,6 +124,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       : new Map<number, Buffer>(),
     runWorkerInProcess: e.RUN_WORKER_IN_PROCESS,
     internalTickToken: e.INTERNAL_TICK_TOKEN,
+    reconciliationIntervalHours: e.RECONCILIATION_SCHEDULE_INTERVAL_HOURS,
     rateLimits: resolvePolicies(limits.data),
   };
 }
