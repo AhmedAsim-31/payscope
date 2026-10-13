@@ -142,7 +142,7 @@ export const reconciliationRoutes: FastifyPluginCallbackZod<Options> = (app, opt
   app.get(
     `${base}/runs`,
     {
-      preHandler: requireOrg(db, 'records:read'),
+      preHandler: [requireOrg(db, 'records:read'), app.rateLimitFor('search')],
       schema: { params: orgParams, querystring: runQuerySchema, response: { 200: runPageSchema } },
     },
     (request) => listRuns(db, currentOrg(request).id, request.query),
@@ -167,7 +167,7 @@ export const reconciliationRoutes: FastifyPluginCallbackZod<Options> = (app, opt
   app.get(
     `${base}/findings`,
     {
-      preHandler: requireOrg(db, 'records:read'),
+      preHandler: [requireOrg(db, 'records:read'), app.rateLimitFor('search')],
       schema: {
         params: orgParams,
         querystring: findingQuerySchema,

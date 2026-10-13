@@ -146,6 +146,20 @@ describe('org data and action limits', () => {
     expect(await get('audit')).toBe(429);
   });
 
+  it('applies the search limit to list endpoints only', async () => {
+    const app = await startWith({ search: { max: 1, windowSec: 60 } });
+    const { owner, orgId } = await ownerOrg(app);
+    const get = (path: string) =>
+      app
+        .inject({ method: 'GET', url: `/api/v1/orgs/${orgId}/${path}`, headers: owner.headers })
+        .then((r) => r.statusCode);
+    expect(await get('payments?status=succeeded')).toBe(200);
+    expect(await get('customers')).toBe(429);
+    expect(await get('audit')).toBe(429);
+    expect(await get('connections')).toBe(200);
+    expect(await get(`payments/${randomUUID()}`)).toBe(404);
+  });
+
   it('limits reconciliation run starts per org', async () => {
     const app = await startWith({ reconciliationRun: { max: 2, windowSec: 600 } });
     const { owner, orgId } = await ownerOrg(app);

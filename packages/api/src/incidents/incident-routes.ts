@@ -32,7 +32,7 @@ export const incidentRoutes: FastifyPluginCallbackZod<{ db: Db }> = (app, { db }
   app.get(
     base,
     {
-      preHandler: requireOrg(db, 'records:read'),
+      preHandler: [requireOrg(db, 'records:read'), app.rateLimitFor('search')],
       schema: {
         params: orgParams,
         querystring: incidentQuerySchema,

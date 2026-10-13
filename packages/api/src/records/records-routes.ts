@@ -42,12 +42,13 @@ export const recordsRoutes: FastifyPluginCallbackZod<Options> = (app, { db }, do
   app.addHook('onRequest', app.authenticate);
   app.addHook('onRequest', app.rateLimitByMethod());
   const preHandler = requireOrg(db, 'records:read');
+  const listPreHandler = [preHandler, app.rateLimitFor('search')];
   const base = '/api/v1/orgs/:orgId';
 
   app.get(
     `${base}/payments`,
     {
-      preHandler,
+      preHandler: listPreHandler,
       schema: {
         params: orgParams,
         querystring: paymentQuerySchema,
@@ -76,7 +77,7 @@ export const recordsRoutes: FastifyPluginCallbackZod<Options> = (app, { db }, do
   app.get(
     `${base}/subscriptions`,
     {
-      preHandler,
+      preHandler: listPreHandler,
       schema: {
         params: orgParams,
         querystring: subscriptionQuerySchema,
@@ -105,7 +106,7 @@ export const recordsRoutes: FastifyPluginCallbackZod<Options> = (app, { db }, do
   app.get(
     `${base}/customers`,
     {
-      preHandler,
+      preHandler: listPreHandler,
       schema: {
         params: orgParams,
         querystring: customerQuerySchema,
@@ -134,7 +135,7 @@ export const recordsRoutes: FastifyPluginCallbackZod<Options> = (app, { db }, do
   app.get(
     `${base}/entitlements`,
     {
-      preHandler,
+      preHandler: listPreHandler,
       schema: {
         params: orgParams,
         querystring: entitlementQuerySchema,
