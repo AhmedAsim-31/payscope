@@ -145,3 +145,57 @@ The key comes from `CREDENTIALS_ENCRYPTION_KEY` (base64, 32 bytes) and is requir
 At most two webhook secrets are kept per connection, so a rotation accepts the old and new secret together.
 The connections API returns `hasWebhookSecret` and `hasApiKey` and never returns secrets or ciphertext.
 Only sandbox API keys are accepted.
+
+## Reconciliation
+
+Reconciliation compares local records against local invariants and, optionally, against the provider's authoritative state.
+Detection and correction are separate: a run only writes findings, and repairs belong to a later flow.
+A finding is never marked `resolved` here; `PATCH` accepts only `reviewed` and `dismissed`.
+
+### Runs
+
+`POST /api/v1/orgs/:orgId/reconciliation/runs` takes `{ connectionId?, mode }` and needs `reconciliation:run`.
+It inserts a `reconciliation_runs` row and a `run_reconciliation` job (idempotency key `run:{id}`) in one transaction.
+A partial unique index allows one `running` run per `(org, connection)`, with an org-wide run using a zero uuid, so a second request returns 409 `RUN_IN_PROGRESS`.
+The worker executes in keyset batches outside any transaction, and each batch writes its findings, count increments, and checkpoint in one short transaction.
+The checkpoint stores the current phase, the last keyset cursor, and the provider request count, so a job retry continues from the checkpoint and processes only the remaining rows.
+A run ends `completed`, or `partial` when objects were unavailable or failed, the request cap was hit, or the provider rejected the credentials.
+A non-retryable error or the last failed attempt ends the run `failed`.
+
+### Local rules
+
+Local mode needs no credentials and makes no provider calls.
+
+| Rule                                                                                                                          | Finding type                        | Subject                             |
+| ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | ----------------------------------- |
+| Succeeded payment and an active subscription for the customer, but no active entitlement                                      | `entitlement_missing_or_stale`      | customer                            |
+| Subscription expired, or canceled with the period ended, but an entitlement is still active                                   | `expired_externally_active_locally` | subscription (plus entitlement key) |
+| `amount_refunded_minor > 0` with a status other than refunded or partially refunded, or status refunded with nothing refunded | `refund_inconsistent`               | payment                             |
+| Payment or subscription whose customer has zero or several mappings on the connection                                         | `mapping_missing_or_ambiguous`      | payment or subscription             |
+| Event stuck in `needs_attention` whose record status contradicts the event type                                               | `status_mismatch`                   | payment or subscription             |
+
+In local mode `examined` and `mismatched` both count the rows a rule flagged.
+
+### Provider mode
+
+Provider mode needs a connection with an API key and an adapter whose `authoritativeFetch` is not `unsupported`.
+It calls `fetchPayment` and `fetchSubscription` for each local record with bounded concurrency (default 3) and a per-run request cap (default 200).
+Status and amount are compared, with refunded and disputed local payments accepting a provider `succeeded`.
+
+| Provider result              | Outcome                                                                                   |
+| ---------------------------- | ----------------------------------------------------------------------------------------- |
+| Statuses and amounts agree   | counted as matched                                                                        |
+| Disagreement                 | `status_mismatch`, severity high                                                          |
+| `not_found`                  | `provider_object_not_found`, severity high                                                |
+| `unavailable` or `transient` | `provider_unavailable`, severity low, counted in `unavailable`; never reported as missing |
+| `provider_auth`              | run ends `partial` with `provider_auth_failed`                                            |
+| Anything else                | counted in `failed`                                                                       |
+
+`provider_payment_missing_locally` is reserved: the adapters have no list operation, so nothing emits it yet.
+
+### Idempotent findings
+
+The fingerprint is `type:subjectType:subjectId`, plus the entitlement key where one applies.
+A partial unique index on `(org_id, fingerprint)` for `open` and `reviewed` findings makes re-detection an `INSERT ... ON CONFLICT DO UPDATE` that refreshes `last_seen_run_id`, `evidence`, and `updated_at`.
+Overlapping runs therefore cannot create duplicates.
+A dismissed finding that is detected again opens a new finding.

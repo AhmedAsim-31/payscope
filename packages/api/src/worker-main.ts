@@ -1,4 +1,5 @@
 import { loadConfig } from './config';
+import { createCredentialsCipher } from './crypto/credentials-cipher';
 import { createDb } from './db/client';
 import { createDefaultHandlers } from './jobs/default-handlers';
 import { createJsonLogger } from './jobs/json-logger';
@@ -10,7 +11,10 @@ const logger = createJsonLogger();
 const { db, sql } = createDb(config.databaseUrl, { max: config.dbPoolMax });
 const worker = createWorker({
   db,
-  handlers: createDefaultHandlers(createDefaultAdapterRegistry()),
+  handlers: createDefaultHandlers(
+    createDefaultAdapterRegistry(),
+    config.credentialsKey ? createCredentialsCipher(config.credentialsKey) : undefined,
+  ),
   logger,
 });
 

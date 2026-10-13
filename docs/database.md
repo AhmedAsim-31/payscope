@@ -114,6 +114,18 @@ The partial index on `lease_expires_at where status = 'running'` serves the expi
 Stored responses for idempotent API requests, unique on `(org_id, scope, key)`, which is also the lookup path.
 `expires_at` supports cleanup.
 
+### reconciliation_runs
+
+One reconciliation execution with `mode` (`local` or `provider`), an optional `connection_id`, `scope`, a `checkpoint` jsonb, five counters, an `error` text, and `triggered_by`.
+A partial unique index on `(org_id, coalesce(connection_id, zero uuid)) where status = 'running'` allows one active run per connection.
+Counters are incremented in the same transaction as the findings and checkpoint of each batch.
+
+### reconciliation_findings
+
+One finding per detected inconsistency, with `type`, `severity`, `status` (`open`, `reviewed`, `resolved`, `dismissed`), the subject, `evidence`, and `recommended_action`.
+`first_seen_run_id` and `last_seen_run_id` reference runs in the same org.
+A partial unique index on `(org_id, fingerprint) where status in ('open', 'reviewed')` makes re-detection an upsert.
+
 ### Domain row level security
 
 `authenticated` has `SELECT` with a policy of `app.is_org_member(org_id)` on every domain table except `idempotency_records`.
