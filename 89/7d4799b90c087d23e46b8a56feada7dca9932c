@@ -1,0 +1,94 @@
+packages/api/src/app.ts
+  h_78e539a96187c3 20,88
+packages/api/src/records/customers-repo.ts
+  h_78e539a96187c3 1-109
+packages/api/src/records/entitlements-repo.ts
+  h_78e539a96187c3 1-74
+packages/api/src/records/keyset.ts
+  h_78e539a96187c3 1-55
+packages/api/src/records/payments-repo.ts
+  h_78e539a96187c3 1-116
+packages/api/src/records/records-routes.ts
+  h_78e539a96187c3 1-155
+packages/api/src/records/records.integration.test.ts
+  h_78e539a96187c3 1-246
+packages/api/src/records/subscriptions-repo.ts
+  h_78e539a96187c3 1-96
+packages/shared/src/records-schemas.test.ts
+  h_78e539a96187c3 1-13
+packages/shared/src/records-schemas.ts
+  h_78e539a96187c3 1-184
+packages/web/src/app/app/[orgId]/customers/[customerId]/page.tsx
+  h_78e539a96187c3 1-19
+packages/web/src/app/app/[orgId]/customers/page.tsx
+  h_78e539a96187c3 1-12
+packages/web/src/app/app/[orgId]/entitlements/[entitlementId]/page.tsx
+  h_78e539a96187c3 1-19
+packages/web/src/app/app/[orgId]/entitlements/page.tsx
+  h_78e539a96187c3 1-12
+packages/web/src/app/app/[orgId]/payments/[paymentId]/page.tsx
+  h_78e539a96187c3 1-19
+packages/web/src/app/app/[orgId]/payments/page.tsx
+  h_78e539a96187c3 1-12
+packages/web/src/app/app/[orgId]/subscriptions/[subscriptionId]/page.tsx
+  h_78e539a96187c3 1-19
+packages/web/src/app/app/[orgId]/subscriptions/page.tsx
+  h_78e539a96187c3 1-16
+packages/web/src/components/records/customer-detail.tsx
+  h_78e539a96187c3 1-96
+packages/web/src/components/records/customers-list.tsx
+  h_78e539a96187c3 1-46
+packages/web/src/components/records/detail-parts.tsx
+  h_78e539a96187c3 1-47
+packages/web/src/components/records/entitlement-detail.tsx
+  h_78e539a96187c3 1-83
+packages/web/src/components/records/entitlements-list.tsx
+  h_78e539a96187c3 1-51
+packages/web/src/components/records/filter-bar.tsx
+  h_78e539a96187c3 1-87
+packages/web/src/components/records/filter-config.ts
+  h_78e539a96187c3 1-69
+packages/web/src/components/records/format.test.ts
+  h_78e539a96187c3 1-35
+packages/web/src/components/records/format.ts
+  h_78e539a96187c3 1-25
+packages/web/src/components/records/payment-detail.tsx
+  h_78e539a96187c3 1-97
+packages/web/src/components/records/payments-list.test.tsx
+  h_78e539a96187c3 1-80
+packages/web/src/components/records/payments-list.tsx
+  h_78e539a96187c3 1-49
+packages/web/src/components/records/records-list-view.tsx
+  h_78e539a96187c3 1-73
+packages/web/src/components/records/records-list.tsx
+  h_78e539a96187c3 1-120
+packages/web/src/components/records/status-badge.test.tsx
+  h_78e539a96187c3 1-15
+packages/web/src/components/records/status-badge.tsx
+  h_78e539a96187c3 1-35
+packages/web/src/components/records/subscription-detail.tsx
+  h_78e539a96187c3 1-92
+packages/web/src/components/records/subscriptions-list.tsx
+  h_78e539a96187c3 1-52
+packages/web/src/components/records/use-record-detail.ts
+  h_78e539a96187c3 1-17
+packages/web/src/components/records/use-url-filters.ts
+  h_78e539a96187c3 1-42
+packages/web/src/components/shell/nav-config.ts
+  h_78e539a96187c3 1-9,20-23
+packages/web/src/components/shell/sidebar-nav.test.tsx
+  h_78e539a96187c3 25-32
+packages/web/src/lib/records-queries.ts
+  h_78e539a96187c3 1-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "897d4799b90c087d23e46b8a56feada7dca9932c",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
