@@ -1,0 +1,20 @@
+packages/e2e/tests/support.ts
+  h_78e539a96187c3 40-47
+packages/e2e/tests/visual.spec.ts
+  h_78e539a96187c3 3-9,44
+packages/web/next.config.ts
+  h_78e539a96187c3 6
+packages/web/src/components/ui/sidebar.tsx
+  h_78e539a96187c3 218
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d462168d6c0bc8266fc92915c6e597061277f892",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
