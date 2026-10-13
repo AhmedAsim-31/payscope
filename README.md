@@ -24,13 +24,15 @@ See [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) for what is real, simul
 
 Captured from the running app on seeded demo data by the Playwright visual sweep.
 
-| Overview                                                   | Overview, dark                                                     |
-| ---------------------------------------------------------- | ------------------------------------------------------------------ |
-| ![Overview](docs/screenshots/overview-light-1280.png)      | ![Overview in dark mode](docs/screenshots/overview-dark-1280.png)  |
-| Payments                                                   | Events                                                             |
-| ![Payments](docs/screenshots/payments-light-1280.png)      | ![Event inbox](docs/screenshots/events-light-1280.png)             |
-| Scenario lab                                               | Payments, mobile                                                   |
-| ![Scenario lab](docs/screenshots/scenarios-light-1280.png) | ![Payments at 375 pixels](docs/screenshots/payments-light-375.png) |
+| Overview                                                             | Overview, dark                                                     |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| ![Overview](docs/screenshots/overview-light-1280.png)                | ![Overview in dark mode](docs/screenshots/overview-dark-1280.png)  |
+| Payments                                                             | Events                                                             |
+| ![Payments](docs/screenshots/payments-light-1280.png)                | ![Event inbox](docs/screenshots/events-light-1280.png)             |
+| Scenario lab                                                         | Payments, mobile                                                   |
+| ![Scenario lab](docs/screenshots/scenarios-light-1280.png)           | ![Payments at 375 pixels](docs/screenshots/payments-light-375.png) |
+| Connections                                                          |                                                                    |
+| ![Provider connections](docs/screenshots/connections-light-1280.png) |                                                                    |
 
 ## Demo
 

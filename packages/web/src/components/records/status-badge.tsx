@@ -11,6 +11,9 @@ const NEUTRAL = 'bg-transparent text-muted-foreground';
 const TONES: Record<string, string> = {
   succeeded: SUCCESS,
   active: SUCCESS,
+  unverified: WARNING,
+  error: DANGER,
+  disabled: NEUTRAL,
   processed: SUCCESS,
   pending: WARNING,
   processing: WARNING,

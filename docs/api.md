@@ -74,12 +74,13 @@ Rate-limited requests answer `429 RATE_LIMITED` with `retry-after` and `x-rateli
 
 ### Provider connections
 
-| Method | Path                              | Permission           | Notes                                                          |
-| ------ | --------------------------------- | -------------------- | -------------------------------------------------------------- |
-| POST   | `{org}/connections`               | `connections:manage` | Mode `sandbox` or `simulation`; only sandbox API keys accepted |
-| GET    | `{org}/connections`               | `connections:read`   | Returns `hasWebhookSecret` and `hasApiKey`, never secrets      |
-| GET    | `{org}/connections/:connectionId` | `connections:read`   |                                                                |
-| PATCH  | `{org}/connections/:connectionId` | `connections:manage` | Rotate webhook secret or API key, set `entitlementMap`         |
+| Method | Path                                     | Permission           | Notes                                                                                                                                  |
+| ------ | ---------------------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| POST   | `{org}/connections`                      | `connections:manage` | Mode `sandbox` or `simulation`; only sandbox API keys accepted                                                                         |
+| GET    | `{org}/connections`                      | `connections:read`   | Returns `hasWebhookSecret` and `hasApiKey`, never secrets                                                                              |
+| GET    | `{org}/connections/:connectionId`        | `connections:read`   |                                                                                                                                        |
+| PATCH  | `{org}/connections/:connectionId`        | `connections:manage` | Rotate webhook secret or API key, set `entitlementMap`                                                                                 |
+| POST   | `{org}/connections/:connectionId/verify` | `connections:manage` | Calls the provider with the stored API key; sets `status`, `lastVerifiedAt`, `lastError`. `409 SIMULATED_CONNECTION`, `422 NO_API_KEY` |
 
 ### Records
 
@@ -154,15 +155,15 @@ The connections, reconciliation, and webhook routes are registered only when `CR
 
 Counters are stored in Postgres (`rate_limit_buckets`), so they hold across restarts and instances.
 
-| Applied to                   | Policy                                               | Default                            |
-| ---------------------------- | ---------------------------------------------------- | ---------------------------------- |
-| Every authenticated route    | `authenticatedRead` / `authenticatedWrite` by method | 300 and 60 per minute per user     |
-| Connection create and update | `credentialTest`, in addition                        | 5 per minute per user and org      |
-| Reconciliation run start     | `reconciliationRun`, in addition                     | 5 per 10 minutes per org           |
-| Scenario run and reset       | `scenarioRun`, in addition                           | 20 per 10 minutes per org          |
-| Repair actions               | `repairAction`, in addition                          | 30 per 10 minutes per user and org |
-| Webhooks                     | `webhookIngress`                                     | 600 per minute per connection      |
-| `/internal/tick`             | `internalTick`                                       | 30 per minute per IP               |
+| Applied to                        | Policy                                               | Default                            |
+| --------------------------------- | ---------------------------------------------------- | ---------------------------------- |
+| Every authenticated route         | `authenticatedRead` / `authenticatedWrite` by method | 300 and 60 per minute per user     |
+| Connection create, update, verify | `credentialTest`, in addition                        | 5 per minute per user and org      |
+| Reconciliation run start          | `reconciliationRun`, in addition                     | 5 per 10 minutes per org           |
+| Scenario run and reset            | `scenarioRun`, in addition                           | 20 per 10 minutes per org          |
+| Repair actions                    | `repairAction`, in addition                          | 30 per 10 minutes per user and org |
+| Webhooks                          | `webhookIngress`                                     | 600 per minute per connection      |
+| `/internal/tick`                  | `internalTick`                                       | 30 per minute per IP               |
 
 Authenticated routes are `/api/v1/me` and every org route: orgs, members, connections, records, events, reconciliation, incidents, repairs, scenarios, audit, and overview.
 Each policy can be overridden with `RATE_LIMIT_<POLICY>_MAX` and `RATE_LIMIT_<POLICY>_WINDOW_SEC`, for example `RATE_LIMIT_WEBHOOK_INGRESS_MAX`.

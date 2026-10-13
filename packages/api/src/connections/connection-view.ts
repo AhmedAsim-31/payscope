@@ -1,8 +1,12 @@
 import { z } from 'zod';
+import { CAPABILITY_NAMES, CAPABILITY_STATUSES } from '@payscope/provider-adapters/capabilities';
 import { PROVIDER_NAMES } from '@payscope/provider-adapters/provider-name';
 import type { CredentialsCipher } from '../crypto/credentials-cipher';
 import type { providerConnectionsTable } from '../db/schema/providers';
+import { createDefaultAdapterRegistry } from '../providers/adapter-registry';
 import { entitlementMapSchema } from './entitlement-map';
+
+const adapters = createDefaultAdapterRegistry();
 
 export const connectionViewSchema = z.object({
   id: z.uuid(),
@@ -14,8 +18,10 @@ export const connectionViewSchema = z.object({
   hasWebhookSecret: z.boolean(),
   hasApiKey: z.boolean(),
   webhookUrl: z.string(),
+  capabilities: z.record(z.enum(CAPABILITY_NAMES), z.enum(CAPABILITY_STATUSES)),
   entitlementMap: entitlementMapSchema,
   lastVerifiedAt: z.date().nullable(),
+  lastError: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -31,6 +37,7 @@ export type ConnectionRow = Pick<
   | 'credentialsCiphertext'
   | 'entitlementMap'
   | 'lastVerifiedAt'
+  | 'lastError'
   | 'createdAt'
   | 'updatedAt'
 >;
@@ -49,8 +56,10 @@ export function toConnectionView(row: ConnectionRow, cipher: CredentialsCipher) 
     hasWebhookSecret: (credentials?.webhookSecrets.length ?? 0) > 0,
     hasApiKey: credentials?.apiKey !== undefined,
     webhookUrl: `/webhooks/${row.provider}/${row.id}`,
+    capabilities: adapters.get(row.provider).capabilities,
     entitlementMap: entitlementMapSchema.catch({}).parse(row.entitlementMap),
     lastVerifiedAt: row.lastVerifiedAt,
+    lastError: row.lastError,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   };

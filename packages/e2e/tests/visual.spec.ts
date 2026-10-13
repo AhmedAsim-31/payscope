@@ -26,6 +26,7 @@ const PAGES = [
   ['repairs', '/repairs'],
   ['scenarios', '/scenarios'],
   ['audit', '/audit'],
+  ['connections', '/connections'],
   ['members', '/members'],
 ] as const;
 const WIDTHS = [375, 768, 1280] as const;

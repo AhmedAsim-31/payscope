@@ -36,6 +36,7 @@ describe('SidebarNav', () => {
       `/app/${ORG_ID}/repairs`,
       `/app/${ORG_ID}/scenarios`,
       `/app/${ORG_ID}/audit`,
+      `/app/${ORG_ID}/connections`,
       `/app/${ORG_ID}/members`,
     ]);
     expect(hrefs).toHaveLength(NAV_ITEMS.length);

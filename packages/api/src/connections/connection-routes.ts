@@ -47,7 +47,7 @@ const patchBody = z
 const orgParams = z.object({ orgId: z.uuid() });
 const connectionParams = z.object({ orgId: z.uuid(), connectionId: z.uuid() });
 
-const viewColumns = {
+export const viewColumns = {
   id: providerConnectionsTable.id,
   provider: providerConnectionsTable.provider,
   mode: providerConnectionsTable.mode,
@@ -57,6 +57,7 @@ const viewColumns = {
   credentialsCiphertext: providerConnectionsTable.credentialsCiphertext,
   entitlementMap: providerConnectionsTable.entitlementMap,
   lastVerifiedAt: providerConnectionsTable.lastVerifiedAt,
+  lastError: providerConnectionsTable.lastError,
   createdAt: providerConnectionsTable.createdAt,
   updatedAt: providerConnectionsTable.updatedAt,
 };
