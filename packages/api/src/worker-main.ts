@@ -13,7 +13,12 @@ const worker = createWorker({
   db,
   handlers: createDefaultHandlers(
     createDefaultAdapterRegistry(),
-    config.credentialsKey ? createCredentialsCipher(config.credentialsKey) : undefined,
+    config.credentialsKey
+      ? createCredentialsCipher(config.credentialsKey, {
+          version: config.credentialsKeyVersion,
+          previous: config.credentialsPreviousKeys,
+        })
+      : undefined,
   ),
   logger,
 });

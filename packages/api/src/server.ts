@@ -13,7 +13,10 @@ const config = loadConfig();
 const { db, sql } = createDb(config.databaseUrl, { max: config.dbPoolMax });
 const adapters = createDefaultAdapterRegistry();
 const credentialsCipher = config.credentialsKey
-  ? createCredentialsCipher(config.credentialsKey)
+  ? createCredentialsCipher(config.credentialsKey, {
+      version: config.credentialsKeyVersion,
+      previous: config.credentialsPreviousKeys,
+    })
   : undefined;
 const worker = createWorker({
   db,
@@ -27,6 +30,7 @@ const app = await buildApp({
   corsOrigins: config.corsOrigins,
   logLevel: config.logLevel,
   trustProxy: config.trustProxy,
+  hsts: config.nodeEnv === 'production',
   rateLimits: config.rateLimits,
   readinessChecks: [
     {

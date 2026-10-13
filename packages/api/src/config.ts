@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { decodeCredentialsKey } from './crypto/credentials-cipher';
+import { decodeCredentialsKey, parsePreviousKeys } from './crypto/credentials-cipher';
 import { rateLimitEnvSchema, resolvePolicies, type RatePolicies } from './rate-limit/policies';
 
 const DEFAULT_CORS_ORIGIN = 'http://localhost:3000';
@@ -23,6 +23,13 @@ const envSchema = z
         error: 'must be base64 that decodes to 32 bytes',
       })
       .optional(),
+    CREDENTIALS_ENCRYPTION_KEY_VERSION: z.coerce.number().int().min(1).max(255).default(1),
+    CREDENTIALS_ENCRYPTION_KEYS_PREVIOUS: z
+      .string()
+      .refine((v) => parsePreviousKeys(v) !== undefined, {
+        error: 'must be comma-separated version:base64 entries with 32-byte keys',
+      })
+      .optional(),
     RUN_WORKER_IN_PROCESS: z
       .enum(['true', 'false'])
       .default('true')
@@ -37,6 +44,17 @@ const envSchema = z
     path: ['CORS_ORIGIN'],
     error: 'required in production',
   })
+  .refine(
+    (env) =>
+      !env.CREDENTIALS_ENCRYPTION_KEYS_PREVIOUS ||
+      !parsePreviousKeys(env.CREDENTIALS_ENCRYPTION_KEYS_PREVIOUS)?.has(
+        env.CREDENTIALS_ENCRYPTION_KEY_VERSION,
+      ),
+    {
+      path: ['CREDENTIALS_ENCRYPTION_KEYS_PREVIOUS'],
+      error: 'must not contain the active key version',
+    },
+  )
   .refine((env) => env.NODE_ENV !== 'production' || env.CREDENTIALS_ENCRYPTION_KEY !== undefined, {
     path: ['CREDENTIALS_ENCRYPTION_KEY'],
     error: 'required in production',
@@ -56,6 +74,8 @@ export type Config = {
   databaseUrl: string;
   dbPoolMax: number;
   credentialsKey: Buffer | undefined;
+  credentialsKeyVersion: number;
+  credentialsPreviousKeys: Map<number, Buffer>;
   runWorkerInProcess: boolean;
   internalTickToken: string | undefined;
   rateLimits: RatePolicies;
@@ -90,6 +110,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     credentialsKey: e.CREDENTIALS_ENCRYPTION_KEY
       ? decodeCredentialsKey(e.CREDENTIALS_ENCRYPTION_KEY)
       : undefined,
+    credentialsKeyVersion: e.CREDENTIALS_ENCRYPTION_KEY_VERSION,
+    credentialsPreviousKeys: e.CREDENTIALS_ENCRYPTION_KEYS_PREVIOUS
+      ? (parsePreviousKeys(e.CREDENTIALS_ENCRYPTION_KEYS_PREVIOUS) ?? new Map<number, Buffer>())
+      : new Map<number, Buffer>(),
     runWorkerInProcess: e.RUN_WORKER_IN_PROCESS,
     internalTickToken: e.INTERNAL_TICK_TOKEN,
     rateLimits: resolvePolicies(limits.data),
