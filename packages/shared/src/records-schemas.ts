@@ -71,6 +71,7 @@ export const relatedEventSchema = z.object({
 export type RelatedEvent = z.infer<typeof relatedEventSchema>;
 
 export const paymentDetailSchema = paymentSchema.extend({
+  subscriptionId: z.uuid().nullable(),
   lastEventAt: nullableDate,
   updatedAt: isoDate,
   events: z.array(relatedEventSchema),

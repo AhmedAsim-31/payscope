@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { auditPageSchema } from '@payscope/shared/audit-schemas';
+import { findingPageSchema } from '@payscope/shared/reconciliation-schemas';
 import { paymentDetailSchema } from '@payscope/shared/records-schemas';
 import {
   BackLink,
@@ -12,6 +13,7 @@ import {
   Timestamp,
 } from './detail-parts';
 import { AUDIT_COLUMNS } from '@/components/audit/audit-list';
+import { findingColumns } from '@/components/reconciliation/findings-list';
 import { formatMoney, humanize, recordHref } from './format';
 import { RelatedRecords } from './related-records';
 import { StatusBadge } from './status-badge';
@@ -55,6 +57,18 @@ export function PaymentDetail({ orgId, paymentId }: { orgId: string; paymentId: 
               <span className="text-muted-foreground">Unknown</span>
             )}
           </DetailField>
+          <DetailField label="Subscription">
+            {payment.subscriptionId ? (
+              <Link
+                href={recordHref(orgId, 'subscriptions', payment.subscriptionId)}
+                className="underline underline-offset-4"
+              >
+                View subscription
+              </Link>
+            ) : (
+              <span className="text-muted-foreground">None</span>
+            )}
+          </DetailField>
           <DetailField label="Provider time (created at the provider)">
             <Timestamp value={payment.providerCreatedAt} />
           </DetailField>
@@ -95,6 +109,21 @@ export function PaymentDetail({ orgId, paymentId }: { orgId: string; paymentId: 
           </ol>
         )}
       </DetailSection>
+
+      <RelatedRecords
+        orgId={orgId}
+        title="Reconciliation findings"
+        resource="reconciliation/findings"
+        listPath="findings"
+        viewAllLabel="View all findings"
+        schema={findingPageSchema}
+        params={{ subjectType: 'payment', subjectId: payment.id }}
+        columns={findingColumns(orgId)}
+        empty={{
+          title: 'No findings',
+          hint: 'Reconciliation has not flagged this payment. Findings appear here after a run detects a discrepancy.',
+        }}
+      />
 
       <RelatedRecords
         orgId={orgId}
