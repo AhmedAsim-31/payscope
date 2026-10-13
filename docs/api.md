@@ -75,13 +75,18 @@ Rate-limited requests answer `429 RATE_LIMITED` with `retry-after` and `x-rateli
 
 ### Provider connections
 
-| Method | Path                                     | Permission           | Notes                                                                                                                                  |
-| ------ | ---------------------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| POST   | `{org}/connections`                      | `connections:manage` | Mode `sandbox` or `simulation`; only sandbox API keys accepted                                                                         |
-| GET    | `{org}/connections`                      | `connections:read`   | Returns `hasWebhookSecret` and `hasApiKey`, never secrets                                                                              |
-| GET    | `{org}/connections/:connectionId`        | `connections:read`   |                                                                                                                                        |
-| PATCH  | `{org}/connections/:connectionId`        | `connections:manage` | Rotate webhook secret or API key, set `entitlementMap`                                                                                 |
-| POST   | `{org}/connections/:connectionId/verify` | `connections:manage` | Calls the provider with the stored API key; sets `status`, `lastVerifiedAt`, `lastError`. `409 SIMULATED_CONNECTION`, `422 NO_API_KEY` |
+| Method | Path                                                      | Permission           | Notes                                                                                                                                  |
+| ------ | --------------------------------------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| POST   | `{org}/connections`                                       | `connections:manage` | Mode `sandbox` or `simulation`; only sandbox API keys accepted                                                                         |
+| GET    | `{org}/connections`                                       | `connections:read`   | Returns `hasWebhookSecret` and `hasApiKey`, never secrets                                                                              |
+| GET    | `{org}/connections/:connectionId`                         | `connections:read`   |                                                                                                                                        |
+| PATCH  | `{org}/connections/:connectionId`                         | `connections:manage` | Rotate webhook secret or API key, set `entitlementMap`                                                                                 |
+| POST   | `{org}/connections/:connectionId/verify`                  | `connections:manage` | Calls the provider with the stored API key; sets `status`, `lastVerifiedAt`, `lastError`. `409 SIMULATED_CONNECTION`, `422 NO_API_KEY` |
+| DELETE | `{org}/connections/:connectionId/credentials/:credential` | `connections:manage` | `:credential` is `webhookSecret` or `apiKey`. Returns the connection view; audited as `connection.credential_remove`                   |
+
+Removing `webhookSecret` drops every stored webhook secret, and removing `apiKey` drops the API key.
+Removing the API key of a sandbox connection that is not `disabled` sets its `status` back to `unverified`.
+Removing a credential that is not stored answers `200` and changes nothing.
 
 ### Records
 
@@ -94,6 +99,11 @@ All need `records:read`.
 | GET    | `{org}/subscriptions`, `{org}/subscriptions/:subscriptionId` |
 | GET    | `{org}/customers`, `{org}/customers/:customerId`             |
 | GET    | `{org}/entitlements`, `{org}/entitlements/:entitlementId`    |
+
+Payment list filters: `status`, `provider`, `currency`, `connectionId`, `customerId`, and `subscriptionId` match exactly.
+`subscriptionId` matches payments on the same connection whose provider subscription id is that subscription's.
+`minAmount` and `maxAmount` are inclusive bounds on `amountMinor`, as digit strings; `minAmount` above `maxAmount` answers `422 INVALID_AMOUNT_RANGE`.
+`from` (inclusive) and `to` (exclusive) are ISO 8601 timestamps on `createdAt`.
 
 ### Entitlement ingestion
 
@@ -118,6 +128,9 @@ Each applied or ignored write is audited as `entitlement.ingest`; reusing a key 
 | GET    | `{org}/jobs/summary`          | `events:read` | Job counts by status                              |
 | POST   | `{org}/events/:eventId/retry` | `jobs:retry`  | Sets the event back to `pending` and re-queues it |
 
+Event list filters: `status`, `provider`, `connectionId`, `normalizedType`, and `objectRef` (the provider object id) match exactly, and `from` and `to` bound the timestamp.
+`customerId` matches events whose object is a payment, subscription, or provider customer mapping of that customer on the same connection.
+
 ### Reconciliation
 
 | Method | Path                                                       | Permission           | Notes                                            |
@@ -126,6 +139,8 @@ Each applied or ignored write is audited as `entitlement.ingest`; reusing a key 
 | GET    | `{org}/reconciliation/runs`, `.../runs/:runId`             | `records:read`       |                                                  |
 | GET    | `{org}/reconciliation/findings`, `.../findings/:findingId` | `records:read`       |                                                  |
 | PATCH  | `{org}/reconciliation/findings/:findingId`                 | `findings:update`    | Status `reviewed` or `dismissed` only            |
+
+Finding list filters: `type`, `status`, `severity`, `subjectType`, and `subjectId` match exactly.
 
 Each run carries `trigger`: `manual` for runs started through this API, `scheduled` for runs the internal tick starts (see [operations.md](operations.md#scheduled-reconciliation)).
 
@@ -141,11 +156,17 @@ Each run carries `trigger`: `manual` for runs started through this API, `schedul
 All need `repairs:execute`, an `Idempotency-Key` header, and a `reason` of 10 to 500 characters.
 None of them write to a provider.
 
-| Method | Path                                |
-| ------ | ----------------------------------- |
-| POST   | `{org}/repairs/reprocess-event`     |
-| POST   | `{org}/repairs/correct-entitlement` |
-| POST   | `{org}/repairs/resolve-finding`     |
+| Method | Path                                  |
+| ------ | ------------------------------------- |
+| POST   | `{org}/repairs/reprocess-event`       |
+| POST   | `{org}/repairs/correct-entitlement`   |
+| POST   | `{org}/repairs/resolve-finding`       |
+| POST   | `{org}/repairs/refresh-from-provider` |
+
+`refresh-from-provider` takes `{ paymentId, reason }` or `{ subscriptionId, reason }`, never both.
+It reads the object from the provider and overwrites the local status (and, for a payment, amount and currency).
+When the result matches the provider, open or reviewed `status_mismatch` findings on that record are resolved and their ids are returned in `resultingState.resolvedFindingIds`.
+Errors: `404 NOT_FOUND`, `409 CONNECTION_NOT_VERIFIED`, `409 PROVIDER_NOT_CONFIGURED`, `422 PROVIDER_FETCH_UNSUPPORTED` when the adapter cannot fetch that kind (RevenueCat payments), `409 PROVIDER_OBJECT_NOT_FOUND`, `502 PROVIDER_UNAVAILABLE`, `502 PROVIDER_FETCH_FAILED`, `422 PROVIDER_STATUS_UNMAPPED`, `409 ALREADY_CONSISTENT`, `409 REFUND_EXCEEDS_AMOUNT`, and `409 CONCURRENT_UPDATE` when the record changed while the provider was being read.
 
 Reusing a key with a different body answers `422 IDEMPOTENCY_KEY_REUSED`; see [architecture.md](architecture.md#repair-center).
 
@@ -160,6 +181,7 @@ Reusing a key with a different body answers `422 IDEMPOTENCY_KEY_REUSED`; see [a
 | GET    | `{org}/audit`                     | `audit:read`    | Append-only log         |
 
 Audit list filters: `action`, `actor` (user id), `targetType`, `targetId` match exactly.
+`customerId` matches rows that target that customer or one of its payments, subscriptions, or entitlements.
 `from` (inclusive) and `to` (exclusive) are ISO 8601 timestamps on `createdAt`; `from` after `to` answers `400 VALIDATION_ERROR`.
 `q` is trimmed free text (1 to 200 characters) matched case-insensitively as a substring of action, target type, target id, actor id, actor type, and reason; `%` and `_` match literally.
 All filters combine with AND and keep keyset pagination, so pass the same filters alongside `cursor`.
@@ -177,15 +199,15 @@ The connections, reconciliation, and webhook routes are registered only when `CR
 
 Counters are stored in Postgres (`rate_limit_buckets`), so they hold across restarts and instances.
 
-| Applied to                        | Policy                                               | Default                            |
-| --------------------------------- | ---------------------------------------------------- | ---------------------------------- |
-| Every authenticated route         | `authenticatedRead` / `authenticatedWrite` by method | 300 and 60 per minute per user     |
-| Connection create, update, verify | `credentialTest`, in addition                        | 5 per minute per user and org      |
-| Reconciliation run start          | `reconciliationRun`, in addition                     | 5 per 10 minutes per org           |
-| Scenario run and reset            | `scenarioRun`, in addition                           | 20 per 10 minutes per org          |
-| Repair actions                    | `repairAction`, in addition                          | 30 per 10 minutes per user and org |
-| Webhooks                          | `webhookIngress`                                     | 600 per minute per connection      |
-| `/internal/tick`                  | `internalTick`                                       | 30 per minute per IP               |
+| Applied to                                            | Policy                                               | Default                            |
+| ----------------------------------------------------- | ---------------------------------------------------- | ---------------------------------- |
+| Every authenticated route                             | `authenticatedRead` / `authenticatedWrite` by method | 300 and 60 per minute per user     |
+| Connection create, update, verify, credential removal | `credentialTest`, in addition                        | 5 per minute per user and org      |
+| Reconciliation run start                              | `reconciliationRun`, in addition                     | 5 per 10 minutes per org           |
+| Scenario run and reset                                | `scenarioRun`, in addition                           | 20 per 10 minutes per org          |
+| Repair actions                                        | `repairAction`, in addition                          | 30 per 10 minutes per user and org |
+| Webhooks                                              | `webhookIngress`                                     | 600 per minute per connection      |
+| `/internal/tick`                                      | `internalTick`                                       | 30 per minute per IP               |
 
 Authenticated routes are `/api/v1/me` and every org route: orgs, members, connections, records, events, reconciliation, incidents, repairs, scenarios, audit, and overview.
 Each policy can be overridden with `RATE_LIMIT_<POLICY>_MAX` and `RATE_LIMIT_<POLICY>_WINDOW_SEC`, for example `RATE_LIMIT_WEBHOOK_INGRESS_MAX`.
