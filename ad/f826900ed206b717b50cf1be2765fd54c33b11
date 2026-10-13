@@ -1,0 +1,24 @@
+packages/api/src/audit/audit-routes.ts
+  h_78e539a96187c3 1,7-11,29-52,76,82,87
+packages/api/src/audit/audit.integration.test.ts
+  h_78e539a96187c3 12-17,229-261
+packages/shared/src/audit-schemas.ts
+  h_78e539a96187c3 17
+packages/web/src/components/records/customer-detail.tsx
+  h_78e539a96187c3 138,142
+packages/web/src/components/records/filter-config.ts
+  h_78e539a96187c3 125
+packages/web/src/components/records/record-detail-related.test.tsx
+  h_78e539a96187c3 150-151
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "adf826900ed206b717b50cf1be2765fd54c33b11",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
