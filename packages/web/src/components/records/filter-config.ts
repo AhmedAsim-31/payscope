@@ -39,10 +39,29 @@ function currencyCode(value: string): string | undefined {
   return /^[A-Z]{3}$/.test(upper) ? upper : undefined;
 }
 
+function minorUnits(value: string): string | undefined {
+  const trimmed = value.trim();
+  return /^\d+$/.test(trimmed) ? trimmed : undefined;
+}
+
 export const PAYMENT_FILTERS: readonly FilterField[] = [
   { name: 'status', label: 'Status', kind: 'select', options: PAYMENT_STATUSES },
   { name: 'provider', label: 'Provider', kind: 'select', options: RECORD_PROVIDERS },
   { name: 'currency', label: 'Currency', kind: 'text', placeholder: 'USD', toParam: currencyCode },
+  {
+    name: 'minAmount',
+    label: 'Min amount (minor units)',
+    kind: 'text',
+    placeholder: '1000',
+    toParam: minorUnits,
+  },
+  {
+    name: 'maxAmount',
+    label: 'Max amount (minor units)',
+    kind: 'text',
+    placeholder: '50000',
+    toParam: minorUnits,
+  },
   { name: 'from', label: 'From', kind: 'date', toParam: startOfDay },
   { name: 'to', label: 'To', kind: 'date', toParam: endExclusive },
 ];

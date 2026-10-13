@@ -144,6 +144,14 @@ export const customerDetailSchema = customerSchema.extend({
 });
 export type CustomerDetail = z.infer<typeof customerDetailSchema>;
 
+const PG_BIGINT_MAX = 9223372036854775807n;
+
+const minorAmountQuerySchema = z
+  .string()
+  .regex(/^\d+$/)
+  .transform(BigInt)
+  .pipe(z.bigint().max(PG_BIGINT_MAX));
+
 const limitSchema = z.coerce
   .number()
   .int()
@@ -166,6 +174,8 @@ export const paymentQuerySchema = pageQuerySchema.extend({
   connectionId: z.uuid().optional(),
   from: isoDate.optional(),
   to: isoDate.optional(),
+  minAmount: minorAmountQuerySchema.optional(),
+  maxAmount: minorAmountQuerySchema.optional(),
 });
 
 export const subscriptionQuerySchema = pageQuerySchema.extend({

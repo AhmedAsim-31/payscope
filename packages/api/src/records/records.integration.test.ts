@@ -96,6 +96,43 @@ describe('payments', () => {
     expect(outOfRange.body.items).toEqual([]);
   });
 
+  it('filters by an inclusive amount range in minor units', async () => {
+    const at = '2026-04-01T00:00:00Z';
+    const small = await insertPayment(a, { amount: '499', createdAt: at });
+    const low = await insertPayment(a, { amount: '500', createdAt: at });
+    const high = await insertPayment(a, { amount: '1500', createdAt: at });
+    await insertPayment(a, { amount: '1501', createdAt: at });
+    const range = `from=${at}&to=2026-04-02T00:00:00Z`;
+    const both = await get<Page>(
+      a.owner,
+      a.orgId,
+      `/payments?${range}&minAmount=500&maxAmount=1500`,
+    );
+    expect(both.body.items.map((i) => i.id).sort()).toEqual([low, high].sort());
+    const maxOnly = await get<Page>(a.owner, a.orgId, `/payments?${range}&maxAmount=499`);
+    expect(maxOnly.body.items.map((i) => i.id)).toEqual([small]);
+    const minOnly = await get<Page>(a.owner, a.orgId, `/payments?${range}&minAmount=1501`);
+    expect(minOnly.body.items).toHaveLength(1);
+  });
+
+  it('rejects malformed amounts with 400 and an inverted range with 422', async () => {
+    for (const bad of ['1.5', '-1', 'abc']) {
+      const res = await get<{ error: { code: string } }>(
+        a.owner,
+        a.orgId,
+        `/payments?minAmount=${bad}`,
+      );
+      expect(res.status).toBe(400);
+    }
+    const inverted = await get<{ error: { code: string } }>(
+      a.owner,
+      a.orgId,
+      '/payments?minAmount=200&maxAmount=100',
+    );
+    expect(inverted.status).toBe(422);
+    expect(inverted.body.error.code).toBe('INVALID_AMOUNT_RANGE');
+  });
+
   it('serializes bigint amounts beyond 2^53 exactly', async () => {
     const big = '9007199254740993123';
     const id = await insertPayment(a, { amount: big });
