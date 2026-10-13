@@ -6,11 +6,11 @@ See [demo.md](demo.md) for what the seed contains and [../IMPLEMENTATION_STATUS.
 
 ## Before you start
 
-1. Start from the local setup in the [README](../README.md), with `.env.local` exported into the shell.
+1. Start from the local setup in the [README](../README.md), with `.env.local` filled in.
 2. Run `pnpm demo:reset`.
    It applies migrations, then deletes and re-seeds only the two demo orgs.
    It refuses any `DATABASE_URL` host other than `localhost` or `127.0.0.1` unless `SEED_ALLOW_REMOTE=true`.
-3. Run `pnpm dev --env-mode=loose` and open http://localhost:3000/login.
+3. Run `pnpm dev` and open http://localhost:3000/login.
 4. Sign in as `demo-owner@example.com` with the password from `DEMO_USER_PASSWORD` in `.env.local`.
    Keep the password off screen.
 

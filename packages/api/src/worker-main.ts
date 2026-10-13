@@ -2,12 +2,12 @@ import { loadConfig } from './config';
 import { createCredentialsCipher } from './crypto/credentials-cipher';
 import { createDb } from './db/client';
 import { createDefaultHandlers } from './jobs/default-handlers';
-import { createJsonLogger } from './jobs/json-logger';
 import { createWorker } from './jobs/worker';
+import { createLogger } from './logger';
 import { createDefaultAdapterRegistry } from './providers/adapter-registry';
 
 const config = loadConfig();
-const logger = createJsonLogger();
+const logger = createLogger(config.logLevel);
 const { db, sql } = createDb(config.databaseUrl, { max: config.dbPoolMax });
 const worker = createWorker({
   db,

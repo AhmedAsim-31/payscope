@@ -20,6 +20,15 @@ async function build(opts: Parameters<typeof buildApp>[0] = {}) {
 }
 
 describe('health and readiness', () => {
+  it('GET /openapi.json documents the registered routes', async () => {
+    await build();
+    const res = await app.inject('/openapi.json');
+    expect(res.statusCode).toBe(200);
+    const doc = res.json<{ openapi: string; paths: Record<string, unknown> }>();
+    expect(doc.openapi).toMatch(/^3\./);
+    expect(Object.keys(doc.paths)).toEqual(expect.arrayContaining(['/health', '/ready']));
+  });
+
   it('GET /health returns ok', async () => {
     await build();
     const res = await app.inject('/health');

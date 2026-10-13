@@ -2,7 +2,7 @@
 
 Derived from the route files in `packages/api/src`.
 Request and response schemas live in `packages/shared/src/*-schemas.ts` and are enforced with Zod on both sides.
-There is no generated OpenAPI document.
+`GET /openapi.json` serves an OpenAPI 3 document generated from those Zod schemas.
 
 ## Conventions
 
