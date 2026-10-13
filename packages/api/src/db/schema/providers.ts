@@ -40,6 +40,7 @@ export const providerConnectionsTable = pgTable(
     credentialsCiphertext: bytea('credentials_ciphertext'),
     credentialsKeyVersion: integer('credentials_key_version'),
     capabilities: jsonb('capabilities').notNull().default({}),
+    entitlementMap: jsonb('entitlement_map').notNull().default({}),
     lastVerifiedAt: timestamp('last_verified_at', { withTimezone: true }),
     lastError: text('last_error'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

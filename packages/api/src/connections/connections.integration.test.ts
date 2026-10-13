@@ -104,6 +104,32 @@ describe('connections API', () => {
     expect(list.statusCode).toBe(200);
   });
 
+  it('stores and returns an entitlement map, validates keys, and forbids VIEWER', async () => {
+    const id = (await create(owner, base())).json<{ id: string }>().id;
+    const patch = (user: TestUser, entitlementMap: unknown) =>
+      app.inject({
+        method: 'PATCH',
+        url: `/api/v1/orgs/${orgId}/connections/${id}`,
+        headers: user.headers,
+        payload: { entitlementMap },
+      });
+    const ok = await patch(owner, { price_pro: ['pro', 'team:seat'] });
+    expect(ok.statusCode).toBe(200);
+    expect(ok.json()).toMatchObject({
+      entitlementMap: { price_pro: ['pro', 'team:seat'] },
+      hasWebhookSecret: true,
+    });
+    const got = await app.inject({
+      url: `/api/v1/orgs/${orgId}/connections/${id}`,
+      headers: owner.headers,
+    });
+    expect(got.json()).toMatchObject({ entitlementMap: { price_pro: ['pro', 'team:seat'] } });
+    expect((await patch(owner, { price_pro: ['Bad Key'] })).statusCode).toBe(400);
+    expect((await patch(owner, { price_pro: Array(21).fill('k') })).statusCode).toBe(400);
+    const viewer = await addMember('VIEWER');
+    expect((await patch(viewer, { price_pro: ['pro'] })).statusCode).toBe(403);
+  });
+
   it('rejects live Stripe keys and non-sandbox Paddle keys', async () => {
     const live = await create(owner, base({ apiKey: 'sk_live_abc' }));
     expect(live.statusCode).toBe(422);

@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { PROVIDER_NAMES } from '@payscope/provider-adapters/provider-name';
 import type { CredentialsCipher } from '../crypto/credentials-cipher';
 import type { providerConnectionsTable } from '../db/schema/providers';
+import { entitlementMapSchema } from './entitlement-map';
 
 export const connectionViewSchema = z.object({
   id: z.uuid(),
@@ -13,6 +14,7 @@ export const connectionViewSchema = z.object({
   hasWebhookSecret: z.boolean(),
   hasApiKey: z.boolean(),
   webhookUrl: z.string(),
+  entitlementMap: entitlementMapSchema,
   lastVerifiedAt: z.date().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -27,6 +29,7 @@ export type ConnectionRow = Pick<
   | 'displayName'
   | 'externalAccountId'
   | 'credentialsCiphertext'
+  | 'entitlementMap'
   | 'lastVerifiedAt'
   | 'createdAt'
   | 'updatedAt'
@@ -46,6 +49,7 @@ export function toConnectionView(row: ConnectionRow, cipher: CredentialsCipher) 
     hasWebhookSecret: (credentials?.webhookSecrets.length ?? 0) > 0,
     hasApiKey: credentials?.apiKey !== undefined,
     webhookUrl: `/webhooks/${row.provider}/${row.id}`,
+    entitlementMap: entitlementMapSchema.catch({}).parse(row.entitlementMap),
     lastVerifiedAt: row.lastVerifiedAt,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,

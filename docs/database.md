@@ -57,6 +57,7 @@ Timestamps are `timestamptz`.
 One row per connected provider account, with `provider`, `mode` (`sandbox` or `simulation`), and `status`.
 It is unique on `(org_id, provider, external_account_id)`, so one account cannot be connected twice in an organization.
 `credentials_ciphertext` and `credentials_key_version` hold encrypted credentials and are not granted to `authenticated`.
+`entitlement_map` (`jsonb`, default `{}`) maps a plan reference to entitlement keys, is validated by the API, and is granted to `authenticated` because it is not secret.
 There are no secondary indexes because organizations have only a handful of connections.
 
 ### customers and provider_customer_mappings

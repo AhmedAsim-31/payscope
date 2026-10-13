@@ -43,6 +43,20 @@
       "when": 1791855402937,
       "tag": "20261013013642_entitlement_ordering",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791855925461,
+      "tag": "20261013014525_connection_entitlement_map",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791855925734,
+      "tag": "20261013014525_connection_entitlement_map_grant",
+      "breakpoints": true
     }
   ]
 }
