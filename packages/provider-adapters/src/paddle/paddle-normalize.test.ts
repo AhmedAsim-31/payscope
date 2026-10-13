@@ -153,6 +153,11 @@ describe('normalizePaddleEvent', () => {
     expect(normalizePaddleEvent(payload).currency).toBe('EUR');
   });
 
+  it('reads the current billing period end on a subscription event', () => {
+    const event = normalizePaddleEvent(load('subscription-created'));
+    expect(event.metadata).toEqual({ currentPeriodEnd: '2026-11-01T10:00:00.000000Z' });
+  });
+
   it('records the transaction on a renewal', () => {
     const event = normalizePaddleEvent(load('transaction-completed-recurring'));
     expect(event.metadata).toMatchObject({ transactionId: 'txn_01k00000000000000000000001' });

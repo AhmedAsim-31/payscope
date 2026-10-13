@@ -40,7 +40,7 @@ export function identifyEvent(
     };
   } catch (err) {
     if (err instanceof ProviderError && err.category === 'invalid_input') {
-      const liveMode = /live-?mode|production/i.test(err.message);
+      const liveMode = err.reason === 'live_mode';
       throw new ApiHttpError(
         422,
         liveMode ? 'WEBHOOK_LIVE_MODE_REJECTED' : 'WEBHOOK_PAYLOAD_INVALID',

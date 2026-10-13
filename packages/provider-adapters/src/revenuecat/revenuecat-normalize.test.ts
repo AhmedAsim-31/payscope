@@ -13,7 +13,7 @@ describe('normalizeRevenueCatEvent', () => {
     ['initial-purchase', 'INITIAL_PURCHASE', 'subscription.created', 'subscription', ['pro'], 999n],
     ['renewal', 'RENEWAL', 'subscription.renewed', 'subscription', ['pro'], 999n],
     ['cancellation-unsubscribe', 'CANCELLATION', 'subscription.canceled', 'subscription', [], 999n],
-    ['cancellation-refund', 'CANCELLATION', 'payment.refunded', 'payment', [], 999n],
+    ['cancellation-refund', 'CANCELLATION', 'payment.refunded', 'payment', ['pro'], 999n],
     ['uncancellation', 'UNCANCELLATION', 'subscription.updated', 'subscription', [], 999n],
     ['expiration', 'EXPIRATION', 'subscription.expired', 'subscription', ['pro'], 0n],
     ['billing-issue', 'BILLING_ISSUE', 'payment.failed', 'subscription', [], 999n],
@@ -61,6 +61,7 @@ describe('normalizeRevenueCatEvent', () => {
       run();
     } catch (error) {
       expect((error as ProviderError).category).toBe('invalid_input');
+      expect((error as ProviderError).reason).toBe('live_mode');
     }
   });
 

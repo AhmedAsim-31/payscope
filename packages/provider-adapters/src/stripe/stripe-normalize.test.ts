@@ -167,6 +167,7 @@ describe('normalizeStripeEvent', () => {
       normalizeStripeEvent(loadStripeFixture('livemode-payment-intent-succeeded'));
     expect(attempt).toThrow(ProviderError);
     expect(attempt).toThrow(/live-mode/i);
+    expect(attempt).toThrow(expect.objectContaining({ reason: 'live_mode' }));
   });
 
   it('rejects float amounts', () => {

@@ -31,6 +31,7 @@ const SubscriptionSchema = z.looseObject({
   status: z.string().min(1),
   customer_id: z.string().min(1).nullish(),
   currency_code: z.string().min(1).nullish(),
+  current_billing_period: z.looseObject({ ends_at: z.string().min(1) }).nullish(),
 });
 
 type EventBody = Omit<
@@ -136,7 +137,9 @@ function subscriptionBody(
     amountMinor: null,
     currency: sub.currency_code ?? null,
     status: sub.status,
-    metadata: null,
+    metadata: sub.current_billing_period
+      ? { currentPeriodEnd: sub.current_billing_period.ends_at }
+      : null,
   };
 }
 
