@@ -36,6 +36,14 @@ describe('ProviderError', () => {
     expect(error.status).toBe(404);
   });
 
+  it('accepts only a known structured reason', () => {
+    expect(new ProviderError('invalid_input', 'x', { reason: 'live_mode' }).reason).toBe(
+      'live_mode',
+    );
+    // @ts-expect-error free-form reasons would let callers drift back to string matching
+    expect(new ProviderError('invalid_input', 'x', { reason: 'livemode' }).reason).toBe('livemode');
+  });
+
   it('builds from an HTTP status', () => {
     const error = ProviderError.fromHttpStatus(429, 'slow down');
     expect(error.category).toBe('transient');

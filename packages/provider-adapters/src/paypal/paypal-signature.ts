@@ -24,20 +24,20 @@ export type PayPalSignatureResult = { ok: true } | { ok: false; reason: Verifica
 
 const fail = (reason: VerificationFailureReason): PayPalSignatureResult => ({ ok: false, reason });
 
-function isAllowedCertUrl(raw: string): boolean {
+function allowedCertUrl(raw: string): string | null {
   let url: URL;
   try {
     url = new URL(raw);
   } catch {
-    return false;
+    return null;
   }
-  return (
+  const allowed =
     url.protocol === 'https:' &&
     CERT_HOSTS.includes(url.hostname) &&
     url.port === '' &&
     url.username === '' &&
-    url.password === ''
-  );
+    url.password === '';
+  return allowed ? url.href : null;
 }
 
 export async function verifyPayPalSignature(
@@ -58,9 +58,11 @@ export async function verifyPayPalSignature(
   if (!withinTolerance(seconds, input.now, TOLERANCE_SECONDS)) {
     return fail('timestamp_out_of_tolerance');
   }
-  if (!isAllowedCertUrl(certUrl)) return fail('invalid_signature');
+  const allowedUrl = allowedCertUrl(certUrl);
+  if (!allowedUrl) return fail('invalid_signature');
   try {
-    const cert = new X509Certificate(await input.getCertificate(certUrl));
+    // Fetch the URL that was validated, so no second parser can resolve the raw header differently.
+    const cert = new X509Certificate(await input.getCertificate(allowedUrl));
     if (input.now < new Date(cert.validFrom) || input.now > new Date(cert.validTo)) {
       return fail('invalid_signature');
     }

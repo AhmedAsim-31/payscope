@@ -124,6 +124,17 @@ describe('verifyPayPalSignature', () => {
     'https://paypal.com/cert',
     'ftp://api.paypal.com/cert',
     'not a url',
+    'https://api.paypal.com./cert',
+    'https://api.paypal.com%2eevil.test/cert',
+    'https://evil.test\\@api.paypal.com/cert',
+    'https://evil.test#@api.paypal.com',
+    'https://evil.test?@api.paypal.com',
+    'https://xn--pi-7ia.paypal.com/cert',
+    'https://api.paypal.co/cert',
+    'https://api.sandbox.paypal.com.evil.test/cert',
+    'https://[::1]/cert',
+    'https://127.0.0.1/cert',
+    '//api.paypal.com/cert',
   ])('rejects cert url %s without fetching it', async (url) => {
     const { result, getCertificate } = run(signedHeaders({ 'paypal-cert-url': url }));
     expect(await result).toEqual({ ok: false, reason: 'invalid_signature' });
@@ -137,6 +148,15 @@ describe('verifyPayPalSignature', () => {
     'https://api-m.sandbox.paypal.com/v1/notifications/certs/C',
   ])('allows cert url %s', async (url) => {
     expect((await run(signedHeaders({ 'paypal-cert-url': url })).result).ok).toBe(true);
+  });
+
+  it('fetches the parsed, normalized cert url rather than the raw header', async () => {
+    const raw = 'https://API.SANDBOX.PAYPAL.COM:443/v1/notifications/certs/C';
+    const { result, getCertificate } = run(signedHeaders({ 'paypal-cert-url': raw }));
+    expect((await result).ok).toBe(true);
+    expect(getCertificate).toHaveBeenCalledWith(
+      'https://api.sandbox.paypal.com/v1/notifications/certs/C',
+    );
   });
 
   it('rejects when the certificate has expired', async () => {
