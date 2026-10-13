@@ -52,7 +52,7 @@ Not verified:
 | Provider sandbox webhooks and API calls                       | Planned   | Needs sandbox credentials per provider                               |
 | Provider-mode reconciliation against a real provider          | Planned   | Code exists; untested without a sandbox key                          |
 | Hosted demo (Vercel web, Render API, Supabase DB)             | Blocked   | PAYSCOPE-45                                                          |
-| Scheduled tick (pg_cron plus pg_net, GitHub Actions fallback) | Planned   | `/internal/tick` exists; schedulers not written                      |
+| Scheduled tick (pg_cron plus pg_net, GitHub Actions fallback) | Planned   | Config added; not applied, see docs/deployment.md                    |
 | E2E in CI                                                     | Planned   | Needs `DEMO_USER_PASSWORD` and Supabase values as GitHub secrets     |
 
 ## Quality gates
@@ -64,14 +64,13 @@ Not verified:
 ## Known gaps and blockers
 
 - PAYSCOPE-45 (blocker): the Supabase database connection string and secret key are not available, so the Supabase Postgres has no migrations or data and there is no hosted environment.
-- No pg_cron tick migration and no backup GitHub Actions schedule exist yet.
-- No `render.yaml` or `vercel.json` exists yet; the hosting plan is in [docs/deployment.md](docs/deployment.md).
+- `render.yaml`, the opt-in pg_cron tick (`supabase/cron/tick.sql`), and the backup tick workflow are in the repo but not applied; the owner steps are in [docs/deployment.md](docs/deployment.md#owner-steps).
+- The web project needs Vercel dashboard settings only; there is no `vercel.json`.
 - No provider sandbox credentials are configured.
 - The planned free hosts sleep and pause: Render Free after 15 minutes idle (about a minute to wake), Supabase Free after 7 days of low activity.
 - Screenshots in `docs/screenshots/` come from `next dev`, so the Next.js dev indicator appears in the bottom-left corner.
 
 ## Next actions
 
-1. Resolve PAYSCOPE-45, then migrate the Supabase database and stand up the hosted demo.
-2. Add the pg_cron tick migration, the backup workflow, `render.yaml`, and `vercel.json`.
-3. Add provider sandbox credentials and verify the adapters end to end.
+1. Resolve PAYSCOPE-45, then migrate the Supabase database and stand up the hosted demo with the owner steps in [docs/deployment.md](docs/deployment.md#owner-steps).
+2. Add provider sandbox credentials and verify the adapters end to end.

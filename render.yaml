@@ -1,0 +1,46 @@
+# Render Blueprint for the API and in-process worker, see docs/deployment.md.
+# sync: false values are prompted for once, when the Blueprint is first created.
+services:
+  - type: web
+    name: payscope-api
+    runtime: node
+    plan: free
+    buildCommand: corepack enable && pnpm install --no-frozen-lockfile --prod=false && pnpm --filter @payscope/api build
+    startCommand: node packages/api/dist/server.js
+    healthCheckPath: /ready
+    autoDeployTrigger: checksPass
+    buildFilter:
+      paths:
+        - packages/api/**
+        - packages/shared/**
+        - packages/provider-adapters/**
+        - package.json
+        - pnpm-workspace.yaml
+        - .nvmrc
+        - render.yaml
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Render routes to PORT, which defaults to 10000; the API reads API_PORT.
+      - key: API_PORT
+        value: '10000'
+      - key: API_HOST
+        value: 0.0.0.0
+      - key: TRUST_PROXY
+        value: 'true'
+      - key: RUN_WORKER_IN_PROCESS
+        value: 'true'
+      - key: LOG_LEVEL
+        value: info
+      - key: CREDENTIALS_ENCRYPTION_KEY_VERSION
+        value: '1'
+      - key: SUPABASE_URL
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: CREDENTIALS_ENCRYPTION_KEY
+        sync: false
+      - key: INTERNAL_TICK_TOKEN
+        sync: false
