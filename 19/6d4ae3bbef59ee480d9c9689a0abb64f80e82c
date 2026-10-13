@@ -1,0 +1,64 @@
+packages/api/src/app.ts
+  h_78e539a96187c3 20,90
+packages/api/src/events/event-inbox-repo.ts
+  h_78e539a96187c3 1-139
+packages/api/src/events/event-inbox-routes.ts
+  h_78e539a96187c3 1-70
+packages/api/src/events/event-inbox.integration.test.ts
+  h_78e539a96187c3 1-220
+packages/api/src/events/event-redaction.test.ts
+  h_78e539a96187c3 1-25
+packages/api/src/events/event-redaction.ts
+  h_78e539a96187c3 1-25
+packages/api/src/events/event-retry.ts
+  h_78e539a96187c3 1-46
+packages/shared/src/events-schemas.ts
+  h_78e539a96187c3 1-99
+packages/web/src/app/app/[orgId]/events/[eventId]/page.tsx
+  h_78e539a96187c3 1-19
+packages/web/src/app/app/[orgId]/events/page.tsx
+  h_78e539a96187c3 1-12
+packages/web/src/app/app/[orgId]/jobs/page.tsx
+  h_78e539a96187c3 1-12
+packages/web/src/components/events/attempts-timeline.tsx
+  h_78e539a96187c3 1-47
+packages/web/src/components/events/event-components.test.tsx
+  h_78e539a96187c3 1-84
+packages/web/src/components/events/event-detail.tsx
+  h_78e539a96187c3 1-93
+packages/web/src/components/events/events-list.tsx
+  h_78e539a96187c3 1-52
+packages/web/src/components/events/jobs-summary.tsx
+  h_78e539a96187c3 1-61
+packages/web/src/components/events/payload-viewer.tsx
+  h_78e539a96187c3 1-36
+packages/web/src/components/events/retry-event-button.tsx
+  h_78e539a96187c3 1-55
+packages/web/src/components/records/filter-config.ts
+  h_78e539a96187c3 1,58-70
+packages/web/src/components/records/format.test.ts
+  h_78e539a96187c3 2,36-45
+packages/web/src/components/records/format.ts
+  h_78e539a96187c3 26-35
+packages/web/src/components/records/status-badge.tsx
+  h_78e539a96187c3 17-20
+packages/web/src/components/shell/nav-config.ts
+  h_78e539a96187c3 3,6,26-27
+packages/web/src/components/shell/sidebar-nav.test.tsx
+  h_78e539a96187c3 31-32
+packages/web/src/lib/api-messages.ts
+  h_78e539a96187c3 3-4,13-18
+packages/web/src/lib/records-queries.ts
+  h_78e539a96187c3 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "196d4ae3bbef59ee480d9c9689a0abb64f80e82c",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
