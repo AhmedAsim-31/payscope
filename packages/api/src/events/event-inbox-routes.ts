@@ -30,7 +30,7 @@ export const eventInboxRoutes: FastifyPluginCallbackZod<Options> = (app, { db },
   app.get(
     `${base}/events`,
     {
-      preHandler: canRead,
+      preHandler: [canRead, app.rateLimitFor('search')],
       schema: {
         params: orgParams,
         querystring: eventQuerySchema,

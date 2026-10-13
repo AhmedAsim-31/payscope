@@ -35,7 +35,7 @@ export const auditRoutes: FastifyPluginCallbackZod<{ db: Db }> = (app, { db }, d
   app.get(
     '/api/v1/orgs/:orgId/audit',
     {
-      preHandler: requireOrg(db, 'audit:read'),
+      preHandler: [requireOrg(db, 'audit:read'), app.rateLimitFor('search')],
       schema: {
         params: z.object({ orgId: z.uuid() }),
         querystring: auditQuerySchema,
