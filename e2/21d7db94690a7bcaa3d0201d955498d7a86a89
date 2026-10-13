@@ -1,0 +1,42 @@
+packages/api/src/app.ts
+  h_78e539a96187c3 22,94-98
+packages/api/src/db/schema/reconciliation.ts
+  h_78e539a96187c3 1-113
+packages/api/src/jobs/default-handlers.ts
+  h_78e539a96187c3 2,5-8,11-18
+packages/api/src/jobs/handlers/run-reconciliation.ts
+  h_78e539a96187c3 1-39
+packages/api/src/reconciliation/finding-upsert.ts
+  h_78e539a96187c3 1-53
+packages/api/src/reconciliation/local-rules.ts
+  h_78e539a96187c3 1-200
+packages/api/src/reconciliation/provider-checks.ts
+  h_78e539a96187c3 1-185
+packages/api/src/reconciliation/reconciliation-repo.ts
+  h_78e539a96187c3 1-148
+packages/api/src/reconciliation/reconciliation-routes.ts
+  h_78e539a96187c3 1-205
+packages/api/src/reconciliation/run-executor.ts
+  h_78e539a96187c3 1-212
+packages/api/src/reconciliation/run-store.ts
+  h_78e539a96187c3 1-83
+packages/api/src/worker-main.ts
+  h_78e539a96187c3 2,14-17
+packages/shared/src/reconciliation-schemas.ts
+  h_78e539a96187c3 1-99
+supabase/migrations/meta/20261013014525_snapshot.json
+  h_78e539a96187c3 1,4-1000,1008-1194,1195-1891,1892-1948
+supabase/migrations/meta/_journal.json
+  h_78e539a96187c3 46-49,52-56,59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e221d7db94690a7bcaa3d0201d955498d7a86a89",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
