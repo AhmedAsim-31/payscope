@@ -80,6 +80,8 @@ export const eventQuerySchema = pageQuerySchema.extend({
   provider: z.enum(RECORD_PROVIDERS).optional(),
   connectionId: z.uuid().optional(),
   normalizedType: z.string().trim().min(1).max(100).optional(),
+  objectRef: z.string().min(1).max(255).optional(),
+  customerId: z.uuid().optional(),
   from: isoDate.optional(),
   to: isoDate.optional(),
 });

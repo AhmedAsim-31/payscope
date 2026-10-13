@@ -281,3 +281,81 @@ describe('subscriptions, customers and entitlements', () => {
     }
   });
 });
+
+describe('related record filters', () => {
+  let t: Tenant;
+  let subscriptionId: string;
+  let subPaymentId: string;
+  let otherPaymentId: string;
+
+  async function insertEvent(objectRef: string): Promise<string> {
+    const [row] = await sql<{ id: string }[]>`insert into provider_events
+      (org_id, connection_id, provider, provider_event_id, event_type, occurred_at, signature_verified, payload, object_ref)
+      values (${t.orgId}, ${t.connectionId}, 'stripe', ${`evt_${randomUUID()}`}, 'x', now(), true, '{}'::jsonb, ${objectRef})
+      returning id`;
+    return row?.id ?? '';
+  }
+
+  async function insertFinding(subjectType: string, subjectId: string, runId: string) {
+    const [row] = await sql<{ id: string }[]>`insert into reconciliation_findings
+      (org_id, type, severity, subject_type, subject_id, fingerprint, recommended_action, first_seen_run_id, last_seen_run_id)
+      values (${t.orgId}, 'status_mismatch', 'low', ${subjectType}, ${subjectId}, ${randomUUID()}, 'review', ${runId}, ${runId})
+      returning id`;
+    return row?.id ?? '';
+  }
+
+  beforeAll(async () => {
+    t = await createTenant();
+    subscriptionId = randomUUID();
+    await sql`insert into subscription_records
+      (id, org_id, connection_id, customer_id, provider_subscription_id, status)
+      values (${subscriptionId}, ${t.orgId}, ${t.connectionId}, ${t.customerId}, 'sub_rel', 'active')`;
+    subPaymentId = await insertPayment(t);
+    await sql`update payment_records set provider_subscription_id = 'sub_rel' where id = ${subPaymentId}`;
+    otherPaymentId = await insertPayment(t);
+    await sql`update payment_records set customer_id = null where id = ${otherPaymentId}`;
+  });
+
+  it('filters payments by customer and by subscription', async () => {
+    const byCustomer = await get<Page>(t.owner, t.orgId, `/payments?customerId=${t.customerId}`);
+    expect(byCustomer.body.items.map((i) => i.id)).toEqual([subPaymentId]);
+    const bySub = await get<Page>(t.owner, t.orgId, `/payments?subscriptionId=${subscriptionId}`);
+    expect(bySub.body.items.map((i) => i.id)).toEqual([subPaymentId]);
+    const cross = await get<Page>(b.owner, b.orgId, `/payments?subscriptionId=${subscriptionId}`);
+    expect(cross.body.items).toEqual([]);
+  });
+
+  it('filters events by object ref and by customer', async () => {
+    const subEvent = await insertEvent('sub_rel');
+    const payEvent = await insertEvent(`pi_${subPaymentId}`);
+    const customerEvent = await insertEvent('cus_1');
+    await insertEvent(`pi_${otherPaymentId}`);
+
+    const byRef = await get<Page>(
+      t.owner,
+      t.orgId,
+      `/events?connectionId=${t.connectionId}&objectRef=sub_rel`,
+    );
+    expect(byRef.body.items.map((i) => i.id)).toEqual([subEvent]);
+    const byCustomer = await get<Page>(t.owner, t.orgId, `/events?customerId=${t.customerId}`);
+    expect(byCustomer.body.items.map((i) => i.id).sort()).toEqual(
+      [subEvent, payEvent, customerEvent].sort(),
+    );
+    const cross = await get<Page>(b.owner, b.orgId, `/events?customerId=${t.customerId}`);
+    expect(cross.body.items).toEqual([]);
+  });
+
+  it('filters findings by subject', async () => {
+    const [run] = await sql<{ id: string }[]>`insert into reconciliation_runs (org_id, mode, status)
+      values (${t.orgId}, 'local', 'completed') returning id`;
+    const runId = run?.id ?? '';
+    const findingId = await insertFinding('subscription', subscriptionId, runId);
+    await insertFinding('payment', subPaymentId, runId);
+    const hit = await get<Page>(
+      t.owner,
+      t.orgId,
+      `/reconciliation/findings?subjectType=subscription&subjectId=${subscriptionId}`,
+    );
+    expect(hit.body.items.map((i) => i.id)).toEqual([findingId]);
+  });
+});

@@ -68,6 +68,16 @@ describe('PaymentsList', () => {
     expect(path).not.toContain('maxAmount');
   });
 
+  it('sends scope filters from the URL without rendering inputs for them', async () => {
+    search = `customerId=${payment.id}`;
+    mockedFetch.mockResolvedValue({ items: [], nextCursor: null });
+    renderWithQuery(<PaymentsList orgId={ORG_ID} />);
+    await screen.findByText('No payments match these filters');
+    expect(String(mockedFetch.mock.calls[0]?.[0])).toContain(`customerId=${payment.id}`);
+    expect(screen.queryByLabelText(/customer/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Clear filters' })).toBeInTheDocument();
+  });
+
   it('applies an amount filter typed into the bar', async () => {
     mockedFetch.mockResolvedValue({ items: [], nextCursor: null });
     renderWithQuery(<PaymentsList orgId={ORG_ID} />);

@@ -74,52 +74,54 @@ export function FilterBar({ label, fields, read, isFiltered, onChange, onClear }
         }
       }}
     >
-      {fields.map((field) => {
-        const id = `filter-${field.name}`;
-        return (
-          <div key={field.name} className="grid gap-1.5 lg:w-44">
-            <Label htmlFor={id}>{field.label}</Label>
-            {field.kind === 'select' ? (
-              <select
-                id={id}
-                name={field.name}
-                value={read(field.name)}
-                onChange={(event) => onChange(field.name, event.target.value)}
-                className={SELECT_CLASS}
-              >
-                <option value="">Any</option>
-                {field.options?.map((option) => (
-                  <option key={option} value={option}>
-                    {humanize(option)}
-                  </option>
-                ))}
-              </select>
-            ) : field.kind === 'search' ? (
-              <SearchInput
-                id={id}
-                name={field.name}
-                placeholder={field.placeholder}
-                value={read(field.name)}
-                onChange={(value) => onChange(field.name, value)}
-              />
-            ) : (
-              <Input
-                id={id}
-                name={field.name}
-                type={field.kind === 'date' ? 'date' : 'search'}
-                autoComplete="off"
-                spellCheck={false}
-                placeholder={field.placeholder}
-                key={read(field.name)}
-                defaultValue={read(field.name)}
-                onChange={
-                  field.kind === 'date' ? (e) => onChange(field.name, e.target.value) : undefined
-                }
-              />
-            )}
-          </div>
-        );
-      })}
+      {fields
+        .filter((field) => field.kind !== 'scope')
+        .map((field) => {
+          const id = `filter-${field.name}`;
+          return (
+            <div key={field.name} className="grid gap-1.5 lg:w-44">
+              <Label htmlFor={id}>{field.label}</Label>
+              {field.kind === 'select' ? (
+                <select
+                  id={id}
+                  name={field.name}
+                  value={read(field.name)}
+                  onChange={(event) => onChange(field.name, event.target.value)}
+                  className={SELECT_CLASS}
+                >
+                  <option value="">Any</option>
+                  {field.options?.map((option) => (
+                    <option key={option} value={option}>
+                      {humanize(option)}
+                    </option>
+                  ))}
+                </select>
+              ) : field.kind === 'search' ? (
+                <SearchInput
+                  id={id}
+                  name={field.name}
+                  placeholder={field.placeholder}
+                  value={read(field.name)}
+                  onChange={(value) => onChange(field.name, value)}
+                />
+              ) : (
+                <Input
+                  id={id}
+                  name={field.name}
+                  type={field.kind === 'date' ? 'date' : 'search'}
+                  autoComplete="off"
+                  spellCheck={false}
+                  placeholder={field.placeholder}
+                  key={read(field.name)}
+                  defaultValue={read(field.name)}
+                  onChange={
+                    field.kind === 'date' ? (e) => onChange(field.name, e.target.value) : undefined
+                  }
+                />
+              )}
+            </div>
+          );
+        })}
       {fields.some((field) => field.kind === 'text') ? (
         <Button type="submit" variant="secondary">
           Apply

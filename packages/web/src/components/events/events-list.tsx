@@ -8,7 +8,7 @@ import type { Column } from '@/components/records/records-list';
 import { RecordsListView } from '@/components/records/records-list-view';
 import { StatusBadge } from '@/components/records/status-badge';
 
-function eventColumns(orgId: string): Column<EventSummary>[] {
+export function eventColumns(orgId: string): Column<EventSummary>[] {
   return [
     { header: 'Received', cell: (e) => formatTimestamp(e.receivedAt) },
     { header: 'Provider', cell: (e) => humanize(e.provider) },

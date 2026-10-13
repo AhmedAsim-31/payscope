@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { auditPageSchema } from '@payscope/shared/audit-schemas';
 import { paymentDetailSchema } from '@payscope/shared/records-schemas';
 import {
   BackLink,
@@ -10,7 +11,9 @@ import {
   SectionEmpty,
   Timestamp,
 } from './detail-parts';
+import { AUDIT_COLUMNS } from '@/components/audit/audit-list';
 import { formatMoney, humanize, recordHref } from './format';
+import { RelatedRecords } from './related-records';
 import { StatusBadge } from './status-badge';
 import { useRecordDetail } from './use-record-detail';
 
@@ -92,6 +95,21 @@ export function PaymentDetail({ orgId, paymentId }: { orgId: string; paymentId: 
           </ol>
         )}
       </DetailSection>
+
+      <RelatedRecords
+        orgId={orgId}
+        title="Audit history"
+        resource="audit"
+        listPath="audit"
+        viewAllLabel="View all audit entries"
+        schema={auditPageSchema}
+        params={{ targetType: 'payment', targetId: payment.id }}
+        columns={AUDIT_COLUMNS}
+        empty={{
+          title: 'No audit entries yet',
+          hint: 'Repairs and other audited actions on this payment appear here.',
+        }}
+      />
     </div>
   );
 }
