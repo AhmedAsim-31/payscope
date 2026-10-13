@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 import { createHarness, type TestUser } from '../test/identity-harness';
+import { DEFAULT_POLICIES } from '../rate-limit/policies';
 
 const harness = createHarness();
 let app: FastifyInstance;
@@ -9,7 +10,9 @@ let owner: TestUser;
 let orgId: string;
 
 beforeAll(async () => {
-  app = await harness.start();
+  app = await harness.start({
+    rateLimits: { ...DEFAULT_POLICIES, credentialTest: { max: 1000, windowSec: 60 } },
+  });
   owner = await harness.newUser();
   const res = await app.inject({
     method: 'POST',

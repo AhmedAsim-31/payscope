@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { decodeCredentialsKey } from './crypto/credentials-cipher';
+import { rateLimitEnvSchema, resolvePolicies, type RatePolicies } from './rate-limit/policies';
 
 const DEFAULT_CORS_ORIGIN = 'http://localhost:3000';
 
@@ -57,12 +58,15 @@ export type Config = {
   credentialsKey: Buffer | undefined;
   runWorkerInProcess: boolean;
   internalTickToken: string | undefined;
+  rateLimits: RatePolicies;
 };
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const result = envSchema.safeParse(env);
-  if (!result.success) {
-    const keys = [...new Set(result.error.issues.map((i) => String(i.path[0])))];
+  const limits = rateLimitEnvSchema.safeParse(env);
+  if (!result.success || !limits.success) {
+    const issues = [...(result.error?.issues ?? []), ...(limits.error?.issues ?? [])];
+    const keys = [...new Set(issues.map((i) => String(i.path[0])))];
     throw new Error(`Invalid environment configuration: ${keys.join(', ')}`);
   }
   const e = result.data;
@@ -88,5 +92,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       : undefined,
     runWorkerInProcess: e.RUN_WORKER_IN_PROCESS,
     internalTickToken: e.INTERNAL_TICK_TOKEN,
+    rateLimits: resolvePolicies(limits.data),
   };
 }

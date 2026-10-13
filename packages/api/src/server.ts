@@ -24,6 +24,7 @@ const app = await buildApp({
   corsOrigins: config.corsOrigins,
   logLevel: config.logLevel,
   trustProxy: config.trustProxy,
+  rateLimits: config.rateLimits,
   readinessChecks: [
     {
       name: 'database',

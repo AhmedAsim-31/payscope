@@ -14,6 +14,9 @@ import type { TokenVerifier } from './auth/token-verifier';
 import { connectionRoutes } from './connections/connection-routes';
 import type { CredentialsCipher } from './crypto/credentials-cipher';
 import type { Db } from './db/client';
+import { pgRateLimitStore } from './rate-limit/pg-rate-limit-store';
+import { DEFAULT_POLICIES, type RatePolicies } from './rate-limit/policies';
+import { rateLimitPlugin } from './rate-limit/rate-limit-plugin';
 import { tickRoutes } from './jobs/tick-routes';
 import type { Worker } from './jobs/worker';
 import { identityRoutes } from './orgs/identity-routes';
@@ -36,6 +39,7 @@ export type BuildAppOptions = {
   adapters?: AdapterRegistry;
   worker?: Worker;
   internalTickToken?: string;
+  rateLimits?: RatePolicies;
 };
 
 const BODY_LIMIT_BYTES = 1024 * 1024;
@@ -82,6 +86,10 @@ export async function buildApp(opts: BuildAppOptions = {}) {
   await app.register(helmet);
   await app.register(cors, { origin: opts.corsOrigins ?? [], credentials: true });
   await app.register(sensible);
+  await app.register(rateLimitPlugin, {
+    policies: opts.rateLimits ?? DEFAULT_POLICIES,
+    ...(opts.db ? { store: pgRateLimitStore({ db: opts.db, logger: app.log }) } : {}),
+  });
   await app.register(healthRoutes, { readinessChecks: opts.readinessChecks ?? [] });
   if (opts.tokenVerifier) {
     await app.register(authenticatePlugin, { tokenVerifier: opts.tokenVerifier });
