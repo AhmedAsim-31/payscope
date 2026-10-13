@@ -4,14 +4,19 @@ import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import sensible from '@fastify/sensible';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
+import type { AdapterRegistry } from '@payscope/provider-adapters/registry';
 import { z } from 'zod';
 import { errorHandler, notFoundHandler } from './error-handler';
 import { healthRoutes, type ReadinessCheck } from './health-routes';
 import { authenticatePlugin } from './auth/authenticate';
 import { meRoutes } from './auth/me-routes';
 import type { TokenVerifier } from './auth/token-verifier';
+import { connectionRoutes } from './connections/connection-routes';
+import type { CredentialsCipher } from './crypto/credentials-cipher';
 import type { Db } from './db/client';
 import { identityRoutes } from './orgs/identity-routes';
+import { createDefaultAdapterRegistry } from './providers/adapter-registry';
+import { webhookRoutes } from './webhooks/webhook-routes';
 
 export type BuildAppOptions = {
   corsOrigins?: string[];
@@ -22,6 +27,8 @@ export type BuildAppOptions = {
   readinessChecks?: ReadinessCheck[];
   tokenVerifier?: TokenVerifier;
   db?: Db;
+  credentialsCipher?: CredentialsCipher;
+  adapters?: AdapterRegistry;
 };
 
 const BODY_LIMIT_BYTES = 1024 * 1024;
@@ -73,6 +80,16 @@ export async function buildApp(opts: BuildAppOptions = {}) {
     await app.register(authenticatePlugin, { tokenVerifier: opts.tokenVerifier });
     await app.register(meRoutes, { prefix: '/api/v1' });
     if (opts.db) await app.register(identityRoutes, { db: opts.db });
+    if (opts.db && opts.credentialsCipher) {
+      await app.register(connectionRoutes, { db: opts.db, cipher: opts.credentialsCipher });
+    }
+  }
+  if (opts.db && opts.credentialsCipher) {
+    await app.register(webhookRoutes, {
+      db: opts.db,
+      cipher: opts.credentialsCipher,
+      adapters: opts.adapters ?? createDefaultAdapterRegistry(),
+    });
   }
 
   return app;

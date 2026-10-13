@@ -31,7 +31,11 @@ export function errorHandler(error: FastifyError, request: FastifyRequest, reply
     return send(reply, 401, { code: error.code, message: error.message });
   }
   if (error instanceof ApiHttpError) {
-    return send(reply, error.statusCode, { code: error.code, message: error.message });
+    return send(reply, error.statusCode, {
+      code: error.code,
+      message: error.message,
+      ...(error.details === undefined ? {} : { details: error.details }),
+    });
   }
   const status = error.statusCode ?? 500;
   if (status < 500) {

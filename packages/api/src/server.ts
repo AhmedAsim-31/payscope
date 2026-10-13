@@ -2,6 +2,7 @@ import { createRemoteJWKSet } from 'jose';
 import { buildApp } from './app';
 import { createTokenVerifier } from './auth/token-verifier';
 import { loadConfig } from './config';
+import { createCredentialsCipher } from './crypto/credentials-cipher';
 import { createDb } from './db/client';
 
 const config = loadConfig();
@@ -19,12 +20,19 @@ const app = await buildApp({
     },
   ],
   db,
+  credentialsCipher: config.credentialsKey
+    ? createCredentialsCipher(config.credentialsKey)
+    : undefined,
   tokenVerifier: createTokenVerifier({
     issuer: config.jwtIssuer,
     audience: config.jwtAudience,
     keySet: createRemoteJWKSet(new URL(config.jwksUrl)),
   }),
 });
+
+if (!config.credentialsKey) {
+  app.log.warn('CREDENTIALS_ENCRYPTION_KEY not set; connections API and webhook ingress disabled');
+}
 
 for (const signal of ['SIGINT', 'SIGTERM'] as const) {
   process.once(signal, () => {

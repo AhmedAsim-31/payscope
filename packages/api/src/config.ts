@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { decodeCredentialsKey } from './crypto/credentials-cipher';
 
 const DEFAULT_CORS_ORIGIN = 'http://localhost:3000';
 
@@ -15,6 +16,12 @@ const envSchema = z
     LOG_LEVEL: z
       .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'])
       .default('info'),
+    CREDENTIALS_ENCRYPTION_KEY: z
+      .string()
+      .refine((v) => decodeCredentialsKey(v) !== undefined, {
+        error: 'must be base64 that decodes to 32 bytes',
+      })
+      .optional(),
     TRUST_PROXY: z
       .enum(['true', 'false'])
       .default('false')
@@ -22,6 +29,10 @@ const envSchema = z
   })
   .refine((env) => env.NODE_ENV !== 'production' || env.CORS_ORIGIN !== undefined, {
     path: ['CORS_ORIGIN'],
+    error: 'required in production',
+  })
+  .refine((env) => env.NODE_ENV !== 'production' || env.CREDENTIALS_ENCRYPTION_KEY !== undefined, {
+    path: ['CREDENTIALS_ENCRYPTION_KEY'],
     error: 'required in production',
   });
 
@@ -38,6 +49,7 @@ export type Config = {
   jwtAudience: string;
   databaseUrl: string;
   dbPoolMax: number;
+  credentialsKey: Buffer | undefined;
 };
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
@@ -64,5 +76,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     jwtAudience: 'authenticated',
     databaseUrl: e.DATABASE_URL,
     dbPoolMax: e.DB_POOL_MAX,
+    credentialsKey: e.CREDENTIALS_ENCRYPTION_KEY
+      ? decodeCredentialsKey(e.CREDENTIALS_ENCRYPTION_KEY)
+      : undefined,
   };
 }

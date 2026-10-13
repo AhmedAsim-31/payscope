@@ -8,8 +8,11 @@ import {
 } from '@payscope/test-utils/test-jwt';
 import { buildApp } from '../app';
 import { createTokenVerifier } from '../auth/token-verifier';
+import { createCredentialsCipher } from '../crypto/credentials-cipher';
 import { createDb } from '../db/client';
 import { TEST_DATABASE_URL } from './test-database-url';
+
+export const TEST_CREDENTIALS_KEY = Buffer.alloc(32, 9);
 
 export type TestUser = { id: string; email: string; headers: { authorization: string } };
 
@@ -21,6 +24,7 @@ export function createHarness() {
     app = await buildApp({
       logger: false,
       db,
+      credentialsCipher: createCredentialsCipher(TEST_CREDENTIALS_KEY),
       tokenVerifier: createTokenVerifier({
         issuer: TEST_ISSUER,
         audience: TEST_AUDIENCE,
