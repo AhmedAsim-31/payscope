@@ -8,7 +8,7 @@ import type { Column } from './records-list';
 import { RecordsListView } from './records-list-view';
 import { StatusBadge } from './status-badge';
 
-function paymentColumns(orgId: string): Column<Payment>[] {
+export function paymentColumns(orgId: string): Column<Payment>[] {
   return [
     {
       header: 'Payment',

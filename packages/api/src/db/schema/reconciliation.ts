@@ -112,5 +112,6 @@ export const reconciliationFindingsTable = pgTable(
       .where(sql`${t.status} IN ('open', 'reviewed')`),
     index('reconciliation_findings_org_created_idx').on(t.orgId, t.createdAt, t.id),
     index('reconciliation_findings_org_status_idx').on(t.orgId, t.status, t.createdAt, t.id),
+    index('reconciliation_findings_org_subject_idx').on(t.orgId, t.subjectType, t.subjectId),
   ],
 ).enableRLS();

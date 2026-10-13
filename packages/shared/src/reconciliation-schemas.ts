@@ -67,6 +67,8 @@ export const findingQuerySchema = z.object({
   type: z.enum(FINDING_TYPES).optional(),
   status: z.enum(FINDING_STATUSES).optional(),
   severity: z.enum(FINDING_SEVERITIES).optional(),
+  subjectType: z.string().min(1).max(50).optional(),
+  subjectId: z.uuid().optional(),
 });
 
 export const findingSchema = z.object({

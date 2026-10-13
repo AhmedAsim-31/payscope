@@ -46,6 +46,13 @@ export const auditLogsTable = pgTable(
   (t) => [
     index('audit_logs_org_created_idx').on(t.orgId, t.createdAt.desc(), t.id.desc()),
     index('audit_logs_org_action_idx').on(t.orgId, t.action, t.createdAt, t.id),
+    index('audit_logs_org_target_idx').on(
+      t.orgId,
+      t.targetType,
+      t.targetId,
+      t.createdAt.desc(),
+      t.id.desc(),
+    ),
     index('audit_logs_created_idx').on(t.createdAt),
   ],
 ).enableRLS();

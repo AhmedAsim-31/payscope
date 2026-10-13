@@ -176,6 +176,8 @@ export const paymentQuerySchema = pageQuerySchema.extend({
   to: isoDate.optional(),
   minAmount: minorAmountQuerySchema.optional(),
   maxAmount: minorAmountQuerySchema.optional(),
+  customerId: z.uuid().optional(),
+  subscriptionId: z.uuid().optional(),
 });
 
 export const subscriptionQuerySchema = pageQuerySchema.extend({

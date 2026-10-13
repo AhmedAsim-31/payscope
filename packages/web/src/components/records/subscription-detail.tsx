@@ -1,7 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { subscriptionDetailSchema } from '@payscope/shared/records-schemas';
+import { eventPageSchema } from '@payscope/shared/events-schemas';
+import { findingPageSchema } from '@payscope/shared/reconciliation-schemas';
+import { paymentPageSchema, subscriptionDetailSchema } from '@payscope/shared/records-schemas';
+import { eventColumns } from '@/components/events/events-list';
+import { findingColumns } from '@/components/reconciliation/findings-list';
 import {
   BackLink,
   DetailField,
@@ -11,6 +15,8 @@ import {
   Timestamp,
 } from './detail-parts';
 import { humanize, recordHref } from './format';
+import { paymentColumns } from './payments-list';
+import { RelatedRecords } from './related-records';
 import { StatusBadge } from './status-badge';
 import { useRecordDetail } from './use-record-detail';
 
@@ -87,6 +93,51 @@ export function SubscriptionDetail({
           </ul>
         )}
       </DetailSection>
+
+      <RelatedRecords
+        orgId={orgId}
+        title="Payments"
+        resource="payments"
+        listPath="payments"
+        viewAllLabel="View all payments"
+        schema={paymentPageSchema}
+        params={{ subscriptionId: sub.id }}
+        columns={paymentColumns(orgId)}
+        empty={{
+          title: 'No payments yet',
+          hint: 'Payments the provider attributes to this subscription appear here.',
+        }}
+      />
+
+      <RelatedRecords
+        orgId={orgId}
+        title="Provider events"
+        resource="events"
+        listPath="events"
+        viewAllLabel="View all events"
+        schema={eventPageSchema}
+        params={{ connectionId: sub.connectionId, objectRef: sub.providerSubscriptionId }}
+        columns={eventColumns(orgId)}
+        empty={{
+          title: 'No events yet',
+          hint: 'Events that reference this subscription appear here as webhooks are ingested.',
+        }}
+      />
+
+      <RelatedRecords
+        orgId={orgId}
+        title="Reconciliation findings"
+        resource="reconciliation/findings"
+        listPath="findings"
+        viewAllLabel="View all findings"
+        schema={findingPageSchema}
+        params={{ subjectType: 'subscription', subjectId: sub.id }}
+        columns={findingColumns(orgId)}
+        empty={{
+          title: 'No findings',
+          hint: 'Reconciliation has not flagged this subscription. Findings appear here after a run detects a discrepancy.',
+        }}
+      />
     </div>
   );
 }

@@ -1,7 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { customerDetailSchema } from '@payscope/shared/records-schemas';
+import { auditPageSchema } from '@payscope/shared/audit-schemas';
+import { eventPageSchema } from '@payscope/shared/events-schemas';
+import { customerDetailSchema, paymentPageSchema } from '@payscope/shared/records-schemas';
+import { AUDIT_COLUMNS } from '@/components/audit/audit-list';
+import { eventColumns } from '@/components/events/events-list';
 import {
   BackLink,
   DetailField,
@@ -11,6 +15,8 @@ import {
   Timestamp,
 } from './detail-parts';
 import { humanize, recordHref } from './format';
+import { paymentColumns } from './payments-list';
+import { RelatedRecords } from './related-records';
 import { StatusBadge } from './status-badge';
 import { useRecordDetail } from './use-record-detail';
 
@@ -91,6 +97,51 @@ export function CustomerDetail({ orgId, customerId }: { orgId: string; customerI
           </ul>
         )}
       </DetailSection>
+
+      <RelatedRecords
+        orgId={orgId}
+        title="Payments"
+        resource="payments"
+        listPath="payments"
+        viewAllLabel="View all payments"
+        schema={paymentPageSchema}
+        params={{ customerId: customer.id }}
+        columns={paymentColumns(orgId)}
+        empty={{
+          title: 'No payments yet',
+          hint: 'Payments linked to this customer appear here as provider events are ingested.',
+        }}
+      />
+
+      <RelatedRecords
+        orgId={orgId}
+        title="Provider events"
+        resource="events"
+        listPath="events"
+        viewAllLabel="View all events"
+        schema={eventPageSchema}
+        params={{ customerId: customer.id }}
+        columns={eventColumns(orgId)}
+        empty={{
+          title: 'No events yet',
+          hint: 'Events for this customer, its payments and its subscriptions appear here.',
+        }}
+      />
+
+      <RelatedRecords
+        orgId={orgId}
+        title="Audit timeline"
+        resource="audit"
+        listPath="audit"
+        viewAllLabel="View all audit entries"
+        schema={auditPageSchema}
+        params={{ targetType: 'customer', targetId: customer.id }}
+        columns={AUDIT_COLUMNS}
+        empty={{
+          title: 'No audit entries yet',
+          hint: 'Audited actions that target this customer appear here.',
+        }}
+      />
     </div>
   );
 }

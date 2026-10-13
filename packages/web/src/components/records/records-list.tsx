@@ -1,6 +1,7 @@
 'use client';
 
 import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
+import Link from 'next/link';
 import type { ReactNode } from 'react';
 import type { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -36,6 +37,8 @@ type RecordsListProps<T extends { id: string }> = {
   empty: EmptyCopy;
   /** Refetch every few seconds while any loaded item matches. */
   pollWhile?: (item: T) => boolean;
+  /** Shows the first page only, linking here instead of loading more. */
+  viewAll?: { href: string; label: string };
 };
 
 export function RecordsList<T extends { id: string }>({
@@ -48,6 +51,7 @@ export function RecordsList<T extends { id: string }>({
   isFiltered,
   empty,
   pollWhile,
+  viewAll,
 }: RecordsListProps<T>) {
   const { data, hasNextPage, isFetchingNextPage, isFetchNextPageError, fetchNextPage } =
     useSuspenseInfiniteQuery({
@@ -113,7 +117,11 @@ export function RecordsList<T extends { id: string }>({
           Could not load more. Try again.
         </p>
       ) : null}
-      {hasNextPage ? (
+      {viewAll && hasNextPage ? (
+        <Link href={viewAll.href} className="w-fit text-sm underline underline-offset-4">
+          {viewAll.label}
+        </Link>
+      ) : hasNextPage ? (
         <div>
           <Button
             variant="outline"

@@ -98,6 +98,12 @@ export const paymentRecordsTable = pgTable(
     ),
     index('payment_records_org_created_idx').on(t.orgId, t.createdAt, t.id),
     index('payment_records_org_status_idx').on(t.orgId, t.status, t.createdAt, t.id),
+    index('payment_records_org_customer_idx').on(t.orgId, t.customerId, t.createdAt, t.id),
+    index('payment_records_org_subscription_idx').on(
+      t.orgId,
+      t.connectionId,
+      t.providerSubscriptionId,
+    ),
   ],
 ).enableRLS();
 
@@ -136,6 +142,7 @@ export const subscriptionRecordsTable = pgTable(
     unique('subscription_records_org_id_id_unique').on(t.orgId, t.id),
     index('subscription_records_org_created_idx').on(t.orgId, t.createdAt, t.id),
     index('subscription_records_org_status_idx').on(t.orgId, t.status, t.createdAt, t.id),
+    index('subscription_records_org_customer_idx').on(t.orgId, t.customerId),
   ],
 ).enableRLS();
 

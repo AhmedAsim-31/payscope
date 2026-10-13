@@ -1,10 +1,10 @@
-import { and, desc, eq, gte, lt, lte, type SQL } from 'drizzle-orm';
+import { and, desc, eq, exists, gte, lt, lte, type SQL } from 'drizzle-orm';
 import type { z } from 'zod';
 import type { paymentQuerySchema } from '@payscope/shared/records-schemas';
 import type { Db } from '../db/client';
 import { providerEventsTable } from '../db/schema/events';
 import { customersTable, providerConnectionsTable } from '../db/schema/providers';
-import { paymentRecordsTable as p } from '../db/schema/records';
+import { paymentRecordsTable as p, subscriptionRecordsTable as s } from '../db/schema/records';
 import { cursorTsColumn, iso, isoOrNull, keysetAfter, toPage } from './keyset';
 
 const RELATED_EVENT_LIMIT = 50;
@@ -77,6 +77,22 @@ export async function listPayments(db: Db, orgId: string, q: PaymentQuery) {
     q.to === undefined ? undefined : lt(p.createdAt, new Date(q.to)),
     q.minAmount === undefined ? undefined : gte(p.amountMinor, q.minAmount),
     q.maxAmount === undefined ? undefined : lte(p.amountMinor, q.maxAmount),
+    q.customerId === undefined ? undefined : eq(p.customerId, q.customerId),
+    q.subscriptionId === undefined
+      ? undefined
+      : exists(
+          db
+            .select({ id: s.id })
+            .from(s)
+            .where(
+              and(
+                eq(s.orgId, p.orgId),
+                eq(s.id, q.subscriptionId),
+                eq(s.connectionId, p.connectionId),
+                eq(s.providerSubscriptionId, p.providerSubscriptionId),
+              ),
+            ),
+        ),
     keysetAfter(p.createdAt, p.id, q.cursor),
   );
   const rows = await selectRows(db, where, q.limit + 1);

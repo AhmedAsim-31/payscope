@@ -7,7 +7,7 @@ import type { Column } from '@/components/records/records-list';
 import { RecordsListView } from '@/components/records/records-list-view';
 import { StatusBadge } from '@/components/records/status-badge';
 
-const COLUMNS: Column<AuditEntry>[] = [
+export const AUDIT_COLUMNS: Column<AuditEntry>[] = [
   { header: 'When', cell: (e) => formatTimestamp(e.createdAt) },
   { header: 'Action', cell: (e) => <span className="font-mono text-xs">{e.action}</span> },
   { header: 'Outcome', cell: (e) => <StatusBadge status={e.outcome} /> },
@@ -60,7 +60,7 @@ export function AuditList({ orgId }: { orgId: string }) {
       description="Append-only record of who changed what. Entries cannot be edited or deleted."
       fields={AUDIT_FILTERS}
       schema={auditPageSchema}
-      columns={COLUMNS}
+      columns={AUDIT_COLUMNS}
       empty={{
         title: 'No audit entries yet',
         filteredTitle: 'No entries match these filters',

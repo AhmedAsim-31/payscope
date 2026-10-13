@@ -15,7 +15,8 @@ import {
 export type FilterField = {
   name: string;
   label: string;
-  kind: 'select' | 'text' | 'search' | 'date';
+  /** A scope is set by links from detail pages and is never rendered as an input. */
+  kind: 'select' | 'text' | 'search' | 'date' | 'scope';
   options?: readonly string[];
   placeholder?: string;
   toParam?: (value: string) => string | undefined;
@@ -44,6 +45,10 @@ function minorUnits(value: string): string | undefined {
   return /^\d+$/.test(trimmed) ? trimmed : undefined;
 }
 
+function scope(name: string): FilterField {
+  return { name, label: name, kind: 'scope' };
+}
+
 export const PAYMENT_FILTERS: readonly FilterField[] = [
   { name: 'status', label: 'Status', kind: 'select', options: PAYMENT_STATUSES },
   { name: 'provider', label: 'Provider', kind: 'select', options: RECORD_PROVIDERS },
@@ -64,6 +69,8 @@ export const PAYMENT_FILTERS: readonly FilterField[] = [
   },
   { name: 'from', label: 'From', kind: 'date', toParam: startOfDay },
   { name: 'to', label: 'To', kind: 'date', toParam: endExclusive },
+  scope('customerId'),
+  scope('subscriptionId'),
 ];
 
 export const SUBSCRIPTION_FILTERS: readonly FilterField[] = [
@@ -91,12 +98,17 @@ export const EVENT_FILTERS: readonly FilterField[] = [
   },
   { name: 'from', label: 'From', kind: 'date', toParam: startOfDay },
   { name: 'to', label: 'To', kind: 'date', toParam: endExclusive },
+  scope('connectionId'),
+  scope('objectRef'),
+  scope('customerId'),
 ];
 
 export const FINDING_FILTERS: readonly FilterField[] = [
   { name: 'status', label: 'Status', kind: 'select', options: FINDING_STATUSES },
   { name: 'severity', label: 'Severity', kind: 'select', options: FINDING_SEVERITIES },
   { name: 'type', label: 'Type', kind: 'select', options: FINDING_TYPES },
+  scope('subjectType'),
+  scope('subjectId'),
 ];
 
 export const INCIDENT_FILTERS: readonly FilterField[] = [

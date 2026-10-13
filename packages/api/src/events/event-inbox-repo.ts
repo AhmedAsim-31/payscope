@@ -1,13 +1,28 @@
-import { and, asc, count, desc, eq, gte, lt, min } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gte, lt, min, sql } from 'drizzle-orm';
 import type { z } from 'zod';
 import type { eventQuerySchema } from '@payscope/shared/events-schemas';
 import type { Db } from '../db/client';
 import { eventProcessingAttemptsTable, providerEventsTable as e } from '../db/schema/events';
 import { backgroundJobsTable } from '../db/schema/jobs';
+import { providerCustomerMappingsTable as m } from '../db/schema/providers';
+import { paymentRecordsTable as p, subscriptionRecordsTable as s } from '../db/schema/records';
 import { cursorTsColumn, iso, isoOrNull, keysetAfter, toPage } from '../records/keyset';
 import { redactPayload } from './event-redaction';
 
 type EventQuery = z.output<typeof eventQuerySchema>;
+
+function refersToCustomer(orgId: string, customerId: string) {
+  return sql`(${e.connectionId}, ${e.objectRef}) in (
+    select ${p.connectionId}, ${p.providerPaymentId} from ${p}
+      where ${p.orgId} = ${orgId} and ${p.customerId} = ${customerId}
+    union all
+    select ${s.connectionId}, ${s.providerSubscriptionId} from ${s}
+      where ${s.orgId} = ${orgId} and ${s.customerId} = ${customerId}
+    union all
+    select ${m.connectionId}, ${m.providerCustomerId} from ${m}
+      where ${m.orgId} = ${orgId} and ${m.customerId} = ${customerId}
+  )`;
+}
 
 const summaryColumns = {
   id: e.id,
@@ -29,6 +44,8 @@ export async function listEvents(db: Db, orgId: string, q: EventQuery) {
     q.provider === undefined ? undefined : eq(e.provider, q.provider),
     q.connectionId === undefined ? undefined : eq(e.connectionId, q.connectionId),
     q.normalizedType === undefined ? undefined : eq(e.normalizedType, q.normalizedType),
+    q.objectRef === undefined ? undefined : eq(e.objectRef, q.objectRef),
+    q.customerId === undefined ? undefined : refersToCustomer(orgId, q.customerId),
     q.from === undefined ? undefined : gte(e.receivedAt, new Date(q.from)),
     q.to === undefined ? undefined : lt(e.receivedAt, new Date(q.to)),
     keysetAfter(e.receivedAt, e.id, q.cursor),

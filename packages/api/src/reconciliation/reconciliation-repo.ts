@@ -106,6 +106,8 @@ export async function listFindings(db: Db, orgId: string, q: FindingQuery) {
     q.type === undefined ? undefined : eq(f.type, q.type),
     q.status === undefined ? undefined : eq(f.status, q.status),
     q.severity === undefined ? undefined : eq(f.severity, q.severity),
+    q.subjectType === undefined ? undefined : eq(f.subjectType, q.subjectType),
+    q.subjectId === undefined ? undefined : eq(f.subjectId, q.subjectId),
     keysetAfter(f.createdAt, f.id, q.cursor),
   ];
   const rows = await db
