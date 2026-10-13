@@ -178,6 +178,17 @@ describe('normalizePaddleEvent', () => {
     });
   });
 
+  it('carries the subscription id on a subscription payment and its refund, not a one-off', () => {
+    const subscriptionId = 'sub_01k00000000000000000000001';
+    const refund = load('adjustment-created-refund-approved');
+    (refund['data'] as Record<string, unknown>)['subscription_id'] = subscriptionId;
+    expect(normalizePaddleEvent(load('transaction-completed-subscription-first')).metadata).toEqual(
+      { subscriptionId },
+    );
+    expect(normalizePaddleEvent(refund).metadata).toMatchObject({ subscriptionId });
+    expect(normalizePaddleEvent(load('transaction-completed')).metadata).toBeNull();
+  });
+
   it('does not require a mapped data shape for unsupported events', () => {
     const payload = load('unsupported-customer-created');
     payload['event_type'] = 'product.created';

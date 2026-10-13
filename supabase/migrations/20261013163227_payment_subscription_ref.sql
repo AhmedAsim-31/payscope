@@ -1,0 +1,1 @@
+ALTER TABLE "payment_records" ADD COLUMN "provider_subscription_id" text;

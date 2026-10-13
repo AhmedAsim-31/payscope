@@ -118,6 +118,9 @@ export function normalizePayPalEvent(payload: unknown): NormalizedEvent {
     metadata['refundId'] = resource.id;
     objectId = captureIdFromLinks(resource) ?? objectId;
   }
+  if (mapping.objectType === 'payment' && resource.billing_agreement_id) {
+    metadata['subscriptionId'] = resource.billing_agreement_id;
+  }
   const orderId = resource.supplementary_data?.related_ids?.order_id;
   if (orderId) metadata['orderId'] = orderId;
   if (resource.plan_id) metadata['planId'] = resource.plan_id;

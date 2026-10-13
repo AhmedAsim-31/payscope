@@ -3,21 +3,26 @@ import { and, eq, gt, isNull, lte, or, sql } from 'drizzle-orm';
 import { paymentRecordsTable as t } from '../db/schema/records';
 import type { ApplyContext, ApplyOutcome } from './apply-types';
 import { resolveCustomerId } from './customers';
-import { applyEntitlements, revokeConnectionEntitlements } from './entitlements';
+import { applyEntitlements, revokeSubscriptionEntitlements } from './entitlements';
+import { subscriptionRefOf } from './payments';
 
 const CUMULATIVE_REFUND_PROVIDERS = new Set(['stripe']);
 
-async function revokeLinked(ctx: ApplyContext, customerId: string | null): Promise<void> {
+/** A one-off payment has no subscription, so its refund revokes nothing. */
+async function revokeLinked(
+  ctx: ApplyContext,
+  providerSubscriptionId: string | null,
+): Promise<void> {
   if (ctx.event.entitlementKeys.length > 0) {
     await applyEntitlements(ctx, null);
     return;
   }
-  if (!customerId) return;
-  await revokeConnectionEntitlements({
+  if (!providerSubscriptionId) return;
+  await revokeSubscriptionEntitlements({
     tx: ctx.tx,
     orgId: ctx.orgId,
     connectionId: ctx.connectionId,
-    customerId,
+    providerSubscriptionId,
     occurredAt: ctx.event.occurredAt,
   });
 }
@@ -46,14 +51,15 @@ export async function applyRefund(ctx: ApplyContext): Promise<ApplyOutcome> {
       status: sql`(CASE WHEN ${refunded} >= ${t.amountMinor} THEN 'refunded' ELSE 'partially_refunded' END)::payment_status`,
       amountRefundedMinor: refunded,
       customerId: sql`COALESCE(${t.customerId}, ${customerId}::uuid)`,
+      providerSubscriptionId: sql`COALESCE(${t.providerSubscriptionId}, ${subscriptionRefOf(event.metadata)})`,
       lastEventAt: event.occurredAt,
       version: sql`${t.version} + 1`,
       updatedAt: sql`now()`,
     })
     .where(and(match, or(isNull(t.lastEventAt), lte(t.lastEventAt, event.occurredAt))))
-    .returning({ status: t.status, customerId: t.customerId });
+    .returning({ status: t.status, providerSubscriptionId: t.providerSubscriptionId });
   if (row) {
-    if (row.status === 'refunded') await revokeLinked(ctx, row.customerId);
+    if (row.status === 'refunded') await revokeLinked(ctx, row.providerSubscriptionId);
     return { kind: 'applied' };
   }
   const [newer] = await tx

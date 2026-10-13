@@ -21,6 +21,7 @@ const AdjustmentSchema = z.looseObject({
   action: z.string().min(1),
   status: z.string().min(1),
   transaction_id: z.string().min(1),
+  subscription_id: z.string().min(1).nullish(),
   customer_id: z.string().min(1).nullish(),
   currency_code: z.string().min(1),
   totals: z.looseObject({ total: z.string() }),
@@ -71,13 +72,14 @@ function transactionBody(envelope: PaddleEnvelope): EventBody {
     currency: txn.currency_code,
     status: txn.status,
   };
+  const subscriptionRef = txn.subscription_id ? { subscriptionId: txn.subscription_id } : null;
   if (envelope.event_type === 'transaction.payment_failed') {
     return {
       ...base,
       normalizedType: 'payment.failed',
       objectType: 'payment',
       objectId: txn.id,
-      metadata: null,
+      metadata: subscriptionRef,
     };
   }
   if (txn.subscription_id && txn.origin === 'subscription_recurring') {
@@ -94,7 +96,7 @@ function transactionBody(envelope: PaddleEnvelope): EventBody {
     normalizedType: 'payment.succeeded',
     objectType: 'payment',
     objectId: txn.id,
-    metadata: null,
+    metadata: subscriptionRef,
   };
 }
 
@@ -112,7 +114,10 @@ function adjustmentBody(envelope: PaddleEnvelope): EventBody | undefined {
       normalizedType: 'payment.refunded',
       objectType: 'payment',
       objectId: adj.transaction_id,
-      metadata: { adjustmentId: adj.id },
+      metadata: {
+        adjustmentId: adj.id,
+        ...(adj.subscription_id ? { subscriptionId: adj.subscription_id } : {}),
+      },
     };
   }
   if (adj.action === 'chargeback') {
