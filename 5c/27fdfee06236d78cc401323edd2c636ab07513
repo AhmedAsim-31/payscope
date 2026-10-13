@@ -1,0 +1,62 @@
+.env.example
+  h_78e539a96187c3 20-24
+docs/architecture.md
+  h_78e539a96187c3 45-71
+docs/operations.md
+  h_78e539a96187c3 1-38
+packages/api/package.json
+  h_78e539a96187c3 10
+packages/api/src/app.ts
+  h_78e539a96187c3 17-18,34-35,98-100
+packages/api/src/config.test.ts
+  h_78e539a96187c3 23,90-102
+packages/api/src/config.ts
+  h_78e539a96187c3 25-29,58-59,89-90
+packages/api/src/jobs/backoff.test.ts
+  h_78e539a96187c3 1-21
+packages/api/src/jobs/backoff.ts
+  h_78e539a96187c3 1-9
+packages/api/src/jobs/default-handlers.ts
+  h_78e539a96187c3 1-8
+packages/api/src/jobs/handlers/process-provider-event.ts
+  h_78e539a96187c3 1-96
+packages/api/src/jobs/job-errors.ts
+  h_78e539a96187c3 1-22
+packages/api/src/jobs/job-queue.integration.test.ts
+  h_78e539a96187c3 1-173
+packages/api/src/jobs/job-queue.ts
+  h_78e539a96187c3 1-123
+packages/api/src/jobs/json-logger.ts
+  h_78e539a96187c3 1-8
+packages/api/src/jobs/tick-routes.ts
+  h_78e539a96187c3 1-22
+packages/api/src/jobs/tick.integration.test.ts
+  h_78e539a96187c3 1-136
+packages/api/src/jobs/worker.integration.test.ts
+  h_78e539a96187c3 1-162
+packages/api/src/jobs/worker.ts
+  h_78e539a96187c3 1-188
+packages/api/src/server.ts
+  h_78e539a96187c3 7-10,14-19,21-23,53-55,68
+packages/api/src/test/identity-harness.ts
+  h_78e539a96187c3 9,23,33
+packages/api/src/test/job-fixtures.ts
+  h_78e539a96187c3 1-50
+packages/api/src/worker-main.ts
+  h_78e539a96187c3 1-34
+packages/api/tsdown.config.ts
+  h_78e539a96187c3 4
+packages/api/vitest.config.ts
+  h_78e539a96187c3 17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5c27fdfee06236d78cc401323edd2c636ab07513",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
