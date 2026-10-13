@@ -12,9 +12,12 @@ import { createDefaultAdapterRegistry } from './providers/adapter-registry';
 const config = loadConfig();
 const { db, sql } = createDb(config.databaseUrl, { max: config.dbPoolMax });
 const adapters = createDefaultAdapterRegistry();
+const credentialsCipher = config.credentialsKey
+  ? createCredentialsCipher(config.credentialsKey)
+  : undefined;
 const worker = createWorker({
   db,
-  handlers: createDefaultHandlers(adapters),
+  handlers: createDefaultHandlers(adapters, credentialsCipher),
   logger: createJsonLogger(),
 });
 const app = await buildApp({
@@ -34,9 +37,7 @@ const app = await buildApp({
     },
   ],
   db,
-  credentialsCipher: config.credentialsKey
-    ? createCredentialsCipher(config.credentialsKey)
-    : undefined,
+  credentialsCipher,
   tokenVerifier: createTokenVerifier({
     issuer: config.jwtIssuer,
     audience: config.jwtAudience,

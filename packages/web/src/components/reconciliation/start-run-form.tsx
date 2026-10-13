@@ -15,7 +15,7 @@ const connectionsSchema = z.object({
 });
 
 const selectClass =
-  'border-input h-9 rounded-md border bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50';
+  'border-input h-9 w-full rounded-md border bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50';
 
 export function StartRunForm({ orgId, role }: { orgId: string; role: Role }) {
   const queryClient = useQueryClient();
@@ -49,13 +49,13 @@ export function StartRunForm({ orgId, role }: { orgId: string; role: Role }) {
 
   return (
     <form
-      className="flex flex-wrap items-end gap-3"
+      className="flex min-w-0 flex-wrap items-end gap-3"
       onSubmit={(event) => {
         event.preventDefault();
         start.mutate();
       }}
     >
-      <div className="grid gap-1.5">
+      <div className="grid w-full min-w-0 gap-1.5 sm:w-auto">
         <Label htmlFor="run-connection">Connection</Label>
         <select
           id="run-connection"
@@ -71,7 +71,7 @@ export function StartRunForm({ orgId, role }: { orgId: string; role: Role }) {
           ))}
         </select>
       </div>
-      <div className="grid gap-1.5">
+      <div className="grid w-full min-w-0 gap-1.5 sm:w-auto">
         <Label htmlFor="run-mode">Mode</Label>
         <select
           id="run-mode"

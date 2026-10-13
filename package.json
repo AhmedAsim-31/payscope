@@ -15,7 +15,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:seed": "pnpm --filter @payscope/api db:seed",
-    "db:reset-demo": "pnpm --filter @payscope/api db:seed --reset"
+    "db:reset-demo": "pnpm --filter @payscope/api db:seed --reset",
+    "e2e": "pnpm --filter @payscope/e2e e2e",
+    "e2e:headed": "pnpm --filter @payscope/e2e e2e:headed"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",

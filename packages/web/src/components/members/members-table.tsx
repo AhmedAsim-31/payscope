@@ -36,7 +36,7 @@ export function MembersTable({
   return (
     <Table>
       <caption className="sr-only">Organization members</caption>
-      <TableHeader>
+      <TableHeader className="max-md:hidden">
         <TableRow>
           <TableHead scope="col">Email</TableHead>
           <TableHead scope="col">Name</TableHead>
@@ -49,12 +49,21 @@ export function MembersTable({
           const editable = canManage && canModifyMember(callerRole, member.role);
           const busy = busyUserId === member.userId;
           return (
-            <TableRow key={member.userId} aria-busy={busy}>
-              <TableCell className="font-medium">{member.email}</TableCell>
-              <TableCell className={member.displayName ? undefined : 'text-muted-foreground'}>
-                {member.displayName ?? 'Not set'}
+            <TableRow key={member.userId} aria-busy={busy} className="max-md:block max-md:py-2">
+              <TableCell className="font-medium max-md:flex max-md:items-center max-md:justify-between max-md:gap-4 max-md:py-1 max-md:whitespace-normal">
+                <span className="text-muted-foreground text-xs font-normal md:hidden">Email</span>
+                <span className="max-md:min-w-0 max-md:break-words max-md:text-right">
+                  {member.email}
+                </span>
               </TableCell>
-              <TableCell>
+              <TableCell
+                className={`${member.displayName ? '' : 'text-muted-foreground'} max-md:flex max-md:items-center max-md:justify-between max-md:gap-4 max-md:py-1 max-md:whitespace-normal`}
+              >
+                <span className="text-muted-foreground text-xs md:hidden">Name</span>
+                <span>{member.displayName ?? 'Not set'}</span>
+              </TableCell>
+              <TableCell className="max-md:flex max-md:items-center max-md:justify-between max-md:gap-4 max-md:py-1 max-md:whitespace-normal">
+                <span className="text-muted-foreground text-xs md:hidden">Role</span>
                 {editable ? (
                   <RoleSelect
                     label={`Role for ${member.email}`}
@@ -68,7 +77,8 @@ export function MembersTable({
                 )}
               </TableCell>
               {canManage ? (
-                <TableCell>
+                <TableCell className="max-md:flex max-md:items-center max-md:justify-between max-md:gap-4 max-md:py-1 max-md:whitespace-normal">
+                  <span className="text-muted-foreground text-xs md:hidden">Actions</span>
                   {editable ? (
                     <Button
                       variant="ghost"

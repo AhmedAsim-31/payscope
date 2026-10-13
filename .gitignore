@@ -19,3 +19,7 @@ next-env.d.ts
 *.tsbuildinfo
 .claude/worktrees/
 .playwright-mcp/
+
+playwright-report/
+test-results/
+.auth/

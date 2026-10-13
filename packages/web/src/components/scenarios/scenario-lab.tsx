@@ -22,6 +22,7 @@ export function ScenarioLab({ orgId }: { orgId: string }) {
   const org = useCurrentOrg(orgId);
   const queryClient = useQueryClient();
   const [confirming, setConfirming] = useState(false);
+  const [resetCount, setResetCount] = useState(0);
   const canRun = can(org.role, 'scenarios:run');
   const { data } = useSuspenseQuery({
     queryKey: ['orgs', orgId, 'scenarios'],
@@ -34,7 +35,10 @@ export function ScenarioLab({ orgId }: { orgId: string }) {
       resetResultSchema.parse(
         await apiFetch(`/api/v1/orgs/${orgId}/scenarios/reset`, { method: 'POST' }),
       ),
-    onSuccess: () => setConfirming(false),
+    onSuccess: () => {
+      setConfirming(false);
+      setResetCount((count) => count + 1);
+    },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['orgs', orgId] }),
   });
 
@@ -57,7 +61,12 @@ export function ScenarioLab({ orgId }: { orgId: string }) {
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
         {data.map((scenario) => (
-          <ScenarioCard key={scenario.id} orgId={orgId} scenario={scenario} canRun={canRun} />
+          <ScenarioCard
+            key={`${scenario.id}-${resetCount}`}
+            orgId={orgId}
+            scenario={scenario}
+            canRun={canRun}
+          />
         ))}
       </div>
       {confirming ? (
