@@ -1,5 +1,6 @@
 'use client';
 
+import { PageHeader } from '@/components/page-header';
 import { Suspense } from 'react';
 import type { z } from 'zod';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -44,10 +45,7 @@ export function RecordsListView<T extends { id: string }>({
 
   return (
     <div className="grid gap-6">
-      <div className="grid gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-        <p className="text-muted-foreground text-sm">{description}</p>
-      </div>
+      <PageHeader title={title} description={description} />
       <FilterBar
         label={`Filter ${title.toLowerCase()}`}
         fields={fields}

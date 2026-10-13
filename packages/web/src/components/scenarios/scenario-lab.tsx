@@ -1,5 +1,6 @@
 'use client';
 
+import { PageHeader } from '@/components/page-header';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { can } from '@payscope/shared/permissions';
@@ -44,21 +45,17 @@ export function ScenarioLab({ orgId }: { orgId: string }) {
 
   return (
     <div className="grid gap-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="grid gap-1">
-          <h1 className="text-2xl font-semibold tracking-tight">Scenario lab</h1>
-          <p className="text-muted-foreground max-w-prose text-sm">
-            Each scenario drives the real pipeline (webhook, job, worker, reconciliation) on a
-            dedicated &quot;Scenario lab (demo)&quot; simulation connection, so your other data is
-            never touched. Nothing here calls a live provider.
-          </p>
-        </div>
-        {canRun ? (
-          <Button type="button" variant="outline" onClick={() => setConfirming(true)}>
-            Reset scenario lab
-          </Button>
-        ) : null}
-      </div>
+      <PageHeader
+        title="Scenario lab"
+        description={`Each scenario drives the real pipeline (webhook, job, worker, reconciliation) on a dedicated "Scenario lab (demo)" simulation connection, so your other data is never touched. Nothing here calls a live provider.`}
+        actions={
+          canRun ? (
+            <Button type="button" variant="outline" onClick={() => setConfirming(true)}>
+              Reset scenario lab
+            </Button>
+          ) : null
+        }
+      />
       <div className="grid gap-4 lg:grid-cols-2">
         {data.map((scenario) => (
           <ScenarioCard

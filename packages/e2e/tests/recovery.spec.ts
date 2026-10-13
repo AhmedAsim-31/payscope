@@ -20,10 +20,7 @@ test('reconcile, find the missing entitlement, repair it with a reason', async (
   await page.getByLabel('Mode').selectOption('local');
   await page.getByRole('button', { name: 'Start run' }).click();
   const latestRun = page.getByRole('row', { name: /Local/ }).first();
-  await expect(async () => {
-    await page.reload();
-    await expect(latestRun).toContainText(/Completed|Passed|Partial/, { timeout: 2_000 });
-  }).toPass({ timeout: 30_000 });
+  await expect(latestRun).toContainText(/Completed|Passed|Partial/, { timeout: 30_000 });
 
   await page.goto(`/app/${acme}/findings?type=entitlement_missing_or_stale&status=open`);
   await expect(page.getByRole('row').getByRole('link').first()).toBeVisible();
