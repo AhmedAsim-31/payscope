@@ -17,9 +17,9 @@ import { recheckFinding } from './finding-recheck';
 
 type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
 type Finding = typeof f.$inferSelect;
-type Outcome = {
+export type Outcome = {
   value: {
-    action: 'reprocess_event' | 'correct_entitlement' | 'resolve_finding';
+    action: 'reprocess_event' | 'correct_entitlement' | 'resolve_finding' | 'refresh_from_provider';
     targetId: string;
     previousState: Record<string, unknown>;
     resultingState: Record<string, unknown>;
@@ -30,7 +30,7 @@ type Outcome = {
 
 const REPROCESSABLE = ['processed', 'ignored', 'failed', 'needs_attention'] as const;
 
-function outcome(
+export function outcome(
   action: Outcome['value']['action'],
   targetId: string,
   previousState: Record<string, unknown>,

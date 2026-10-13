@@ -56,6 +56,7 @@ const BODIES: Record<string, unknown> = {
   'POST /repairs/reprocess-event': { eventId: SOME_ID, reason: REASON },
   'POST /repairs/correct-entitlement': { findingId: SOME_ID, reason: REASON },
   'POST /repairs/resolve-finding': { findingId: SOME_ID, reason: REASON },
+  'POST /repairs/refresh-from-provider': { paymentId: SOME_ID, reason: REASON },
   'POST /scenarios/:scenarioId/run': undefined,
   'POST /scenarios/reset': undefined,
 };
@@ -80,6 +81,7 @@ const MUTATION_ACTIONS: Record<string, Action> = {
   'POST /repairs/reprocess-event': 'repairs:execute',
   'POST /repairs/correct-entitlement': 'repairs:execute',
   'POST /repairs/resolve-finding': 'repairs:execute',
+  'POST /repairs/refresh-from-provider': 'repairs:execute',
   'POST /scenarios/:scenarioId/run': 'scenarios:run',
   'POST /scenarios/reset': 'scenarios:run',
 };

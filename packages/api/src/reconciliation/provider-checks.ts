@@ -74,19 +74,23 @@ export type BatchResult = {
 
 const SETTLED_LOCALLY = new Set(['refunded', 'partially_refunded', 'disputed']);
 
-function statusAgrees(local: string, remote: string): boolean {
+export function statusAgrees(local: string, remote: string): boolean {
   const r = remote.toLowerCase().replace('cancelled', 'canceled');
   return local === r || (SETTLED_LOCALLY.has(local) && r === 'succeeded');
 }
 
-type Fetched =
+export type Fetched =
   | { kind: 'ok'; status: string; amountMinor: bigint | null; currency: string | null }
   | { kind: 'not_found' }
   | { kind: 'unavailable'; message: string }
   | { kind: 'auth' }
   | { kind: 'failed' };
 
-async function fetchOne(target: ProviderTarget, kind: ObjectKind, id: string): Promise<Fetched> {
+export async function fetchOne(
+  target: ProviderTarget,
+  kind: ObjectKind,
+  id: string,
+): Promise<Fetched> {
   const { adapter, ctx } = target;
   try {
     const snap =

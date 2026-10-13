@@ -4,7 +4,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { repairResultSchema } from '@payscope/shared/repair-schemas';
 import { apiFetch } from '@/lib/api-client';
 
-export type RepairPath = 'reprocess-event' | 'correct-entitlement' | 'resolve-finding';
+export type RepairPath =
+  'reprocess-event' | 'correct-entitlement' | 'resolve-finding' | 'refresh-from-provider';
 export type RepairRequest = { body: Record<string, string>; idempotencyKey: string };
 
 export function useRepair(orgId: string, path: RepairPath) {

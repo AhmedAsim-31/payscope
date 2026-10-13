@@ -2,20 +2,31 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import {
   correctEntitlementBodySchema,
+  refreshFromProviderBodySchema,
   reprocessEventBodySchema,
   repairHeadersSchema,
   repairResultSchema,
   resolveFindingBodySchema,
 } from '@payscope/shared/repair-schemas';
 import type { Db } from '../db/client';
+import { ApiHttpError } from '../http-error';
 import { currentOrg, currentUserId } from '../orgs/request-context';
 import { requireOrg } from '../orgs/require-org';
 import { runRepair } from './idempotent-repair';
 import { correctEntitlement, reprocessEvent, resolveFinding } from './repair-actions';
+import {
+  applyPaymentRefresh,
+  planPaymentRefresh,
+  type ProviderDeps,
+} from './refresh-from-provider';
 
 const orgParams = z.object({ orgId: z.uuid() });
 
-export const repairRoutes: FastifyPluginCallbackZod<{ db: Db }> = (app, { db }, done) => {
+export const repairRoutes: FastifyPluginCallbackZod<{ db: Db } & ProviderDeps> = (
+  app,
+  { db, ...providers },
+  done,
+) => {
   app.decorateRequest('org', undefined);
   app.addHook('onRequest', app.authenticate);
   app.addHook('onRequest', app.rateLimitByMethod());
@@ -114,6 +125,45 @@ export const repairRoutes: FastifyPluginCallbackZod<{ db: Db }> = (app, { db }, 
           ...(await resolveFinding(tx, currentOrg(request).id, findingId, reason)),
           targetId: findingId,
         }),
+      );
+    },
+  );
+
+  app.post(
+    `${base}/refresh-from-provider`,
+    {
+      preHandler: route.preHandler,
+      schema: {
+        params: orgParams,
+        headers: repairHeadersSchema,
+        body: refreshFromProviderBodySchema,
+        response: route.response,
+      },
+    },
+    async (request) => {
+      const { paymentId, reason } = request.body;
+      const orgId = currentOrg(request).id;
+      // The provider read happens outside the transaction; the write re-checks the version it saw.
+      const plan = await planPaymentRefresh(db, providers, orgId, paymentId).catch(
+        (err: unknown) => {
+          if (err instanceof ApiHttpError) return err;
+          throw err;
+        },
+      );
+      return runRepair(
+        db,
+        {
+          ...context(request),
+          action: 'refresh_from_provider',
+          targetType: 'payment',
+          targetId: paymentId,
+          reason,
+          body: request.body,
+        },
+        async (tx) => {
+          if (plan instanceof ApiHttpError) throw plan;
+          return applyPaymentRefresh(tx, orgId, plan);
+        },
       );
     },
   );

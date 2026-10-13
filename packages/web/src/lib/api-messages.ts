@@ -31,6 +31,14 @@ const CONFLICT_MESSAGES: Record<string, string> = {
   EVENT_IN_FLIGHT: 'This event is already pending or processing. Wait for it to finish.',
   PAYLOAD_PRUNED:
     'The raw payload of this event was removed by retention, so it cannot be reprocessed.',
+  CONNECTION_NOT_VERIFIED:
+    'The provider connection is not verified. Verify its credentials on the connections page first.',
+  PROVIDER_NOT_CONFIGURED:
+    'This connection cannot read records from the provider. Add sandbox credentials first.',
+  PROVIDER_OBJECT_NOT_FOUND: 'The provider has no record of this payment. Nothing was changed.',
+  CONCURRENT_UPDATE: 'The payment changed while the provider was being read. Try again.',
+  REFUND_EXCEEDS_AMOUNT:
+    'The provider amount is below what was refunded locally. Review the payment by hand.',
   SIMULATED_CONNECTION: 'Simulated connections have no provider account to test.',
   ALREADY_OWNER: 'That member is already an owner.',
   OWNERSHIP_CHANGED:
@@ -47,6 +55,8 @@ const UNPROCESSABLE_MESSAGES: Record<string, string> = {
     'The subscription plan has no entitlement mapping. Map it on the connection first.',
   NOT_LOCALLY_VERIFIABLE: 'This finding came from the provider and cannot be re-checked locally.',
   NOT_CORRECTABLE: 'This finding type has no entitlement correction.',
+  PROVIDER_STATUS_UNMAPPED:
+    'The provider reported a status PayScope cannot map. Nothing was changed.',
   PROVIDER_MODE_UNAVAILABLE: 'This connection does not support provider-mode runs.',
   LIVE_KEYS_NOT_ALLOWED: 'Only sandbox API keys are accepted. Use a test or sandbox key.',
   NO_API_KEY: 'Add a sandbox API key before testing credentials.',
@@ -84,6 +94,9 @@ export function describeError(error: unknown, context: ErrorContext): string {
       return 'This event can no longer be retried. It may already have been retried. Refresh to see its current state.';
     }
     if (error.status === 404) return 'That event no longer exists.';
+  }
+  if (error.status === 502 && context === 'repair') {
+    return 'The provider could not be reached or rejected the request. Nothing was changed.';
   }
   if (error.status === 429 && CONNECTION_CONTEXTS.includes(context)) {
     return 'Too many credential changes or tests. Wait a minute and try again.';

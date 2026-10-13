@@ -9,6 +9,7 @@ import { RecordsList } from '@/components/records/records-list';
 import { findingColumns } from '@/components/reconciliation/findings-list';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCurrentOrg } from '@/hooks/use-current-org';
+import { RefreshPaymentForm } from './refresh-payment-form';
 import { ReprocessEventForm } from './reprocess-event-form';
 
 export function RepairCenter({ orgId }: { orgId: string }) {
@@ -47,6 +48,14 @@ export function RepairCenter({ orgId }: { orgId: string }) {
       <DetailSection title="Reprocess an event">
         {canRepair ? (
           <ReprocessEventForm orgId={orgId} />
+        ) : (
+          <SectionEmpty>Your role can view repairs but not run them.</SectionEmpty>
+        )}
+      </DetailSection>
+
+      <DetailSection title="Refresh a payment from the provider">
+        {canRepair ? (
+          <RefreshPaymentForm orgId={orgId} />
         ) : (
           <SectionEmpty>Your role can view repairs but not run them.</SectionEmpty>
         )}
