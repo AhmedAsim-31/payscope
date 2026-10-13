@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { PageHeader } from '@/components/page-header';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { jobSummarySchema } from '@payscope/shared/events-schemas';
@@ -7,7 +8,14 @@ import { formatAge } from '@/components/records/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { apiFetch } from '@/lib/api-client';
 
-function StatCard({ title, value, hint }: { title: string; value: string; hint: string }) {
+type StatCardProps = {
+  title: string;
+  value: string;
+  hint: string;
+  link?: { href: string; label: string };
+};
+
+function StatCard({ title, value, hint, link }: StatCardProps) {
   return (
     <Card>
       <CardHeader>
@@ -16,6 +24,11 @@ function StatCard({ title, value, hint }: { title: string; value: string; hint: 
       <CardContent className="grid gap-1">
         <p className="text-3xl font-semibold tabular-nums">{value}</p>
         <p className="text-muted-foreground text-xs">{hint}</p>
+        {link ? (
+          <Link href={link.href} className="w-fit text-sm underline underline-offset-4">
+            {link.label}
+          </Link>
+        ) : null}
       </CardContent>
     </Card>
   );
@@ -47,8 +60,21 @@ export function JobsSummary({ orgId }: { orgId: string }) {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard title="Queued" value={String(counts.queued)} hint="Waiting for the worker" />
         <StatCard title="Running" value={String(counts.running)} hint="Being processed now" />
-        <StatCard title="Failed" value={String(counts.failed)} hint="Stopped, can be retried" />
-        <StatCard title="Dead" value={String(counts.dead)} hint="Out of attempts, can be retried" />
+        <StatCard
+          title="Failed"
+          value={String(counts.failed)}
+          hint="Stopped, can be retried"
+          link={{ href: `/app/${orgId}/events?status=failed`, label: 'View failed events' }}
+        />
+        <StatCard
+          title="Dead"
+          value={String(counts.dead)}
+          hint="Out of attempts, can be retried"
+          link={{
+            href: `/app/${orgId}/events?status=needs_attention`,
+            label: 'View events needing attention',
+          }}
+        />
         <StatCard
           title="Oldest queued"
           value={oldestQueuedAgeSeconds === null ? 'None' : formatAge(oldestQueuedAgeSeconds)}

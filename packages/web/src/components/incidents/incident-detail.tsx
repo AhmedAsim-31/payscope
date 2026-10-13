@@ -1,6 +1,8 @@
 'use client';
 
 import { incidentDetailSchema } from '@payscope/shared/incident-schemas';
+import { FINDING_TYPES } from '@payscope/shared/reconciliation-schemas';
+import Link from 'next/link';
 import {
   BackLink,
   DetailField,
@@ -18,6 +20,8 @@ import { IncidentActions } from './incident-actions';
 export function IncidentDetail({ orgId, incidentId }: { orgId: string; incidentId: string }) {
   const incident = useRecordDetail(orgId, 'incidents', incidentId, incidentDetailSchema);
   const org = useCurrentOrg(orgId);
+  const { findingType } = incident.related;
+  const findingsType = FINDING_TYPES.find((t) => t === findingType);
 
   return (
     <div className="grid gap-8">
@@ -33,7 +37,19 @@ export function IncidentDetail({ orgId, incidentId }: { orgId: string; incidentI
       <DetailSection title="Details">
         <DetailGrid>
           <DetailField label="Category">{humanize(incident.category)}</DetailField>
-          <DetailField label="Active findings">{incident.findingCount}</DetailField>
+          <DetailField label="Active findings">
+            <span className="inline-flex flex-wrap items-baseline gap-2">
+              {incident.findingCount}
+              {findingsType ? (
+                <Link
+                  href={`/app/${orgId}/findings?type=${findingsType}`}
+                  className="underline underline-offset-4"
+                >
+                  View findings
+                </Link>
+              ) : null}
+            </span>
+          </DetailField>
           <DetailField label="Opened">
             <Timestamp value={incident.openedAt} />
           </DetailField>
