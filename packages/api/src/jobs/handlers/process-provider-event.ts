@@ -2,7 +2,9 @@ import { and, eq, inArray, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { ProviderError } from '@payscope/provider-adapters/provider-error';
 import type { AdapterRegistry } from '@payscope/provider-adapters/registry';
+import type { CredentialsCipher } from '../../crypto/credentials-cipher';
 import { applyEvent, type ApplyResult } from '../../events/apply-event';
+import { withRefundSubscription } from '../../events/refund-subscription-link';
 import { eventProcessingAttemptsTable, providerEventsTable } from '../../db/schema/events';
 import { findAdapter } from '../../providers/adapter-registry';
 import { PermanentJobError } from '../permanent-job-error';
@@ -35,7 +37,11 @@ function attemptFields(result: Exclude<ApplyResult, { kind: 'already_handled' }>
   }
 }
 
-export function createProcessProviderEventHandler(adapters: AdapterRegistry): JobHandler {
+export function createProcessProviderEventHandler(
+  adapters: AdapterRegistry,
+  cipher?: CredentialsCipher,
+  fetchImpl: typeof fetch = fetch,
+): JobHandler {
   return async (job, { db }) => {
     const parsed = payloadSchema.safeParse(job.payload);
     if (!parsed.success || !job.orgId) throw new PermanentJobError('invalid_job_payload');
@@ -73,7 +79,14 @@ export function createProcessProviderEventHandler(adapters: AdapterRegistry): Jo
     try {
       const adapter = findAdapter(adapters, event.provider);
       if (!adapter) throw new PermanentJobError('no_adapter_for_provider');
-      const normalized = adapter.normalizeEvent(event.payload);
+      const normalized = await withRefundSubscription(
+        db,
+        adapters,
+        cipher,
+        fetchImpl,
+        stored,
+        adapter.normalizeEvent(event.payload),
+      );
       await db.transaction(async (tx) => {
         const result = await applyEvent(tx, stored, normalized);
         if (result.kind === 'already_handled') return;

@@ -15,6 +15,7 @@ export type ProviderAdapter = {
   ): Promise<VerificationResult>;
   normalizeEvent(payload: unknown): NormalizedEvent;
   fetchPayment?(ctx: ProviderContext, id: string): Promise<ProviderObjectSnapshot>;
+  fetchPaymentSubscription?(ctx: ProviderContext, paymentId: string): Promise<string | null>;
   fetchSubscription?(ctx: ProviderContext, id: string): Promise<ProviderObjectSnapshot>;
   listPayments?(
     ctx: ProviderContext,

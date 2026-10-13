@@ -1,8 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ProviderError } from '../provider-error';
 import type { ProviderContext } from '../provider-context';
+import { loadStripeFixture } from './stripe-fixtures';
 import {
   fetchPayment,
+  fetchPaymentSubscription,
   fetchSubscription,
   listPayments,
   validateCredentials,
@@ -81,6 +83,28 @@ describe('stripe client', () => {
       'sub_test_1',
     );
     expect(snapshot).toMatchObject({ objectId: 'sub_test_1', status: 'active', amountMinor: null });
+  });
+
+  it('resolves a payment intent subscription through its expanded invoice payment', async () => {
+    const fetchMock = vi.fn(() =>
+      Promise.resolve(json(loadStripeFixture('invoice-payments-list-expanded'))),
+    );
+    expect(await fetchPaymentSubscription(ctxWith(fetchMock), 'pi_test_3Qa1b2c3d4')).toBe(
+      'sub_test_1Pq9zXy',
+    );
+    const url = new URL((fetchMock.mock.calls[0] as unknown as [string])[0]);
+    expect(url.pathname).toBe('/v1/invoice_payments');
+    expect(Object.fromEntries(url.searchParams)).toEqual({
+      'payment[type]': 'payment_intent',
+      'payment[payment_intent]': 'pi_test_3Qa1b2c3d4',
+      'expand[]': 'data.invoice',
+      limit: '1',
+    });
+  });
+
+  it('returns null for a payment intent with no invoice payment', async () => {
+    const ctx = ctxWith(() => Promise.resolve(json({ object: 'list', has_more: false, data: [] })));
+    expect(await fetchPaymentSubscription(ctx, 'pi_one_off')).toBeNull();
   });
 
   it('validates credentials against /v1/balance', async () => {

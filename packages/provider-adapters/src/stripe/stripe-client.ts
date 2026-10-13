@@ -30,6 +30,20 @@ const SubscriptionSchema = z.looseObject({
   currency: z.string().length(3).nullish(),
 });
 
+const InvoicePaymentListSchema = z.looseObject({
+  data: z.array(
+    z.looseObject({
+      invoice: z.looseObject({
+        parent: z
+          .looseObject({
+            subscription_details: z.looseObject({ subscription: z.string().min(1) }).nullish(),
+          })
+          .nullish(),
+      }),
+    }),
+  ),
+});
+
 function assertUsable(ctx: ProviderContext): void {
   const { apiKey } = ctx.credentials;
   if (apiKey.startsWith('sk_live_') || apiKey.startsWith('rk_live_')) {
@@ -154,6 +168,24 @@ export async function fetchSubscription(
     fetchedAt: new Date(),
     raw,
   };
+}
+
+/** PaymentIntent carries no invoice link since basil, so the subscription is reached through its InvoicePayment. */
+export async function fetchPaymentSubscription(
+  ctx: ProviderContext,
+  paymentIntentId: string,
+): Promise<string | null> {
+  const query = new URLSearchParams({
+    'payment[type]': 'payment_intent',
+    'payment[payment_intent]': paymentIntentId,
+    'expand[]': 'data.invoice',
+    limit: '1',
+  });
+  const list = parseSnapshot(
+    InvoicePaymentListSchema,
+    await stripeGet(ctx, `/v1/invoice_payments?${query.toString()}`),
+  );
+  return list.data[0]?.invoice.parent?.subscription_details?.subscription ?? null;
 }
 
 export async function validateCredentials(ctx: ProviderContext): Promise<void> {
