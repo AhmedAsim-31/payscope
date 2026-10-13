@@ -1,0 +1,94 @@
+docs/demo.md
+  h_78e539a96187c3 66-104
+packages/api/src/app.ts
+  h_78e539a96187c3 31,109
+packages/api/src/db/schema/scenarios.ts
+  h_78e539a96187c3 1-26
+packages/api/src/jobs/default-handlers.ts
+  h_78e539a96187c3 9,19
+packages/api/src/jobs/handlers/run-scenario.ts
+  h_78e539a96187c3 1-53
+packages/api/src/jobs/job-queue.ts
+  h_78e539a96187c3 40-45,48-53,64
+packages/api/src/jobs/worker.ts
+  h_78e539a96187c3 129-135
+packages/api/src/reconciliation/provider-checks.ts
+  h_78e539a96187c3 31,54
+packages/api/src/reconciliation/run-executor.ts
+  h_78e539a96187c3 29,154
+packages/api/src/scenarios/failure-scenarios.ts
+  h_78e539a96187c3 1-117
+packages/api/src/scenarios/http-scenarios.ts
+  h_78e539a96187c3 1-130
+packages/api/src/scenarios/lab-setup.ts
+  h_78e539a96187c3 1-86
+packages/api/src/scenarios/lab.ts
+  h_78e539a96187c3 1-250
+packages/api/src/scenarios/mirror-fetch.ts
+  h_78e539a96187c3 1-41
+packages/api/src/scenarios/payment-scenarios.ts
+  h_78e539a96187c3 1-47
+packages/api/src/scenarios/record-lookup.ts
+  h_78e539a96187c3 1-77
+packages/api/src/scenarios/scenario-job.ts
+  h_78e539a96187c3 1
+packages/api/src/scenarios/scenario-lab.integration.test.ts
+  h_78e539a96187c3 1-163
+packages/api/src/scenarios/scenario-registry.ts
+  h_78e539a96187c3 1-37
+packages/api/src/scenarios/scenario-reset.ts
+  h_78e539a96187c3 1-32
+packages/api/src/scenarios/scenario-routes.ts
+  h_78e539a96187c3 1-119
+packages/api/src/scenarios/scenario-run-repo.ts
+  h_78e539a96187c3 1-72
+packages/api/src/scenarios/stripe-payloads.ts
+  h_78e539a96187c3 1-111
+packages/api/src/scenarios/subscription-scenarios.ts
+  h_78e539a96187c3 1-121
+packages/api/src/scenarios/worker-scenarios.ts
+  h_78e539a96187c3 1-90
+packages/api/src/security/tenant-fixture.ts
+  h_78e539a96187c3 31-33,77-80,97-98
+packages/api/src/security/tenant-isolation.integration.test.ts
+  h_78e539a96187c3 25-26,29-31,46-51,66-71,97-99,104,154-155
+packages/shared/src/scenario-schemas.ts
+  h_78e539a96187c3 1-226
+packages/web/src/app/app/[orgId]/scenarios/page.tsx
+  h_78e539a96187c3 1-12
+packages/web/src/components/records/status-badge.tsx
+  h_78e539a96187c3 41-42
+packages/web/src/components/scenarios/scenario-card.test.tsx
+  h_78e539a96187c3 1-75
+packages/web/src/components/scenarios/scenario-card.tsx
+  h_78e539a96187c3 1-90
+packages/web/src/components/scenarios/scenario-lab.tsx
+  h_78e539a96187c3 1-97
+packages/web/src/components/scenarios/scenario-result.tsx
+  h_78e539a96187c3 1-112
+packages/web/src/components/shell/nav-config.ts
+  h_78e539a96187c3 8,38
+packages/web/src/components/shell/sidebar-nav.test.tsx
+  h_78e539a96187c3 37
+packages/web/src/lib/api-messages.ts
+  h_78e539a96187c3 12-14,17,66
+supabase/migrations/20261013063855_scenario_runs.sql
+  h_78e539a96187c3 1-17
+supabase/migrations/20261013063855_scenario_runs_rls.sql
+  h_78e539a96187c3 1-4
+supabase/migrations/meta/20261013063855_snapshot.json
+  h_78e539a96187c3 1-3075
+supabase/migrations/meta/_journal.json
+  h_78e539a96187c3 95-108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2b2400712c9f244c314843e3785fdd72b0825088",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
