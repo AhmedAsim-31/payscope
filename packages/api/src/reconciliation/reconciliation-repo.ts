@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, sql, type SQL } from 'drizzle-orm';
+import { and, desc, eq, inArray, or, sql, type SQL } from 'drizzle-orm';
 import type { z } from 'zod';
 import type { findingQuerySchema, runQuerySchema } from '@payscope/shared/reconciliation-schemas';
 import type { Db } from '../db/client';
@@ -108,6 +108,9 @@ export async function listFindings(db: Db, orgId: string, q: FindingQuery) {
     q.severity === undefined ? undefined : eq(f.severity, q.severity),
     q.subjectType === undefined ? undefined : eq(f.subjectType, q.subjectType),
     q.subjectId === undefined ? undefined : eq(f.subjectId, q.subjectId),
+    q.runId === undefined
+      ? undefined
+      : or(eq(f.firstSeenRunId, q.runId), eq(f.lastSeenRunId, q.runId)),
     keysetAfter(f.createdAt, f.id, q.cursor),
   ];
   const rows = await db

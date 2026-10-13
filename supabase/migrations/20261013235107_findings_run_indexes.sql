@@ -1,0 +1,2 @@
+CREATE INDEX "reconciliation_findings_org_first_run_idx" ON "reconciliation_findings" USING btree ("org_id","first_seen_run_id");--> statement-breakpoint
+CREATE INDEX "reconciliation_findings_org_last_run_idx" ON "reconciliation_findings" USING btree ("org_id","last_seen_run_id");

@@ -174,6 +174,33 @@ describe('reconciliation API', () => {
     expect(await findings(b)).toEqual([]);
   });
 
+  it('filters findings by the run that first or last saw them, scoped to the org', async () => {
+    const a = await newTenant();
+    const b = await newTenant();
+    const carried = await addPayment(sql, a, { status: 'succeeded', refunded: 100 });
+    const first = await runLocal(a);
+    const fresh = await addPayment(sql, a, { status: 'refunded', refunded: 0 });
+    const second = await runLocal(a);
+    const subjects = async (runId: string) =>
+      (await findings(a, `&runId=${runId}`)).map((f) => f.subjectId).sort();
+    expect(await subjects(second.id)).toEqual([carried.id, fresh.id].sort());
+    expect(await subjects(first.id)).toEqual([carried.id]);
+
+    await addPayment(sql, b, { status: 'succeeded', refunded: 100 });
+    await runLocal(b);
+    expect(await findings(b, `&runId=${second.id}`)).toEqual([]);
+    const cross = await app.inject({
+      url: url(a, `findings?runId=${second.id}`),
+      headers: b.owner.headers,
+    });
+    expect(cross.statusCode).toBe(404);
+    const invalid = await app.inject({
+      url: url(a, 'findings?runId=not-a-uuid'),
+      headers: a.owner.headers,
+    });
+    expect(invalid.statusCode).toBe(400);
+  });
+
   it('forbids a VIEWER from starting a run', async () => {
     const t = await newTenant();
     const viewer = await harness.newUser();

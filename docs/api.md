@@ -141,6 +141,7 @@ Event list filters: `status`, `provider`, `connectionId`, `normalizedType`, and 
 | PATCH  | `{org}/reconciliation/findings/:findingId`                 | `findings:update`    | Status `reviewed` or `dismissed` only            |
 
 Finding list filters: `type`, `status`, `severity`, `subjectType`, and `subjectId` match exactly.
+`runId` matches findings the run first detected or last saw.
 
 Each run carries `trigger`: `manual` for runs started through this API, `scheduled` for runs the internal tick starts (see [operations.md](operations.md#scheduled-reconciliation)).
 
