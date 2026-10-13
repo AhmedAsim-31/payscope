@@ -147,7 +147,8 @@ describe('record detail related sections', () => {
     expect(await screen.findByText('No audit entries yet')).toBeInTheDocument();
     expect(requested('/payments').get('customerId')).toBe(CUSTOMER);
     expect(requested('/events').get('customerId')).toBe(CUSTOMER);
-    expect(requested('/audit').get('targetType')).toBe('customer');
+    expect(requested('/audit').get('customerId')).toBe(CUSTOMER);
+    expect(requested('/audit').has('targetType')).toBe(false);
   });
 
   it('shows subscription payments, events and reconciliation findings', async () => {

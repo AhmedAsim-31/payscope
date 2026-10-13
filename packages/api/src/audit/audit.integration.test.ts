@@ -9,7 +9,12 @@ import {
   runLocalRecon,
   type Tenant,
 } from '../test/ops-harness';
-import { addCustomer, addEntitlement, addSubscription } from '../test/reconciliation-fixtures';
+import {
+  addCustomer,
+  addEntitlement,
+  addPayment,
+  addSubscription,
+} from '../test/reconciliation-fixtures';
 import { auditLogsTable } from '../db/schema/operations';
 import { writeAudit } from './audit-log';
 
@@ -219,6 +224,39 @@ describe('audit log', () => {
     await seed(other, 'tenant.secret', '2026-05-01T00:00:00Z');
     expect((await audit(t, '&q=tenant.secret')).items).toEqual([]);
     expect((await audit(other, '&q=tenant.secret')).items).toHaveLength(1);
+  });
+
+  it('collects a customer timeline from its own, payment, subscription and entitlement rows', async () => {
+    const t = await newTenant(harness, app);
+    const other = await newTenant(harness, app);
+    const customer = await addCustomer(sql, t);
+    const stranger = await addCustomer(sql, t);
+    const payment = await addPayment(sql, t, { customerId: customer });
+    const strangerPayment = await addPayment(sql, t, { customerId: stranger });
+    const sub = await addSubscription(sql, t, customer, 'active');
+    const ent = await addEntitlement(sql, t, customer, 'active', sub);
+    const target = async (o: Tenant, action: string, targetType: string, targetId: string) =>
+      db.insert(auditLogsTable).values({
+        orgId: o.orgId,
+        actorId: null,
+        actorType: 'system',
+        action,
+        targetType,
+        targetId,
+        outcome: 'success',
+      });
+    await target(t, 'c.own', 'customer', customer);
+    await target(t, 'c.payment', 'payment', payment.id);
+    await target(t, 'c.sub', 'subscription', sub);
+    await target(t, 'c.ent', 'entitlement', ent);
+    await target(t, 'c.stranger', 'payment', strangerPayment.id);
+    await target(t, 'c.wrongtype', 'subscription', payment.id);
+    await target(other, 'c.otherorg', 'payment', payment.id);
+    const { res, items } = await audit(t, `&customerId=${customer}`);
+    expect(res.statusCode).toBe(200);
+    expect(items.map((i) => i.action).sort()).toEqual(['c.ent', 'c.own', 'c.payment', 'c.sub']);
+    expect((await audit(other, `&customerId=${customer}`)).items).toEqual([]);
+    expect((await audit(t, '&customerId=nope')).res.statusCode).toBe(400);
   });
 
   it('hides another org and offers no write endpoint', async () => {

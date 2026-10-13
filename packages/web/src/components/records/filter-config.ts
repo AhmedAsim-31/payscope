@@ -122,6 +122,7 @@ export const AUDIT_FILTERS: readonly FilterField[] = [
   { name: 'targetId', label: 'Target id', kind: 'text', placeholder: 'uuid' },
   { name: 'from', label: 'From', kind: 'date', toParam: startOfDay },
   { name: 'to', label: 'To', kind: 'date', toParam: endExclusive },
+  scope('customerId'),
 ];
 
 export function toApiParams(
