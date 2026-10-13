@@ -3,6 +3,7 @@ import type { NormalizedEvent } from '@payscope/provider-adapters/normalized-eve
 import { providerEventsTable } from '../db/schema/events';
 import type { ApplyContext, ApplyOutcome, Tx } from './apply-types';
 import { applyDispute } from './disputes';
+import { deriveEntitlements } from './derived-entitlements';
 import { applyEntitlements } from './entitlements';
 import { applyPayment } from './payments';
 import { applySubscription } from './subscriptions';
@@ -21,8 +22,11 @@ async function applyObject(ctx: ApplyContext): Promise<ApplyOutcome> {
     case 'subscription': {
       const subscriptionId = await applySubscription(ctx);
       if (!subscriptionId) return { kind: 'stale' };
-      await applyEntitlements(ctx, subscriptionId);
-      return { kind: 'applied' };
+      if (ctx.event.provider === 'revenuecat') {
+        await applyEntitlements(ctx, subscriptionId);
+        return { kind: 'applied' };
+      }
+      return deriveEntitlements(ctx, subscriptionId);
     }
     case 'dispute':
       return applyDispute(ctx);

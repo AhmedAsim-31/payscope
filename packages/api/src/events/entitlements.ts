@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { entitlementRecordsTable as t } from '../db/schema/records';
-import type { ApplyContext } from './apply-types';
+import type { ApplyContext, Tx } from './apply-types';
 import { resolveCustomerId } from './customers';
 import { periodEndOf } from './period-end';
 
@@ -13,31 +13,35 @@ function stateOf(type: string): EntitlementState | undefined {
   return undefined;
 }
 
-/** Cancellation is deliberately absent from stateOf: access lasts until the period ends. */
-export async function applyEntitlements(
-  ctx: ApplyContext,
-  subscriptionId: string | null,
-): Promise<boolean> {
-  const { tx, orgId, connectionId, event } = ctx;
-  const state = stateOf(event.normalizedType);
-  if (!state || event.entitlementKeys.length === 0 || !event.providerCustomerId) return false;
-  const customerId = await resolveCustomerId(tx, orgId, connectionId, event.providerCustomerId);
-  const expiresAt = periodEndOf(event.metadata);
+type UpsertInput = {
+  tx: Tx;
+  orgId: string;
+  customerId: string;
+  subscriptionId: string | null;
+  keys: string[];
+  state: EntitlementState;
+  expiresAt: Date | null;
+  occurredAt: Date;
+};
+
+/** One guarded statement: an older event never overwrites a newer entitlement row. */
+export async function upsertEntitlements(input: UpsertInput): Promise<boolean> {
+  const { tx, orgId, customerId, subscriptionId, keys, state, expiresAt, occurredAt } = input;
   const active = state === 'active';
   const rows = await tx
     .insert(t)
     .values(
-      event.entitlementKeys.map((entitlementKey) => ({
+      keys.map((entitlementKey) => ({
         orgId,
         customerId,
         subscriptionId,
         entitlementKey,
         state,
         source: 'provider_event' as const,
-        grantedAt: active ? event.occurredAt : null,
+        grantedAt: active ? occurredAt : null,
         expiresAt,
-        revokedAt: state === 'revoked' ? event.occurredAt : null,
-        lastEventAt: event.occurredAt,
+        revokedAt: state === 'revoked' ? occurredAt : null,
+        lastEventAt: occurredAt,
       })),
     )
     .onConflictDoUpdate({
@@ -51,10 +55,10 @@ export async function applyEntitlements(
               revokedAt: null,
             }
           : {}),
-        ...(state === 'revoked' ? { revokedAt: event.occurredAt } : {}),
+        ...(state === 'revoked' ? { revokedAt: occurredAt } : {}),
         ...(expiresAt ? { expiresAt } : {}),
         subscriptionId: sql`COALESCE(excluded.subscription_id, ${t.subscriptionId})`,
-        lastEventAt: event.occurredAt,
+        lastEventAt: occurredAt,
         version: sql`${t.version} + 1`,
         updatedAt: sql`now()`,
       },
@@ -62,4 +66,25 @@ export async function applyEntitlements(
     })
     .returning({ id: t.id });
   return rows.length > 0;
+}
+
+/** Cancellation is deliberately absent from stateOf: access lasts until the period ends. */
+export async function applyEntitlements(
+  ctx: ApplyContext,
+  subscriptionId: string | null,
+): Promise<boolean> {
+  const { tx, orgId, connectionId, event } = ctx;
+  const state = stateOf(event.normalizedType);
+  if (!state || event.entitlementKeys.length === 0 || !event.providerCustomerId) return false;
+  const customerId = await resolveCustomerId(tx, orgId, connectionId, event.providerCustomerId);
+  return upsertEntitlements({
+    tx,
+    orgId,
+    customerId,
+    subscriptionId,
+    keys: event.entitlementKeys,
+    state,
+    expiresAt: periodEndOf(event.metadata),
+    occurredAt: event.occurredAt,
+  });
 }

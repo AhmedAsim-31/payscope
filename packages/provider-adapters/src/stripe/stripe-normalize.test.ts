@@ -162,6 +162,11 @@ describe('normalizeStripeEvent', () => {
     expect(event.metadata).toMatchObject({ currentPeriodEnd: 1_762_592_000 });
   });
 
+  it('exposes the first item price id as planId', () => {
+    const event = normalizeStripeEvent(loadStripeFixture('customer-subscription-created'));
+    expect(event.metadata).toMatchObject({ planId: 'price_test_pro_monthly' });
+  });
+
   it('rejects live-mode events', () => {
     const attempt = () =>
       normalizeStripeEvent(loadStripeFixture('livemode-payment-intent-succeeded'));

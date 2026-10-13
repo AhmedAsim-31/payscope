@@ -158,6 +158,12 @@ describe('normalizePaddleEvent', () => {
     expect(event.metadata).toEqual({ currentPeriodEnd: '2026-11-01T10:00:00.000000Z' });
   });
 
+  it('exposes the first item price id as planId', () => {
+    const payload = load('subscription-created');
+    (payload['data'] as Record<string, unknown>)['items'] = [{ price: { id: 'pri_pro_monthly' } }];
+    expect(normalizePaddleEvent(payload).metadata).toMatchObject({ planId: 'pri_pro_monthly' });
+  });
+
   it('records the transaction on a renewal', () => {
     const event = normalizePaddleEvent(load('transaction-completed-recurring'));
     expect(event.metadata).toMatchObject({ transactionId: 'txn_01k00000000000000000000001' });

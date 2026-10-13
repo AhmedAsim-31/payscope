@@ -14,6 +14,7 @@ import { providerConnectionsTable } from '../db/schema/providers';
 import { ApiHttpError } from '../http-error';
 import { currentOrg } from '../orgs/request-context';
 import { requireOrg } from '../orgs/require-org';
+import { entitlementMapSchema } from './entitlement-map';
 import { connectionViewSchema, toConnectionView, type ConnectionRow } from './connection-view';
 import { assertSandboxApiKey } from './sandbox-key-guard';
 
@@ -30,11 +31,17 @@ const createBody = z.object({
   apiKey: secretField.optional(),
 });
 
-const rotateBody = z
-  .object({ webhookSecret: secretField.optional(), apiKey: secretField.optional() })
-  .refine((b) => b.webhookSecret !== undefined || b.apiKey !== undefined, {
-    error: 'webhookSecret or apiKey is required',
-  });
+const patchBody = z
+  .object({
+    webhookSecret: secretField.optional(),
+    apiKey: secretField.optional(),
+    entitlementMap: entitlementMapSchema.optional(),
+  })
+  .refine(
+    (b) =>
+      b.webhookSecret !== undefined || b.apiKey !== undefined || b.entitlementMap !== undefined,
+    { error: 'webhookSecret, apiKey or entitlementMap is required' },
+  );
 
 const orgParams = z.object({ orgId: z.uuid() });
 const connectionParams = z.object({ orgId: z.uuid(), connectionId: z.uuid() });
@@ -47,6 +54,7 @@ const viewColumns = {
   displayName: providerConnectionsTable.displayName,
   externalAccountId: providerConnectionsTable.externalAccountId,
   credentialsCiphertext: providerConnectionsTable.credentialsCiphertext,
+  entitlementMap: providerConnectionsTable.entitlementMap,
   lastVerifiedAt: providerConnectionsTable.lastVerifiedAt,
   createdAt: providerConnectionsTable.createdAt,
   updatedAt: providerConnectionsTable.updatedAt,
@@ -148,14 +156,14 @@ export const connectionRoutes: FastifyPluginCallbackZod<Options> = (app, { db, c
       preHandler: requireOrg(db, 'connections:manage'),
       schema: {
         params: connectionParams,
-        body: rotateBody,
+        body: patchBody,
         response: { 200: connectionViewSchema },
       },
     },
     async (request) => {
       const orgId = currentOrg(request).id;
       const { connectionId } = request.params;
-      const { webhookSecret, apiKey } = request.body;
+      const { webhookSecret, apiKey, entitlementMap } = request.body;
       return db.transaction(async (tx) => {
         const [current] = await tx
           .select({
@@ -172,6 +180,7 @@ export const connectionRoutes: FastifyPluginCallbackZod<Options> = (app, { db, c
           .for('update');
         if (!current) throw notFound();
         assertSandboxApiKey(current.provider, apiKey);
+        const rotatesCredentials = webhookSecret !== undefined || apiKey !== undefined;
         const existing: Credentials = current.ciphertext
           ? cipher.decrypt(current.ciphertext, connectionId)
           : { webhookSecrets: [] };
@@ -179,18 +188,25 @@ export const connectionRoutes: FastifyPluginCallbackZod<Options> = (app, { db, c
           ? [...existing.webhookSecrets, webhookSecret]
           : existing.webhookSecrets;
         const nextApiKey = apiKey ?? existing.apiKey;
-        const { ciphertext, keyVersion } = cipher.encrypt(
-          {
-            webhookSecrets: secrets.slice(-MAX_WEBHOOK_SECRETS),
-            ...(nextApiKey === undefined ? {} : { apiKey: nextApiKey }),
-          },
-          connectionId,
-        );
+        const encrypted = rotatesCredentials
+          ? cipher.encrypt(
+              {
+                webhookSecrets: secrets.slice(-MAX_WEBHOOK_SECRETS),
+                ...(nextApiKey === undefined ? {} : { apiKey: nextApiKey }),
+              },
+              connectionId,
+            )
+          : undefined;
         const [row] = await tx
           .update(providerConnectionsTable)
           .set({
-            credentialsCiphertext: ciphertext,
-            credentialsKeyVersion: keyVersion,
+            ...(encrypted
+              ? {
+                  credentialsCiphertext: encrypted.ciphertext,
+                  credentialsKeyVersion: encrypted.keyVersion,
+                }
+              : {}),
+            ...(entitlementMap ? { entitlementMap } : {}),
             updatedAt: new Date(),
           })
           .where(eq(providerConnectionsTable.id, connectionId))

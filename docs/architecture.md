@@ -112,6 +112,12 @@ A refund sets `revoked` and `revoked_at`.
 A cancellation never changes an entitlement: access continues until the expiration event arrives.
 Entitlement writes use the same `last_event_at` guard.
 
+Stripe, Paddle and PayPal events carry no entitlement keys.
+For them the entitlements are derived in the same transaction as a successful subscription upsert, from the connection's `entitlement_map` (`{ "<planRef>": ["key", ...] }`) and the subscription's `plan_ref`.
+`active` and `trialing` set `active` with `expires_at` at the period end; `canceled` stays `active` until the period end and is `expired` once it has passed; `expired` sets `expired`; `past_due` and `paused` leave entitlements unchanged.
+A plan with no mapping creates nothing and appends `plan_unmapped` to the attempt row's reason without failing the event.
+Provider refunds do not revoke derived entitlements, because a payment record is not linked to its subscription.
+
 ### Attempt categories
 
 Every processing try writes one attempt row with `failure_category` taken from the `ProviderError` category: `transient`, `permanent`, `invalid_input`, `provider_auth`, `unsupported_event`, or `state_conflict`.

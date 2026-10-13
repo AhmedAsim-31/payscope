@@ -1,0 +1,1 @@
+ALTER TABLE "provider_connections" ADD COLUMN "entitlement_map" jsonb DEFAULT '{}'::jsonb NOT NULL;
