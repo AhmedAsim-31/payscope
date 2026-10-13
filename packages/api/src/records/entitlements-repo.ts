@@ -25,7 +25,7 @@ const columns = {
   cursorTs: cursorTsColumn(e.createdAt),
 };
 
-export function selectEntitlements(db: Db, where: SQL | undefined, limit: number) {
+export function selectEntitlements(db: Pick<Db, 'select'>, where: SQL | undefined, limit: number) {
   return db
     .select(columns)
     .from(e)
@@ -68,7 +68,7 @@ export async function listEntitlements(db: Db, orgId: string, q: EntitlementQuer
   return toPage(rows, q.limit, toEntitlement);
 }
 
-export async function getEntitlement(db: Db, orgId: string, entitlementId: string) {
+export async function getEntitlement(db: Pick<Db, 'select'>, orgId: string, entitlementId: string) {
   const [row] = await selectEntitlements(db, and(eq(e.orgId, orgId), eq(e.id, entitlementId)), 1);
   return row && { ...toEntitlement(row), updatedAt: iso(row.updatedAt) };
 }

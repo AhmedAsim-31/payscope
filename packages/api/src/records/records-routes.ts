@@ -14,11 +14,19 @@ import {
   subscriptionPageSchema,
   subscriptionQuerySchema,
 } from '@payscope/shared/records-schemas';
+import {
+  ingestEntitlementBodySchema,
+  ingestEntitlementResultSchema,
+} from '@payscope/shared/entitlement-ingest-schemas';
+import { repairHeadersSchema } from '@payscope/shared/repair-schemas';
+import { auditContext } from '../audit/audit-log';
+import { idempotentAudited } from '../audit/idempotent-audited';
 import type { Db } from '../db/client';
 import { ApiHttpError } from '../http-error';
 import { currentOrg } from '../orgs/request-context';
 import { requireOrg } from '../orgs/require-org';
 import { getCustomer, listCustomers } from './customers-repo';
+import { assertNotFuture, ingestEntitlement } from './entitlement-ingest';
 import { getEntitlement, listEntitlements } from './entitlements-repo';
 import { getPayment, listPayments } from './payments-repo';
 import { getSubscription, listSubscriptions } from './subscriptions-repo';
@@ -134,6 +142,38 @@ export const recordsRoutes: FastifyPluginCallbackZod<Options> = (app, { db }, do
       },
     },
     (request) => listEntitlements(db, currentOrg(request).id, request.query),
+  );
+
+  app.post(
+    `${base}/entitlements`,
+    {
+      preHandler: requireOrg(db, 'entitlements:ingest'),
+      schema: {
+        params: orgParams,
+        headers: repairHeadersSchema,
+        body: ingestEntitlementBodySchema,
+        response: { 200: ingestEntitlementResultSchema },
+      },
+    },
+    (request) => {
+      assertNotFuture(request.body.observedAt);
+      const orgId = currentOrg(request).id;
+      return idempotentAudited(
+        db,
+        {
+          audit: {
+            ...auditContext(request),
+            action: 'entitlement.ingest',
+            targetType: 'entitlement',
+          },
+          scope: 'entitlement:ingest',
+          idempotencyKey: String(request.headers['idempotency-key']),
+          body: request.body,
+          response: ingestEntitlementResultSchema,
+        },
+        (tx) => ingestEntitlement(tx, orgId, request.body),
+      );
+    },
   );
 
   app.get(

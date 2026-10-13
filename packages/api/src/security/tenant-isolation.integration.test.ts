@@ -46,6 +46,12 @@ const BODIES: Record<string, unknown> = {
   'POST /reconciliation/runs': { mode: 'local' },
   'PATCH /reconciliation/findings/:findingId': { status: 'reviewed', note: 'n' },
   'POST /incidents/:incidentId/actions': { action: 'note', note: 'n' },
+  'POST /entitlements': {
+    customerId: SOME_ID,
+    entitlementKey: 'pro',
+    state: 'active',
+    observedAt: '2026-01-01T00:00:00Z',
+  },
   'POST /repairs/reprocess-event': { eventId: SOME_ID, reason: REASON },
   'POST /repairs/correct-entitlement': { findingId: SOME_ID, reason: REASON },
   'POST /repairs/resolve-finding': { findingId: SOME_ID, reason: REASON },
@@ -68,6 +74,7 @@ const MUTATION_ACTIONS: Record<string, Action> = {
   'POST /reconciliation/runs': 'reconciliation:run',
   'PATCH /reconciliation/findings/:findingId': 'findings:update',
   'POST /incidents/:incidentId/actions': 'findings:update',
+  'POST /entitlements': 'entitlements:ingest',
   'POST /repairs/reprocess-event': 'repairs:execute',
   'POST /repairs/correct-entitlement': 'repairs:execute',
   'POST /repairs/resolve-finding': 'repairs:execute',
@@ -98,9 +105,10 @@ function send(
   values: Record<string, string>,
   headers?: { authorization: string },
 ) {
-  const idempotency = spec.suffix.startsWith('/repairs/')
-    ? { 'idempotency-key': randomUUID() }
-    : undefined;
+  const idempotency =
+    spec.suffix.startsWith('/repairs/') || spec.key === 'POST /entitlements'
+      ? { 'idempotency-key': randomUUID() }
+      : undefined;
   const body = BODIES[spec.key];
   return app.inject({
     method: spec.method as 'GET',

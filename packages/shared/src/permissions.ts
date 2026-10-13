@@ -17,6 +17,7 @@ export const ACTIONS = [
   'findings:update',
   'repairs:execute',
   'scenarios:run',
+  'entitlements:ingest',
   'audit:read',
 ] as const;
 export type Action = (typeof ACTIONS)[number];
@@ -37,6 +38,7 @@ const OPERATOR_ACTIONS: readonly Action[] = [
   'findings:update',
   'repairs:execute',
   'scenarios:run',
+  'entitlements:ingest',
 ];
 
 const PERMISSIONS: Record<Role, ReadonlySet<Action>> = {

@@ -45,6 +45,7 @@ export const entitlementSource = pgEnum('entitlement_source', [
   'reconciliation',
   'manual_repair',
   'scenario',
+  'ingestion_api',
 ]);
 
 const orgId = () =>
