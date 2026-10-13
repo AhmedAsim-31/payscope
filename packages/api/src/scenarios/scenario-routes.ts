@@ -28,6 +28,7 @@ const busy = () => new ApiHttpError(409, 'SCENARIO_RUNNING', 'A scenario is alre
 export const scenarioRoutes: FastifyPluginCallbackZod<{ db: Db }> = (app, { db }, done) => {
   app.decorateRequest('org', undefined);
   app.addHook('onRequest', app.authenticate);
+  app.addHook('onRequest', app.rateLimitByMethod());
   const base = '/api/v1/orgs/:orgId';
   const runGuards = () => [requireOrg(db, 'scenarios:run'), app.rateLimitFor('scenarioRun')];
 

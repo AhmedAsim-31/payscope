@@ -16,13 +16,15 @@ Routes opt in with `app.rateLimitFor('<policy>')`, or `app.rateLimitByMethod()` 
 | `credentialTest`     | 5 / 60 s   | user id + org id | wired        |
 | `webhookIngress`     | 600 / 60 s | connection id    | wired        |
 | `internalTick`       | 30 / 60 s  | client IP        | wired        |
-| `reconciliationRun`  | 5 / 600 s  | org id           | defined only |
-| `scenarioRun`        | 20 / 600 s | org id           | defined only |
-| `repairAction`       | 30 / 600 s | user id + org id | defined only |
+| `reconciliationRun`  | 5 / 600 s  | org id           | wired        |
+| `scenarioRun`        | 20 / 600 s | org id           | wired        |
+| `repairAction`       | 30 / 600 s | user id + org id | wired        |
 | `search`             | 60 / 60 s  | user id          | defined only |
 
+Every authenticated route (`/me`, orgs, members, connections, records, events, reconciliation, incidents, repairs, scenarios, audit, overview) gets `authenticatedRead` or `authenticatedWrite` by method.
 `credentialTest` is applied to connection create and credential rotation, in addition to `authenticatedWrite`.
-Policies marked "defined only" have no route yet; the feature that adds the route references the policy by name.
+`reconciliationRun` is applied to starting a reconciliation run, `scenarioRun` to scenario run and reset, and `repairAction` to every repair action, each in addition to `authenticatedWrite`.
+`search` is defined only; no search route exists yet.
 A policy whose identity is missing at check time (for example no org on the request) falls back to the client IP instead of skipping the limit.
 
 ### Configuration

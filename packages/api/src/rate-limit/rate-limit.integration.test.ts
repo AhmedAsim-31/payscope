@@ -122,6 +122,65 @@ describe('authenticated limits', () => {
   });
 });
 
+describe('org data and action limits', () => {
+  async function ownerOrg(app: FastifyInstance) {
+    const owner = await harness.newUser();
+    const org = await app.inject({
+      method: 'POST',
+      url: '/api/v1/orgs',
+      headers: owner.headers,
+      payload: { name: 'Limits', slug: `org-${randomUUID().slice(0, 12)}` },
+    });
+    return { owner, orgId: org.json<{ id: string }>().id };
+  }
+
+  it('applies the read limit to org record routes', async () => {
+    const app = await startWith({ authenticatedRead: { max: 1, windowSec: 60 } });
+    const { owner, orgId } = await ownerOrg(app);
+    const get = (path: string) =>
+      app
+        .inject({ method: 'GET', url: `/api/v1/orgs/${orgId}/${path}`, headers: owner.headers })
+        .then((r) => r.statusCode);
+    expect(await get('payments')).toBe(200);
+    expect(await get('payments')).toBe(429);
+    expect(await get('audit')).toBe(429);
+  });
+
+  it('limits reconciliation run starts per org', async () => {
+    const app = await startWith({ reconciliationRun: { max: 2, windowSec: 600 } });
+    const { owner, orgId } = await ownerOrg(app);
+    const start = () =>
+      app
+        .inject({
+          method: 'POST',
+          url: `/api/v1/orgs/${orgId}/reconciliation/runs`,
+          headers: owner.headers,
+          payload: { mode: 'local' },
+        })
+        .then((r) => r.statusCode);
+    expect(await start()).toBe(202);
+    expect(await start()).toBe(409);
+    expect(await start()).toBe(429);
+  });
+
+  it('limits repair actions per user and org', async () => {
+    const app = await startWith({ repairAction: { max: 2, windowSec: 600 } });
+    const { owner, orgId } = await ownerOrg(app);
+    const reprocess = () =>
+      app
+        .inject({
+          method: 'POST',
+          url: `/api/v1/orgs/${orgId}/repairs/reprocess-event`,
+          headers: { ...owner.headers, 'idempotency-key': randomUUID() },
+          payload: { eventId: randomUUID(), reason: 'rate limit coverage check' },
+        })
+        .then((r) => r.statusCode);
+    expect(await reprocess()).toBe(404);
+    expect(await reprocess()).toBe(404);
+    expect(await reprocess()).toBe(429);
+  });
+});
+
 describe('ip and connection limits', () => {
   const silent = { info: () => undefined, warn: () => undefined, error: () => undefined };
   const worker = () =>

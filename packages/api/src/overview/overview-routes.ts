@@ -18,6 +18,7 @@ type Options = { db: Db };
 export const overviewRoutes: FastifyPluginCallbackZod<Options> = (app, { db }, done) => {
   app.decorateRequest('org', undefined);
   app.addHook('onRequest', app.authenticate);
+  app.addHook('onRequest', app.rateLimitByMethod());
   const cached = createOverviewCache<Overview>(CACHE_TTL_MS);
 
   app.get(
