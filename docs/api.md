@@ -65,12 +65,13 @@ Rate-limited requests answer `429 RATE_LIMITED` with `retry-after` and `x-rateli
 
 ### Members
 
-| Method | Path                    | Permission                | Notes                                                                                      |
-| ------ | ----------------------- | ------------------------- | ------------------------------------------------------------------------------------------ |
-| GET    | `{org}/members`         | `members:read`            |                                                                                            |
-| POST   | `{org}/members`         | `members:manage`          |                                                                                            |
-| PATCH  | `{org}/members/:userId` | `members:manage`          | Role change; only an owner can grant or change OWNER, and the last owner cannot be demoted |
-| DELETE | `{org}/members/:userId` | `members:manage`, or self | Leaving the org needs only `org:read`                                                      |
+| Method | Path                                       | Permission                | Notes                                                                                                                                                                                                                                                                             |
+| ------ | ------------------------------------------ | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `{org}/members`                            | `members:read`            |                                                                                                                                                                                                                                                                                   |
+| POST   | `{org}/members`                            | `members:manage`          |                                                                                                                                                                                                                                                                                   |
+| PATCH  | `{org}/members/:userId`                    | `members:manage`          | Role change; only an owner can grant or change OWNER, and the last owner cannot be demoted                                                                                                                                                                                        |
+| DELETE | `{org}/members/:userId`                    | `members:manage`, or self | Leaving the org needs only `org:read`                                                                                                                                                                                                                                             |
+| POST   | `{org}/members/:userId/transfer-ownership` | `ownership:transfer`      | Target becomes OWNER and the caller becomes ADMIN in one audited transaction (`ownership.transfer`). `422 SELF_TRANSFER` for the caller, `404` for a non-member, `409 ALREADY_OWNER` if the target is an owner, `409 OWNERSHIP_CHANGED` if the caller lost ownership concurrently |
 
 ### Provider connections
 

@@ -112,4 +112,37 @@ describe('MembersView permission gating', () => {
 
     expect(await screen.findByText(/must keep at least one owner/)).toBeInTheDocument();
   });
+
+  it('offers ownership transfer only to an OWNER, behind a confirm', async () => {
+    serve('OWNER');
+    const user = userEvent.setup();
+    renderWithQuery(<MembersView orgId={ORG_ID} />);
+
+    expect(
+      screen.queryByRole('button', { name: 'Transfer ownership to owner@example.com' }),
+    ).not.toBeInTheDocument();
+    await user.click(
+      await screen.findByRole('button', { name: 'Transfer ownership to viewer@example.com' }),
+    );
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog).toHaveTextContent('viewer@example.com will become the owner');
+    expect(mockedFetch).not.toHaveBeenCalledWith(
+      expect.stringContaining('transfer-ownership'),
+      expect.anything(),
+    );
+    await user.click(within(dialog).getByRole('button', { name: 'Transfer ownership' }));
+
+    expect(mockedFetch).toHaveBeenCalledWith(
+      `/api/v1/orgs/${ORG_ID}/members/${MEMBERS[1]?.userId}/transfer-ownership`,
+      expect.objectContaining({ method: 'POST' }),
+    );
+  });
+
+  it('hides ownership transfer from an ADMIN', async () => {
+    serve('ADMIN');
+    renderWithQuery(<MembersView orgId={ORG_ID} />);
+
+    await screen.findByLabelText('Role for viewer@example.com');
+    expect(screen.queryByRole('button', { name: /transfer ownership/i })).not.toBeInTheDocument();
+  });
 });

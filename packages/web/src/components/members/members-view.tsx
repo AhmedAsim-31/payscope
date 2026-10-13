@@ -20,19 +20,23 @@ type RoleChange = { member: Member; role: Role };
 export function MembersView({ orgId }: { orgId: string }) {
   const org = useCurrentOrg(orgId);
   const { data: members } = useSuspenseQuery(membersQueryOptions(orgId));
-  const { add, changeRole, remove } = useMemberMutations(orgId);
+  const { add, changeRole, remove, transferOwnership } = useMemberMutations(orgId);
   const [pendingChange, setPendingChange] = useState<RoleChange | null>(null);
   const [pendingRemoval, setPendingRemoval] = useState<Member | null>(null);
+  const [pendingTransfer, setPendingTransfer] = useState<Member | null>(null);
 
   const canManage = can(org.role, 'members:manage');
   const busyUserId = changeRole.isPending
     ? changeRole.variables.userId
     : remove.isPending
       ? remove.variables.userId
-      : null;
+      : transferOwnership.isPending
+        ? transferOwnership.variables.userId
+        : null;
 
   function applyRoleChange(change: RoleChange) {
     remove.reset();
+    transferOwnership.reset();
     changeRole.mutate(
       { userId: change.member.userId, role: change.role },
       { onSettled: () => setPendingChange(null) },
@@ -48,14 +52,26 @@ export function MembersView({ orgId }: { orgId: string }) {
 
   function confirmRemoval(member: Member) {
     changeRole.reset();
+    transferOwnership.reset();
     remove.mutate({ userId: member.userId }, { onSettled: () => setPendingRemoval(null) });
+  }
+
+  function confirmTransfer(member: Member) {
+    changeRole.reset();
+    remove.reset();
+    transferOwnership.mutate(
+      { userId: member.userId },
+      { onSettled: () => setPendingTransfer(null) },
+    );
   }
 
   const actionError = changeRole.isError
     ? describeError(changeRole.error, 'change-role')
     : remove.isError
       ? describeError(remove.error, 'remove-member')
-      : null;
+      : transferOwnership.isError
+        ? describeError(transferOwnership.error, 'transfer-ownership')
+        : null;
 
   return (
     <div className="grid gap-6">
@@ -79,9 +95,11 @@ export function MembersView({ orgId }: { orgId: string }) {
           members={members}
           callerRole={org.role}
           canManage={canManage}
+          canTransfer={can(org.role, 'ownership:transfer')}
           busyUserId={busyUserId}
           onChangeRole={requestRoleChange}
           onRemove={setPendingRemoval}
+          onTransfer={setPendingTransfer}
         />
       </div>
 
@@ -111,6 +129,20 @@ export function MembersView({ orgId }: { orgId: string }) {
         isPending={remove.isPending}
         onConfirm={() => pendingRemoval && confirmRemoval(pendingRemoval)}
         onCancel={() => setPendingRemoval(null)}
+      />
+      <ConfirmDialog
+        open={pendingTransfer !== null}
+        title="Transfer ownership?"
+        description={
+          pendingTransfer
+            ? `${pendingTransfer.email} will become the owner of ${org.name}. You will become an Admin and cannot undo this yourself.`
+            : ''
+        }
+        confirmLabel="Transfer ownership"
+        destructive
+        isPending={transferOwnership.isPending}
+        onConfirm={() => pendingTransfer && confirmTransfer(pendingTransfer)}
+        onCancel={() => setPendingTransfer(null)}
       />
     </div>
   );

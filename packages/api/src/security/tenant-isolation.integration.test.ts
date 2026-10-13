@@ -33,6 +33,7 @@ const BODIES: Record<string, unknown> = {
   'POST /members': { email: 'nobody@example.test', role: 'VIEWER' },
   'PATCH /members/:userId': { role: 'VIEWER' },
   'DELETE /members/:userId': undefined,
+  'POST /members/:userId/transfer-ownership': undefined,
   'POST /connections': {
     provider: 'stripe',
     mode: 'sandbox',
@@ -59,6 +60,7 @@ const MUTATION_ACTIONS: Record<string, Action> = {
   'POST /members': 'members:manage',
   'PATCH /members/:userId': 'members:manage',
   'DELETE /members/:userId': 'members:manage',
+  'POST /members/:userId/transfer-ownership': 'ownership:transfer',
   'POST /connections': 'connections:manage',
   'PATCH /connections/:connectionId': 'connections:manage',
   'POST /connections/:connectionId/verify': 'connections:manage',

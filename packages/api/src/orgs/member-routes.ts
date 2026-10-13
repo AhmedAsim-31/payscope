@@ -225,5 +225,73 @@ export const memberRoutes: FastifyPluginCallbackZod<{ db: Db }> = (app, { db }, 
     },
   );
 
+  app.post(
+    '/api/v1/orgs/:orgId/members/:userId/transfer-ownership',
+    {
+      preHandler: requireOrg(db, 'ownership:transfer'),
+      schema: { params: memberParams, response: { 200: memberSchema } },
+    },
+    async (request) => {
+      const org = currentOrg(request);
+      const ownerId = currentUserId(request);
+      const { userId } = request.params;
+      if (userId === ownerId) {
+        throw new ApiHttpError(422, 'SELF_TRANSFER', 'Choose another member to receive ownership');
+      }
+      await audited(
+        db,
+        {
+          ...auditContext(request),
+          action: 'ownership.transfer',
+          targetType: 'member',
+          targetId: userId,
+        },
+        async (tx) => {
+          const targetRole = await roleOf(tx, org.id, userId);
+          const now = new Date();
+          const promoted = await tx
+            .update(membershipsTable)
+            .set({ role: 'OWNER', updatedAt: now })
+            .where(
+              and(
+                eq(membershipsTable.orgId, org.id),
+                eq(membershipsTable.userId, userId),
+                ne(membershipsTable.role, 'OWNER'),
+              ),
+            )
+            .returning({ userId: membershipsTable.userId });
+          if (promoted.length === 0) {
+            if ((await roleOf(tx, org.id, userId)) === 'OWNER') {
+              throw new ApiHttpError(409, 'ALREADY_OWNER', 'That member is already an owner');
+            }
+            throw memberNotFound();
+          }
+          const demoted = await tx
+            .update(membershipsTable)
+            .set({ role: 'ADMIN', updatedAt: now })
+            .where(
+              and(
+                eq(membershipsTable.orgId, org.id),
+                eq(membershipsTable.userId, ownerId),
+                eq(membershipsTable.role, 'OWNER'),
+              ),
+            )
+            .returning({ userId: membershipsTable.userId });
+          if (demoted.length === 0) {
+            throw new ApiHttpError(409, 'OWNERSHIP_CHANGED', 'You are no longer an owner');
+          }
+          return {
+            value: undefined,
+            previousState: { ownerId, targetRole },
+            resultingState: { ownerId: userId, previousOwnerRole: 'ADMIN' },
+          };
+        },
+      );
+      const member = await findMember(org.id, userId);
+      if (!member) throw memberNotFound();
+      return member;
+    },
+  );
+
   done();
 };
