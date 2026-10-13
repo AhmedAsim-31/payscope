@@ -1,0 +1,76 @@
+packages/provider-adapters/src/paypal/fixtures/capture-completed.json
+  h_78e539a96187c3 1-21
+packages/provider-adapters/src/paypal/fixtures/capture-denied.json
+  h_78e539a96187c3 1-21
+packages/provider-adapters/src/paypal/fixtures/capture-refunded.json
+  h_78e539a96187c3 1-23
+packages/provider-adapters/src/paypal/fixtures/capture-reversed.json
+  h_78e539a96187c3 1-23
+packages/provider-adapters/src/paypal/fixtures/dispute-created.json
+  h_78e539a96187c3 1-21
+packages/provider-adapters/src/paypal/fixtures/dispute-resolved.json
+  h_78e539a96187c3 1-21
+packages/provider-adapters/src/paypal/fixtures/sale-completed-standalone.json
+  h_78e539a96187c3 1-16
+packages/provider-adapters/src/paypal/fixtures/sale-completed-subscription.json
+  h_78e539a96187c3 1-17
+packages/provider-adapters/src/paypal/fixtures/subscription-activated.json
+  h_78e539a96187c3 1-19
+packages/provider-adapters/src/paypal/fixtures/subscription-cancelled.json
+  h_78e539a96187c3 1-19
+packages/provider-adapters/src/paypal/fixtures/subscription-created.json
+  h_78e539a96187c3 1-19
+packages/provider-adapters/src/paypal/fixtures/subscription-expired.json
+  h_78e539a96187c3 1-19
+packages/provider-adapters/src/paypal/fixtures/subscription-payment-failed.json
+  h_78e539a96187c3 1-25
+packages/provider-adapters/src/paypal/fixtures/subscription-suspended.json
+  h_78e539a96187c3 1-19
+packages/provider-adapters/src/paypal/fixtures/subscription-updated.json
+  h_78e539a96187c3 1-19
+packages/provider-adapters/src/paypal/fixtures/test-cert/cert.pem
+  h_78e539a96187c3 1-19
+packages/provider-adapters/src/paypal/fixtures/test-cert/key.pem
+  h_78e539a96187c3 1-28
+packages/provider-adapters/src/paypal/fixtures/unsupported-order-approved.json
+  h_78e539a96187c3 1-12
+packages/provider-adapters/src/paypal/paypal-adapter.test.ts
+  h_78e539a96187c3 1-98
+packages/provider-adapters/src/paypal/paypal-adapter.ts
+  h_78e539a96187c3 1-51
+packages/provider-adapters/src/paypal/paypal-amount.ts
+  h_78e539a96187c3 1-12
+packages/provider-adapters/src/paypal/paypal-cert-fetcher.ts
+  h_78e539a96187c3 1-29
+packages/provider-adapters/src/paypal/paypal-client.test.ts
+  h_78e539a96187c3 1-150
+packages/provider-adapters/src/paypal/paypal-client.ts
+  h_78e539a96187c3 1-152
+packages/provider-adapters/src/paypal/paypal-crc32.ts
+  h_78e539a96187c3 1-5
+packages/provider-adapters/src/paypal/paypal-envelope.ts
+  h_78e539a96187c3 1-12
+packages/provider-adapters/src/paypal/paypal-fixtures.ts
+  h_78e539a96187c3 1-13
+packages/provider-adapters/src/paypal/paypal-http.ts
+  h_78e539a96187c3 1-20
+packages/provider-adapters/src/paypal/paypal-normalize.test.ts
+  h_78e539a96187c3 1-112
+packages/provider-adapters/src/paypal/paypal-normalize.ts
+  h_78e539a96187c3 1-148
+packages/provider-adapters/src/paypal/paypal-signature.test.ts
+  h_78e539a96187c3 1-176
+packages/provider-adapters/src/paypal/paypal-signature.ts
+  h_78e539a96187c3 1-73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5178d463d4f0f3a5d54625844538bc1812595223",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
