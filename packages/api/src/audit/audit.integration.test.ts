@@ -10,6 +10,7 @@ import {
   type Tenant,
 } from '../test/ops-harness';
 import { addCustomer, addEntitlement, addSubscription } from '../test/reconciliation-fixtures';
+import { auditLogsTable } from '../db/schema/operations';
 import { writeAudit } from './audit-log';
 
 const harness = createHarness();
@@ -22,7 +23,9 @@ beforeAll(async () => {
 afterAll(() => harness.stop());
 
 type AuditView = {
+  id: string;
   action: string;
+  createdAt: string;
   outcome: string;
   actorId: string | null;
   requestId: string | null;
@@ -138,6 +141,84 @@ describe('audit log', () => {
     expect(filtered.items.map((i) => i.action)).toEqual(['member.add']);
     const byActor = await audit(t, `&actor=${t.owner.id}`);
     expect(byActor.items.length).toBeGreaterThan(0);
+  });
+
+  async function seed(t: Tenant, action: string, at: string, extra: { reason?: string } = {}) {
+    await db.insert(auditLogsTable).values({
+      orgId: t.orgId,
+      actorId: t.owner.id,
+      actorType: 'user',
+      action,
+      targetType: 'search_test',
+      targetId: `${action}-target`,
+      outcome: 'success',
+      createdAt: new Date(at),
+      ...extra,
+    });
+  }
+
+  it('filters by an inclusive from and exclusive to', async () => {
+    const t = await newTenant(harness, app);
+    await seed(t, 'range.a', '2026-01-01T00:00:00Z');
+    await seed(t, 'range.b', '2026-01-02T00:00:00Z');
+    await seed(t, 'range.c', '2026-01-03T00:00:00Z');
+    const { items } = await audit(t, '&from=2026-01-01T00:00:00Z&to=2026-01-03T00:00:00Z');
+    expect(items.map((i) => i.action)).toEqual(['range.b', 'range.a']);
+    const bad = await audit(t, '&from=2026-01-03T00:00:00Z&to=2026-01-01T00:00:00Z');
+    expect(bad.res.statusCode).toBe(400);
+    expect((await audit(t, '&from=yesterday')).res.statusCode).toBe(400);
+  });
+
+  it('matches free text case-insensitively across action, target, actor and reason', async () => {
+    const t = await newTenant(harness, app);
+    await seed(t, 'text.alpha', '2026-02-01T00:00:00Z', { reason: 'Customer asked for REFUND' });
+    await seed(t, 'text.beta', '2026-02-02T00:00:00Z');
+    const q = async (text: string) =>
+      (await audit(t, `&q=${encodeURIComponent(text)}`)).items.map((i) => i.action);
+    expect(await q('  TEXT.ALPHA ')).toEqual(['text.alpha']);
+    expect(await q('refund')).toEqual(['text.alpha']);
+    expect(await q('beta-TARGET')).toEqual(['text.beta']);
+    expect(await q('SEARCH_test')).toEqual(['text.beta', 'text.alpha']);
+    expect(await q(t.owner.id.slice(0, 8))).toEqual(expect.arrayContaining(['text.alpha']));
+    expect((await audit(t, `&q=${'x'.repeat(201)}`)).res.statusCode).toBe(400);
+  });
+
+  it('treats % and _ in free text literally', async () => {
+    const t = await newTenant(harness, app);
+    await seed(t, 'esc.plain', '2026-03-01T00:00:00Z', { reason: 'abc' });
+    await seed(t, 'esc.pct', '2026-03-02T00:00:00Z', { reason: '50% off a_b' });
+    const q = async (text: string) =>
+      (await audit(t, `&q=${encodeURIComponent(text)}`)).items.map((i) => i.action);
+    expect(await q('%')).toEqual(['esc.pct']);
+    expect(await q('a_b')).toEqual(['esc.pct']);
+    expect(await q('esc_p')).toEqual([]);
+  });
+
+  it('pages through filtered results with the cursor', async () => {
+    const t = await newTenant(harness, app);
+    for (let i = 0; i < 5; i += 1) await seed(t, `page.${i}`, `2026-04-0${i + 1}T00:00:00Z`);
+    await seed(t, 'other.x', '2026-04-03T12:00:00Z');
+    const seen: string[] = [];
+    let cursor = '';
+    for (let n = 0; n < 5; n += 1) {
+      const res = await app.inject({
+        url: `/api/v1/orgs/${t.orgId}/audit?limit=2&q=page&from=2026-04-02T00:00:00Z${cursor}`,
+        headers: t.owner.headers,
+      });
+      const body = res.json<{ items: AuditView[]; nextCursor: string | null }>();
+      seen.push(...body.items.map((i) => i.action));
+      if (!body.nextCursor) break;
+      cursor = `&cursor=${body.nextCursor}`;
+    }
+    expect(seen).toEqual(['page.4', 'page.3', 'page.2', 'page.1']);
+  });
+
+  it('never returns another org rows for a matching search', async () => {
+    const t = await newTenant(harness, app);
+    const other = await newTenant(harness, app);
+    await seed(other, 'tenant.secret', '2026-05-01T00:00:00Z');
+    expect((await audit(t, '&q=tenant.secret')).items).toEqual([]);
+    expect((await audit(other, '&q=tenant.secret')).items).toHaveLength(1);
   });
 
   it('hides another org and offers no write endpoint', async () => {

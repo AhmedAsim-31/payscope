@@ -1,4 +1,4 @@
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, gte, ilike, lt, or, sql } from 'drizzle-orm';
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import { auditPageSchema, auditQuerySchema } from '@payscope/shared/audit-schemas';
@@ -6,7 +6,20 @@ import type { Db } from '../db/client';
 import { auditLogsTable as t } from '../db/schema/operations';
 import { currentOrg } from '../orgs/request-context';
 import { requireOrg } from '../orgs/require-org';
+import { escapeLike } from '../records/escape-like';
 import { cursorTsColumn, iso, keysetAfter, toPage } from '../records/keyset';
+
+function matchesText(text: string) {
+  const pattern = `%${escapeLike(text)}%`;
+  return or(
+    ilike(t.action, pattern),
+    ilike(t.targetType, pattern),
+    ilike(t.targetId, pattern),
+    ilike(sql`${t.actorId}::text`, pattern),
+    ilike(sql`${t.actorType}::text`, pattern),
+    ilike(t.reason, pattern),
+  );
+}
 
 function asState(value: unknown): Record<string, unknown> | null {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -41,6 +54,9 @@ export const auditRoutes: FastifyPluginCallbackZod<{ db: Db }> = (app, { db }, d
             q.actor === undefined ? undefined : eq(t.actorId, q.actor),
             q.targetType === undefined ? undefined : eq(t.targetType, q.targetType),
             q.targetId === undefined ? undefined : eq(t.targetId, q.targetId),
+            q.from === undefined ? undefined : gte(t.createdAt, new Date(q.from)),
+            q.to === undefined ? undefined : lt(t.createdAt, new Date(q.to)),
+            q.q === undefined ? undefined : matchesText(q.q),
             keysetAfter(t.createdAt, t.id, q.cursor),
           ),
         )

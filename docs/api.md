@@ -145,6 +145,11 @@ Reusing a key with a different body answers `422 IDEMPOTENCY_KEY_REUSED`; see [a
 | GET    | `{org}/scenario-runs/:runId`      | `records:read`  |                         |
 | GET    | `{org}/audit`                     | `audit:read`    | Append-only log         |
 
+Audit list filters: `action`, `actor` (user id), `targetType`, `targetId` match exactly.
+`from` (inclusive) and `to` (exclusive) are ISO 8601 timestamps on `createdAt`; `from` after `to` answers `400 VALIDATION_ERROR`.
+`q` is trimmed free text (1 to 200 characters) matched case-insensitively as a substring of action, target type, target id, actor id, actor type, and reason; `%` and `_` match literally.
+All filters combine with AND and keep keyset pagination, so pass the same filters alongside `cursor`.
+
 ### Machine routes
 
 | Method | Path                                | Auth               | Notes                                                                                 |
