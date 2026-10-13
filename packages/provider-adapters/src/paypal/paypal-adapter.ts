@@ -15,7 +15,7 @@ export function createPayPalAdapter(getCertificate: CertificateFetcher): Provide
     provider: 'paypal',
     capabilities: {
       webhookVerification: 'supported_tested',
-      eventNormalization: 'supported_tested',
+      eventNormalization: 'implemented_unverified',
       authoritativeFetch: 'implemented_unverified',
       credentialValidation: 'implemented_unverified',
       reconciliation: 'implemented_unverified',
