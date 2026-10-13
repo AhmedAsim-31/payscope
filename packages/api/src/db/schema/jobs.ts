@@ -42,6 +42,9 @@ export const backgroundJobsTable = pgTable(
     index('background_jobs_running_lease_idx')
       .on(t.leaseExpiresAt)
       .where(sql`${t.status} = 'running'`),
+    index('background_jobs_finished_retention_idx')
+      .on(t.updatedAt)
+      .where(sql`${t.status} IN ('succeeded', 'failed', 'dead')`),
   ],
 ).enableRLS();
 
@@ -60,5 +63,8 @@ export const idempotencyRecordsTable = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   },
-  (t) => [unique('idempotency_records_org_scope_key_unique').on(t.orgId, t.scope, t.key)],
+  (t) => [
+    unique('idempotency_records_org_scope_key_unique').on(t.orgId, t.scope, t.key),
+    index('idempotency_records_expires_idx').on(t.expiresAt),
+  ],
 ).enableRLS();

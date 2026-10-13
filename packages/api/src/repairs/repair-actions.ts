@@ -73,11 +73,14 @@ async function markResolved(tx: Tx, orgId: string, findingId: string, note: stri
 
 export async function reprocessEvent(tx: Tx, orgId: string, eventId: string): Promise<Outcome> {
   const [event] = await tx
-    .select({ status: providerEventsTable.status })
+    .select({ status: providerEventsTable.status, prunedAt: providerEventsTable.payloadPrunedAt })
     .from(providerEventsTable)
     .where(and(eq(providerEventsTable.orgId, orgId), eq(providerEventsTable.id, eventId)))
     .for('update');
   if (!event) throw new ApiHttpError(404, 'NOT_FOUND', 'Event not found');
+  if (event.prunedAt) {
+    throw new ApiHttpError(409, 'PAYLOAD_PRUNED', 'Event payload was removed by retention');
+  }
   const [reset] = await tx
     .update(providerEventsTable)
     .set({ status: 'pending' })

@@ -27,6 +27,7 @@ import { DEFAULT_POLICIES, type RatePolicies } from './rate-limit/policies';
 import { rateLimitPlugin } from './rate-limit/rate-limit-plugin';
 import { DEFAULT_RECONCILIATION_INTERVAL_HOURS } from './config';
 import { tickRoutes } from './jobs/tick-routes';
+import { DEFAULT_RETENTION_POLICY, type RetentionPolicy } from './retention/retention-prune';
 import type { Worker } from './jobs/worker';
 import { identityRoutes } from './orgs/identity-routes';
 import { eventInboxRoutes } from './events/event-inbox-routes';
@@ -55,6 +56,7 @@ export type BuildAppOptions = {
   worker?: Worker;
   internalTickToken?: string;
   reconciliationIntervalHours?: number;
+  retention?: RetentionPolicy;
   rateLimits?: RatePolicies;
 };
 
@@ -153,6 +155,7 @@ export async function buildApp(opts: BuildAppOptions = {}) {
       db: opts.db,
       reconciliationIntervalHours:
         opts.reconciliationIntervalHours ?? DEFAULT_RECONCILIATION_INTERVAL_HOURS,
+      retention: opts.retention ?? DEFAULT_RETENTION_POLICY,
     });
   }
 

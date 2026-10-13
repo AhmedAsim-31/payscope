@@ -1,9 +1,13 @@
 import { z } from 'zod';
 import { decodeCredentialsKey, parsePreviousKeys } from './crypto/credentials-cipher';
+import { DEFAULT_RETENTION_POLICY as R, type RetentionPolicy } from './retention/retention-prune';
 import { rateLimitEnvSchema, resolvePolicies, type RatePolicies } from './rate-limit/policies';
 
 const DEFAULT_CORS_ORIGIN = 'http://localhost:3000';
 export const DEFAULT_RECONCILIATION_INTERVAL_HOURS = 24;
+
+const retentionDays = (fallback: number) =>
+  z.coerce.number().int().min(0).max(36500).default(fallback);
 
 const envSchema = z
   .object({
@@ -42,6 +46,11 @@ const envSchema = z
       .min(0)
       .max(8760)
       .default(DEFAULT_RECONCILIATION_INTERVAL_HOURS),
+    RETENTION_EVENT_PAYLOAD_DAYS: retentionDays(R.eventPayloadDays),
+    RETENTION_FINISHED_JOB_DAYS: retentionDays(R.finishedJobDays),
+    RETENTION_IDEMPOTENCY_GRACE_DAYS: retentionDays(R.idempotencyGraceDays),
+    RETENTION_SCENARIO_RUN_DAYS: retentionDays(R.scenarioRunDays),
+    RETENTION_AUDIT_LOG_DAYS: retentionDays(R.auditLogDays),
     TRUST_PROXY: z
       .enum(['true', 'false'])
       .default('false')
@@ -86,6 +95,7 @@ export type Config = {
   runWorkerInProcess: boolean;
   internalTickToken: string | undefined;
   reconciliationIntervalHours: number;
+  retention: RetentionPolicy;
   rateLimits: RatePolicies;
 };
 
@@ -125,6 +135,13 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     runWorkerInProcess: e.RUN_WORKER_IN_PROCESS,
     internalTickToken: e.INTERNAL_TICK_TOKEN,
     reconciliationIntervalHours: e.RECONCILIATION_SCHEDULE_INTERVAL_HOURS,
+    retention: {
+      eventPayloadDays: e.RETENTION_EVENT_PAYLOAD_DAYS,
+      finishedJobDays: e.RETENTION_FINISHED_JOB_DAYS,
+      idempotencyGraceDays: e.RETENTION_IDEMPOTENCY_GRACE_DAYS,
+      scenarioRunDays: e.RETENTION_SCENARIO_RUN_DAYS,
+      auditLogDays: e.RETENTION_AUDIT_LOG_DAYS,
+    },
     rateLimits: resolvePolicies(limits.data),
   };
 }

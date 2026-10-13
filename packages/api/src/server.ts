@@ -28,6 +28,7 @@ const app = await buildApp({
   worker,
   internalTickToken: config.internalTickToken,
   reconciliationIntervalHours: config.reconciliationIntervalHours,
+  retention: config.retention,
   corsOrigins: config.corsOrigins,
   logLevel: config.logLevel,
   trustProxy: config.trustProxy,

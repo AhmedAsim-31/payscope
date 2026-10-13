@@ -127,6 +127,20 @@
       "when": 1791911439776,
       "tag": "20261013171039_reconciliation_trigger",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1791913111313,
+      "tag": "20261013173831_retention",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1791913123291,
+      "tag": "20261013173843_audit_retention",
+      "breakpoints": true
     }
   ]
 }
