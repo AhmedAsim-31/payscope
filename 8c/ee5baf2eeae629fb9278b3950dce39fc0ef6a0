@@ -1,0 +1,24 @@
+packages/api/src/audit/audit-routes.ts
+  h_78e539a96187c3 38
+packages/api/src/events/event-inbox-routes.ts
+  h_78e539a96187c3 33
+packages/api/src/incidents/incident-routes.ts
+  h_78e539a96187c3 35
+packages/api/src/rate-limit/rate-limit.integration.test.ts
+  h_78e539a96187c3 149-162
+packages/api/src/reconciliation/reconciliation-routes.ts
+  h_78e539a96187c3 145,170
+packages/api/src/records/records-routes.ts
+  h_78e539a96187c3 45,51,80,109,138
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8cee5baf2eeae629fb9278b3950dce39fc0ef6a0",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
