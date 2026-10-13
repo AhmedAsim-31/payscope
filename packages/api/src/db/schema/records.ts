@@ -94,8 +94,8 @@ export const paymentRecordsTable = pgTable(
       'payment_records_refunded_check',
       sql`${t.amountRefundedMinor} >= 0 AND ${t.amountRefundedMinor} <= ${t.amountMinor}`,
     ),
-    index('payment_records_org_created_idx').on(t.orgId, t.createdAt.desc()),
-    index('payment_records_org_status_idx').on(t.orgId, t.status),
+    index('payment_records_org_created_idx').on(t.orgId, t.createdAt, t.id),
+    index('payment_records_org_status_idx').on(t.orgId, t.status, t.createdAt, t.id),
   ],
 ).enableRLS();
 
@@ -132,8 +132,8 @@ export const subscriptionRecordsTable = pgTable(
       t.providerSubscriptionId,
     ),
     unique('subscription_records_org_id_id_unique').on(t.orgId, t.id),
-    index('subscription_records_org_created_idx').on(t.orgId, t.createdAt.desc()),
-    index('subscription_records_org_status_idx').on(t.orgId, t.status),
+    index('subscription_records_org_created_idx').on(t.orgId, t.createdAt, t.id),
+    index('subscription_records_org_status_idx').on(t.orgId, t.status, t.createdAt, t.id),
   ],
 ).enableRLS();
 
@@ -168,5 +168,6 @@ export const entitlementRecordsTable = pgTable(
     }),
     unique('entitlement_records_customer_key_unique').on(t.orgId, t.customerId, t.entitlementKey),
     index('entitlement_records_org_state_idx').on(t.orgId, t.state),
+    index('entitlement_records_org_created_idx').on(t.orgId, t.createdAt, t.id),
   ],
 ).enableRLS();

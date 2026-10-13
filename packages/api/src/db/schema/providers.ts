@@ -71,7 +71,7 @@ export const customersTable = pgTable(
   },
   (t) => [
     unique('customers_org_id_id_unique').on(t.orgId, t.id),
-    index('customers_org_created_idx').on(t.orgId, t.createdAt.desc()),
+    index('customers_org_created_idx').on(t.orgId, t.createdAt, t.id),
   ],
 ).enableRLS();
 

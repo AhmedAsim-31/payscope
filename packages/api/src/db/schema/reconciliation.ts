@@ -68,7 +68,7 @@ export const reconciliationRunsTable = pgTable(
       'reconciliation_runs_counts_check',
       sql`${t.examinedCount} >= 0 AND ${t.matchedCount} >= 0 AND ${t.mismatchedCount} >= 0 AND ${t.unavailableCount} >= 0 AND ${t.failedCount} >= 0`,
     ),
-    index('reconciliation_runs_org_started_idx').on(t.orgId, t.startedAt.desc()),
+    index('reconciliation_runs_org_started_idx').on(t.orgId, t.startedAt, t.id),
   ],
 ).enableRLS();
 
@@ -107,7 +107,7 @@ export const reconciliationFindingsTable = pgTable(
     uniqueIndex('reconciliation_findings_open_fingerprint_idx')
       .on(t.orgId, t.fingerprint)
       .where(sql`${t.status} IN ('open', 'reviewed')`),
-    index('reconciliation_findings_org_created_idx').on(t.orgId, t.createdAt.desc()),
-    index('reconciliation_findings_org_status_idx').on(t.orgId, t.status, t.type),
+    index('reconciliation_findings_org_created_idx').on(t.orgId, t.createdAt, t.id),
+    index('reconciliation_findings_org_status_idx').on(t.orgId, t.status, t.createdAt, t.id),
   ],
 ).enableRLS();
