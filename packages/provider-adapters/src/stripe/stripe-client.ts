@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { ProviderError } from '../provider-error';
 import type { ProviderContext } from '../provider-context';
-import type { ProviderObjectSnapshot } from '../provider-object';
+import type { ListWindow, ProviderObjectPage, ProviderObjectSnapshot } from '../provider-object';
 
 const STRIPE_BASE_URL = 'https://api.stripe.com';
 const TIMEOUT_MS = 10_000;
@@ -16,6 +16,13 @@ const PaymentIntentSchema = z.looseObject({
   amount_received: MinorAmount.nullish(),
   currency: z.string().length(3),
 });
+
+const ListSchema = z.looseObject({
+  data: z.array(z.record(z.string(), z.unknown())),
+  has_more: z.boolean(),
+});
+
+const LIST_LIMIT = 100;
 
 const SubscriptionSchema = z.looseObject({
   id: z.string().min(1),
@@ -92,11 +99,7 @@ function parseSnapshot<T extends z.ZodType>(schema: T, raw: Record<string, unkno
   return parsed.data;
 }
 
-export async function fetchPayment(
-  ctx: ProviderContext,
-  id: string,
-): Promise<ProviderObjectSnapshot> {
-  const raw = await stripeGet(ctx, `/v1/payment_intents/${encodeURIComponent(id)}`);
+function paymentSnapshot(raw: Record<string, unknown>): ProviderObjectSnapshot {
   const pi = parseSnapshot(PaymentIntentSchema, raw);
   const settled = pi.status === 'succeeded';
   return {
@@ -108,6 +111,32 @@ export async function fetchPayment(
     fetchedAt: new Date(),
     raw,
   };
+}
+
+export async function fetchPayment(
+  ctx: ProviderContext,
+  id: string,
+): Promise<ProviderObjectSnapshot> {
+  return paymentSnapshot(await stripeGet(ctx, `/v1/payment_intents/${encodeURIComponent(id)}`));
+}
+
+export async function listPayments(
+  ctx: ProviderContext,
+  window: ListWindow,
+  cursor: string | null,
+): Promise<ProviderObjectPage> {
+  const query = new URLSearchParams({
+    limit: String(LIST_LIMIT),
+    'created[gte]': String(Math.floor(window.from.getTime() / 1000)),
+    'created[lt]': String(Math.floor(window.to.getTime() / 1000)),
+  });
+  if (cursor) query.set('starting_after', cursor);
+  const list = parseSnapshot(
+    ListSchema,
+    await stripeGet(ctx, `/v1/payment_intents?${query.toString()}`),
+  );
+  const items = list.data.map(paymentSnapshot);
+  return { items, nextCursor: list.has_more ? (items.at(-1)?.objectId ?? null) : null };
 }
 
 export async function fetchSubscription(

@@ -9,3 +9,7 @@ export type ProviderObjectSnapshot = {
   fetchedAt: Date;
   raw: Record<string, unknown>;
 };
+
+export type ListWindow = { from: Date; to: Date };
+
+export type ProviderObjectPage = { items: ProviderObjectSnapshot[]; nextCursor: string | null };

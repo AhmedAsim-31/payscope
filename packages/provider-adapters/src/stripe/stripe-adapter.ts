@@ -1,6 +1,11 @@
 import type { ProviderAdapter } from '../adapter';
 import type { VerificationResult } from '../webhook';
-import { fetchPayment, fetchSubscription, validateCredentials } from './stripe-client';
+import {
+  fetchPayment,
+  fetchSubscription,
+  listPayments,
+  validateCredentials,
+} from './stripe-client';
 import { normalizeStripeEvent } from './stripe-normalize';
 import { verifyStripeSignature } from './stripe-signature';
 
@@ -45,5 +50,6 @@ export const stripeAdapter: ProviderAdapter = {
   normalizeEvent: normalizeStripeEvent,
   fetchPayment,
   fetchSubscription,
+  listPayments,
   validateCredentials,
 };

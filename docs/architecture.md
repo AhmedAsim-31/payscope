@@ -235,7 +235,11 @@ Status and amount are compared, with refunded and disputed local payments accept
 | `provider_auth`              | run ends `partial` with `provider_auth_failed`                                            |
 | Anything else                | counted in `failed`                                                                       |
 
-`provider_payment_missing_locally` is reserved: the adapters have no list operation, so nothing emits it yet.
+When the adapter implements `listPayments` (Stripe only today), a final phase lists provider payments created in a window from 30 days before the run started to 5 minutes before it, so payments whose webhook may still be in flight are skipped.
+Each listed payment with no local record on the same org and connection raises `provider_payment_missing_locally`, severity high, with the connection as subject and the provider payment id as the fingerprint key.
+Each page costs one request against the cap, and the provider cursor is checkpointed so a retry resumes at the next page.
+An unavailable listing is counted in `unavailable` and never reported as missing.
+Paddle, PayPal, and RevenueCat adapters have no list operation, so they never emit this finding.
 
 ### Idempotent findings
 

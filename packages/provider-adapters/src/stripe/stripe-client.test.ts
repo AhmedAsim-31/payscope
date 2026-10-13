@@ -1,7 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ProviderError } from '../provider-error';
 import type { ProviderContext } from '../provider-context';
-import { fetchPayment, fetchSubscription, validateCredentials } from './stripe-client';
+import {
+  fetchPayment,
+  fetchSubscription,
+  listPayments,
+  validateCredentials,
+} from './stripe-client';
 
 const paymentIntent = {
   id: 'pi_test_1',
@@ -43,6 +48,30 @@ describe('stripe client', () => {
     expect(url).toBe('https://api.stripe.com/v1/payment_intents/pi_test_1');
     expect(init.headers).toEqual({ Authorization: 'Bearer sk_test_abc' });
     expect(init.signal).toBeInstanceOf(AbortSignal);
+  });
+
+  it('lists payment intents created inside the window and pages with starting_after', async () => {
+    const fetchMock = vi.fn(() =>
+      Promise.resolve(json({ object: 'list', has_more: true, data: [paymentIntent] })),
+    );
+    const window = { from: new Date('2026-01-01T00:00:00Z'), to: new Date('2026-01-31T00:00:00Z') };
+    const page = await listPayments(ctxWith(fetchMock), window, 'pi_prev');
+    expect(page.items).toMatchObject([{ objectId: 'pi_test_1', amountMinor: 4999n }]);
+    expect(page.nextCursor).toBe('pi_test_1');
+    const url = new URL((fetchMock.mock.calls[0] as unknown as [string])[0]);
+    expect(url.pathname).toBe('/v1/payment_intents');
+    expect(Object.fromEntries(url.searchParams)).toEqual({
+      limit: '100',
+      'created[gte]': '1767225600',
+      'created[lt]': '1769817600',
+      starting_after: 'pi_prev',
+    });
+  });
+
+  it('ends listing when has_more is false', async () => {
+    const ctx = ctxWith(() => Promise.resolve(json({ has_more: false, data: [paymentIntent] })));
+    const window = { from: new Date(0), to: new Date(1000) };
+    expect((await listPayments(ctx, window, null)).nextCursor).toBeNull();
   });
 
   it('fetches a subscription', async () => {
