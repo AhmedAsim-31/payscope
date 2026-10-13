@@ -1,0 +1,26 @@
+packages/api/src/records/payments-repo.ts
+  h_78e539a96187c3 1,78-79
+packages/api/src/records/records-routes.ts
+  h_78e539a96187c3 58-64
+packages/api/src/records/records.integration.test.ts
+  h_78e539a96187c3 99-135
+packages/shared/src/records-schemas.test.ts
+  h_78e539a96187c3 2,14-26
+packages/shared/src/records-schemas.ts
+  h_78e539a96187c3 147-154,177-178
+packages/web/src/components/records/filter-config.ts
+  h_78e539a96187c3 42-46,51-64
+packages/web/src/components/records/payments-list.test.tsx
+  h_78e539a96187c3 61-79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7fdfdd4e8f2632ecfc9e4ca5382337d918f24f4a",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
