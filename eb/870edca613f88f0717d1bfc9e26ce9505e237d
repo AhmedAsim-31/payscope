@@ -1,0 +1,18 @@
+supabase/migrations/20261013061709_rate_limits.sql
+  h_78e539a96187c3 1-7
+supabase/migrations/meta/20261013061709_snapshot.json
+  h_78e539a96187c3 1-2480
+supabase/migrations/meta/_journal.json
+  h_78e539a96187c3 74-80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "eb870edca613f88f0717d1bfc9e26ce9505e237d",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
