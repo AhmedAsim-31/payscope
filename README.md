@@ -51,6 +51,9 @@ pnpm --filter @payscope/api db:migrate && pnpm db:seed
 pnpm dev
 ```
 
+`pnpm-lock.yaml` is not committed, so use plain `pnpm install` (CI uses `--no-frozen-lockfile`).
+`pnpm install --frozen-lockfile` fails in a fresh checkout with `ERR_PNPM_NO_LOCKFILE`.
+
 Before step 4, edit `.env.local`:
 
 - `DATABASE_URL`: on Homebrew Postgres there is no `postgres` role, so use `postgresql://localhost:5432/payscope` (your OS user).
