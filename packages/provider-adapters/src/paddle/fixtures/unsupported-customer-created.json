@@ -1,0 +1,12 @@
+{
+  "event_id": "evt_01k00000000000000000000017",
+  "event_type": "customer.created",
+  "occurred_at": "2026-10-01T10:00:06.123456Z",
+  "notification_id": "ntf_01k00000000000000000000117",
+  "data": {
+    "id": "ctm_01k00000000000000000000001",
+    "name": "Test Customer",
+    "email": "test@example.com",
+    "status": "active"
+  }
+}

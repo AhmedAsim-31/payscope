@@ -1,0 +1,19 @@
+{
+  "event_id": "evt_01k00000000000000000000013",
+  "event_type": "subscription.canceled",
+  "occurred_at": "2026-11-01T10:00:00.000000Z",
+  "notification_id": "ntf_01k00000000000000000000113",
+  "data": {
+    "id": "sub_01k00000000000000000000001",
+    "status": "canceled",
+    "customer_id": "ctm_01k00000000000000000000001",
+    "currency_code": "USD",
+    "started_at": "2026-10-01T10:00:00.000000Z",
+    "current_billing_period": {
+      "starts_at": "2026-10-01T10:00:00.000000Z",
+      "ends_at": "2026-11-01T10:00:00.000000Z"
+    },
+    "scheduled_change": null,
+    "canceled_at": "2026-11-01T10:00:00.000000Z"
+  }
+}
