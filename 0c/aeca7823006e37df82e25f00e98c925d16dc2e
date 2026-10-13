@@ -1,0 +1,68 @@
+docs/architecture.md
+  h_78e539a96187c3 61,71-132
+packages/api/src/db/schema/records.ts
+  h_78e539a96187c3 154
+packages/api/src/events/apply-event.integration.test.ts
+  h_78e539a96187c3 1-156
+packages/api/src/events/apply-event.ts
+  h_78e539a96187c3 1-69
+packages/api/src/events/apply-retries.integration.test.ts
+  h_78e539a96187c3 1-95
+packages/api/src/events/apply-subscriptions.integration.test.ts
+  h_78e539a96187c3 1-102
+packages/api/src/events/apply-types.ts
+  h_78e539a96187c3 1-14
+packages/api/src/events/customers.ts
+  h_78e539a96187c3 1-46
+packages/api/src/events/disputes.ts
+  h_78e539a96187c3 1-34
+packages/api/src/events/entitlements.ts
+  h_78e539a96187c3 1-65
+packages/api/src/events/payments.ts
+  h_78e539a96187c3 1-66
+packages/api/src/events/period-end.ts
+  h_78e539a96187c3 1-16
+packages/api/src/events/subscriptions.ts
+  h_78e539a96187c3 1-103
+packages/api/src/jobs/handlers/process-provider-event.ts
+  h_78e539a96187c3 5,24-36,56,70,77-78,82,87,91-97
+packages/api/src/providers/adapter-registry.ts
+  h_78e539a96187c3 4-5,9
+packages/api/src/test/event-harness.ts
+  h_78e539a96187c3 1-135
+packages/api/src/webhooks/ingest-event.ts
+  h_78e539a96187c3 43
+packages/provider-adapters/src/paddle/paddle-normalize.test.ts
+  h_78e539a96187c3 156-160
+packages/provider-adapters/src/paddle/paddle-normalize.ts
+  h_78e539a96187c3 34,140-142
+packages/provider-adapters/src/provider-error.ts
+  h_78e539a96187c3 27,32,38
+packages/provider-adapters/src/revenuecat/revenuecat-envelope.ts
+  h_78e539a96187c3 21
+packages/provider-adapters/src/revenuecat/revenuecat-normalize.test.ts
+  h_78e539a96187c3 16,64
+packages/provider-adapters/src/revenuecat/revenuecat-normalize.ts
+  h_78e539a96187c3 59,87-89,101
+packages/provider-adapters/src/stripe/stripe-normalize.test.ts
+  h_78e539a96187c3 170
+packages/provider-adapters/src/stripe/stripe-normalize.ts
+  h_78e539a96187c3 229-231
+supabase/migrations/20261013013642_entitlement_ordering.sql
+  h_78e539a96187c3 1
+supabase/migrations/meta/20261013013642_snapshot.json
+  h_78e539a96187c3 1-1941
+supabase/migrations/meta/_journal.json
+  h_78e539a96187c3 39-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0caeca7823006e37df82e25f00e98c925d16dc2e",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
