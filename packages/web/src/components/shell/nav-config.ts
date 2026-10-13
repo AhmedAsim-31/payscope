@@ -1,4 +1,12 @@
-import { LayoutDashboard, Users, type LucideIcon } from 'lucide-react';
+import {
+  CreditCard,
+  KeyRound,
+  LayoutDashboard,
+  Repeat,
+  UserRound,
+  Users,
+  type LucideIcon,
+} from 'lucide-react';
 
 export type NavItem = {
   title: string;
@@ -9,6 +17,10 @@ export type NavItem = {
 
 export const NAV_ITEMS: readonly NavItem[] = [
   { title: 'Overview', path: '', icon: LayoutDashboard, exact: true },
+  { title: 'Payments', path: '/payments', icon: CreditCard },
+  { title: 'Subscriptions', path: '/subscriptions', icon: Repeat },
+  { title: 'Customers', path: '/customers', icon: UserRound },
+  { title: 'Entitlements', path: '/entitlements', icon: KeyRound },
   { title: 'Members', path: '/members', icon: Users },
 ];
 
