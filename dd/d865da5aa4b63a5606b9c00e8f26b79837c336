@@ -1,0 +1,34 @@
+docs/api.md
+  h_78e539a96187c3 157-167
+docs/backend-performance.md
+  h_78e539a96187c3 19-21,24,26-27
+packages/api/src/audit/audit-routes.ts
+  h_78e539a96187c3 20
+packages/api/src/events/event-inbox-routes.ts
+  h_78e539a96187c3 26
+packages/api/src/incidents/incident-routes.ts
+  h_78e539a96187c3 29
+packages/api/src/overview/overview-routes.ts
+  h_78e539a96187c3 21
+packages/api/src/rate-limit/rate-limit.integration.test.ts
+  h_78e539a96187c3 125-183
+packages/api/src/reconciliation/reconciliation-routes.ts
+  h_78e539a96187c3 77,84
+packages/api/src/records/records-routes.ts
+  h_78e539a96187c3 35
+packages/api/src/repairs/repair-routes.ts
+  h_78e539a96187c3 21,24
+packages/api/src/scenarios/scenario-routes.ts
+  h_78e539a96187c3 31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ddd865da5aa4b63a5606b9c00e8f26b79837c336",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
