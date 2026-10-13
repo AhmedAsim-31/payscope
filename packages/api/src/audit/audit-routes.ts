@@ -17,6 +17,7 @@ function asState(value: unknown): Record<string, unknown> | null {
 export const auditRoutes: FastifyPluginCallbackZod<{ db: Db }> = (app, { db }, done) => {
   app.decorateRequest('org', undefined);
   app.addHook('onRequest', app.authenticate);
+  app.addHook('onRequest', app.rateLimitByMethod());
 
   app.get(
     '/api/v1/orgs/:orgId/audit',

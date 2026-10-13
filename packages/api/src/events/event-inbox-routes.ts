@@ -23,6 +23,7 @@ type Options = { db: Db };
 export const eventInboxRoutes: FastifyPluginCallbackZod<Options> = (app, { db }, done) => {
   app.decorateRequest('org', undefined);
   app.addHook('onRequest', app.authenticate);
+  app.addHook('onRequest', app.rateLimitByMethod());
   const base = '/api/v1/orgs/:orgId';
   const canRead = requireOrg(db, 'events:read');
 

@@ -74,13 +74,14 @@ export const reconciliationRoutes: FastifyPluginCallbackZod<Options> = (app, opt
   const { db } = options;
   app.decorateRequest('org', undefined);
   app.addHook('onRequest', app.authenticate);
+  app.addHook('onRequest', app.rateLimitByMethod());
   const base = '/api/v1/orgs/:orgId/reconciliation';
   const notFound = (what: string) => new ApiHttpError(404, 'NOT_FOUND', `${what} not found`);
 
   app.post(
     `${base}/runs`,
     {
-      preHandler: requireOrg(db, 'reconciliation:run'),
+      preHandler: [requireOrg(db, 'reconciliation:run'), app.rateLimitFor('reconciliationRun')],
       schema: {
         params: orgParams,
         body: startRunBodySchema,

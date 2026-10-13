@@ -26,6 +26,7 @@ const notFound = () => new ApiHttpError(404, 'NOT_FOUND', 'Incident not found');
 export const incidentRoutes: FastifyPluginCallbackZod<{ db: Db }> = (app, { db }, done) => {
   app.decorateRequest('org', undefined);
   app.addHook('onRequest', app.authenticate);
+  app.addHook('onRequest', app.rateLimitByMethod());
   const base = '/api/v1/orgs/:orgId/incidents';
 
   app.get(

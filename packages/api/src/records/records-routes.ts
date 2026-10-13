@@ -32,6 +32,7 @@ type Options = { db: Db };
 export const recordsRoutes: FastifyPluginCallbackZod<Options> = (app, { db }, done) => {
   app.decorateRequest('org', undefined);
   app.addHook('onRequest', app.authenticate);
+  app.addHook('onRequest', app.rateLimitByMethod());
   const preHandler = requireOrg(db, 'records:read');
   const base = '/api/v1/orgs/:orgId';
 
