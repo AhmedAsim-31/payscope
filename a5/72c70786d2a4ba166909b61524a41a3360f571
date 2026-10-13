@@ -1,0 +1,140 @@
+docs/architecture.md
+  h_78e539a96187c3 202-235
+docs/database.md
+  h_78e539a96187c3 129-139
+docs/security.md
+  h_78e539a96187c3 1-17
+packages/api/src/app.ts
+  h_78e539a96187c3 24-26,95-97
+packages/api/src/audit/audit-log.ts
+  h_78e539a96187c3 1-83
+packages/api/src/audit/audit-routes.ts
+  h_78e539a96187c3 1-70
+packages/api/src/audit/audit.integration.test.ts
+  h_78e539a96187c3 1-155
+packages/api/src/connections/connection-routes.ts
+  h_78e539a96187c3 11,89-122,182-183,188,232-240
+packages/api/src/db/schema/operations.ts
+  h_78e539a96187c3 1-97
+packages/api/src/events/event-inbox-routes.ts
+  h_78e539a96187c3 10,65-73
+packages/api/src/events/event-retry.ts
+  h_78e539a96187c3 6,13-30,32-43
+packages/api/src/incidents/incident-open.ts
+  h_78e539a96187c3 1-49
+packages/api/src/incidents/incident-repo.ts
+  h_78e539a96187c3 1-109
+packages/api/src/incidents/incident-routes.ts
+  h_78e539a96187c3 1-112
+packages/api/src/incidents/incidents.integration.test.ts
+  h_78e539a96187c3 1-99
+packages/api/src/orgs/member-routes.ts
+  h_78e539a96187c3 5,48-55,107-123,143-176,195-223
+packages/api/src/orgs/org-routes.ts
+  h_78e539a96187c3 5,67-75
+packages/api/src/reconciliation/local-rules.ts
+  h_78e539a96187c3 11,18-20,36-37,42-43
+packages/api/src/reconciliation/reconciliation-repo.ts
+  h_78e539a96187c3 123,133
+packages/api/src/reconciliation/reconciliation-routes.ts
+  h_78e539a96187c3 15,93-116,118-137,208,210-239
+packages/api/src/reconciliation/run-store.ts
+  h_78e539a96187c3 4,53
+packages/api/src/repairs/evidence.ts
+  h_78e539a96187c3 1-9
+packages/api/src/repairs/finding-recheck.ts
+  h_78e539a96187c3 1-40
+packages/api/src/repairs/idempotent-repair.ts
+  h_78e539a96187c3 1-88
+packages/api/src/repairs/repair-actions.ts
+  h_78e539a96187c3 1-274
+packages/api/src/repairs/repair-routes.ts
+  h_78e539a96187c3 1-130
+packages/api/src/repairs/repairs.integration.test.ts
+  h_78e539a96187c3 1-195
+packages/api/src/test/ops-harness.ts
+  h_78e539a96187c3 1-84
+packages/shared/src/audit-schemas.ts
+  h_78e539a96187c3 1-35
+packages/shared/src/incident-schemas.ts
+  h_78e539a96187c3 1-52
+packages/shared/src/repair-schemas.ts
+  h_78e539a96187c3 1-26
+packages/web/src/app/app/[orgId]/audit/page.tsx
+  h_78e539a96187c3 1-12
+packages/web/src/app/app/[orgId]/findings/[findingId]/page.tsx
+  h_78e539a96187c3 1-19
+packages/web/src/app/app/[orgId]/findings/page.tsx
+  h_78e539a96187c3 1-12
+packages/web/src/app/app/[orgId]/incidents/[incidentId]/page.tsx
+  h_78e539a96187c3 1-19
+packages/web/src/app/app/[orgId]/incidents/page.tsx
+  h_78e539a96187c3 1-12
+packages/web/src/app/app/[orgId]/reconciliation/page.tsx
+  h_78e539a96187c3 1-16
+packages/web/src/app/app/[orgId]/repairs/page.tsx
+  h_78e539a96187c3 1-12
+packages/web/src/components/audit/audit-list.tsx
+  h_78e539a96187c3 1-71
+packages/web/src/components/incidents/incident-actions.tsx
+  h_78e539a96187c3 1-80
+packages/web/src/components/incidents/incident-detail.tsx
+  h_78e539a96187c3 1-82
+packages/web/src/components/incidents/incidents-list.tsx
+  h_78e539a96187c3 1-49
+packages/web/src/components/reconciliation/finding-actions.test.tsx
+  h_78e539a96187c3 1-46
+packages/web/src/components/reconciliation/finding-actions.tsx
+  h_78e539a96187c3 1-139
+packages/web/src/components/reconciliation/finding-detail.tsx
+  h_78e539a96187c3 1-73
+packages/web/src/components/reconciliation/findings-list.tsx
+  h_78e539a96187c3 1-48
+packages/web/src/components/reconciliation/runs-view.tsx
+  h_78e539a96187c3 1-63
+packages/web/src/components/reconciliation/start-run-form.tsx
+  h_78e539a96187c3 1-96
+packages/web/src/components/records/filter-config.ts
+  h_78e539a96187c3 2-7,77-92
+packages/web/src/components/records/status-badge.tsx
+  h_78e539a96187c3 35-47
+packages/web/src/components/repairs/repair-center.tsx
+  h_78e539a96187c3 1-58
+packages/web/src/components/repairs/repair-dialog.test.tsx
+  h_78e539a96187c3 1-49
+packages/web/src/components/repairs/repair-dialog.tsx
+  h_78e539a96187c3 1-106
+packages/web/src/components/repairs/reprocess-event-form.tsx
+  h_78e539a96187c3 1-70
+packages/web/src/components/repairs/use-repair.ts
+  h_78e539a96187c3 1-23
+packages/web/src/components/shell/nav-config.ts
+  h_78e539a96187c3 4-8,33-37
+packages/web/src/components/shell/sidebar-nav.test.tsx
+  h_78e539a96187c3 33-37
+packages/web/src/lib/api-messages.ts
+  h_78e539a96187c3 4-43,52-56,64-66
+packages/web/src/lib/records-queries.ts
+  h_78e539a96187c3 5-14
+supabase/migrations/20261013061841_operations.sql
+  h_78e539a96187c3 1-58
+supabase/migrations/20261013061847_operations_rls.sql
+  h_78e539a96187c3 1-23
+supabase/migrations/meta/20261013061841_snapshot.json
+  h_78e539a96187c3 1-2912
+supabase/migrations/meta/20261013061847_snapshot.json
+  h_78e539a96187c3 1-2912
+supabase/migrations/meta/_journal.json
+  h_78e539a96187c3 74-87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a572c70786d2a4ba166909b61524a41a3360f571",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
