@@ -1,0 +1,26 @@
+{
+  "api_version": "1.0",
+  "event": {
+    "app_id": "app_sandbox_0001",
+    "app_user_id": "user_sandbox_001",
+    "original_app_user_id": "user_sandbox_001",
+    "aliases": ["user_sandbox_001"],
+    "product_id": "pro_monthly",
+    "entitlement_ids": ["pro"],
+    "period_type": "NORMAL",
+    "purchased_at_ms": 1760000000000,
+    "expiration_at_ms": 1760000300000,
+    "environment": "SANDBOX",
+    "store": "TEST_STORE",
+    "currency": "USD",
+    "price": -9.99,
+    "price_in_purchased_currency": -9.99,
+    "transaction_id": "txn_sandbox_0002",
+    "original_transaction_id": "txn_sandbox_0001",
+    "country_code": "US",
+    "id": "f0000000-0000-4000-8000-000000000004",
+    "type": "CANCELLATION",
+    "cancel_reason": "CUSTOMER_SUPPORT",
+    "event_timestamp_ms": 1760000200100
+  }
+}

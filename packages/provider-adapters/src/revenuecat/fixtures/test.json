@@ -1,0 +1,23 @@
+{
+  "api_version": "1.0",
+  "event": {
+    "id": "f0000000-0000-4000-8000-000000000012",
+    "type": "TEST",
+    "app_id": "app_sandbox_0001",
+    "app_user_id": "user_sandbox_001",
+    "original_app_user_id": "user_sandbox_001",
+    "aliases": ["user_sandbox_001"],
+    "environment": "SANDBOX",
+    "event_timestamp_ms": 1760000000000,
+    "product_id": "test_product",
+    "entitlement_ids": ["pro"],
+    "store": "TEST_STORE",
+    "period_type": "NORMAL",
+    "price": 0,
+    "currency": "USD",
+    "transaction_id": "txn_test_0000",
+    "original_transaction_id": "txn_test_0000",
+    "purchased_at_ms": 1760000000000,
+    "expiration_at_ms": 1760000300000
+  }
+}
