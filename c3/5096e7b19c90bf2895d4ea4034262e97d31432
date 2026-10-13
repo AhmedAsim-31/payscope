@@ -1,0 +1,60 @@
+.gitignore
+  h_78e539a96187c3 22-25
+docs/operations.md
+  h_78e539a96187c3 39-63
+eslint.config.mjs
+  h_78e539a96187c3 10-11
+package.json
+  h_78e539a96187c3 18-20
+packages/api/src/server.ts
+  h_78e539a96187c3 15-17,20,40
+packages/e2e/global-setup.ts
+  h_78e539a96187c3 1-13
+packages/e2e/package.json
+  h_78e539a96187c3 1-16
+packages/e2e/playwright.config.ts
+  h_78e539a96187c3 1-53
+packages/e2e/tests/auth.setup.ts
+  h_78e539a96187c3 1-32
+packages/e2e/tests/auth.spec.ts
+  h_78e539a96187c3 1-39
+packages/e2e/tests/events.spec.ts
+  h_78e539a96187c3 1-40
+packages/e2e/tests/org.spec.ts
+  h_78e539a96187c3 1-44
+packages/e2e/tests/payments.spec.ts
+  h_78e539a96187c3 1-26
+packages/e2e/tests/recovery.spec.ts
+  h_78e539a96187c3 1-63
+packages/e2e/tests/scenarios.spec.ts
+  h_78e539a96187c3 1-22
+packages/e2e/tests/smoke.spec.ts
+  h_78e539a96187c3 1-32
+packages/e2e/tests/support.ts
+  h_78e539a96187c3 1-39
+packages/e2e/tests/viewer.spec.ts
+  h_78e539a96187c3 1-26
+packages/e2e/tsconfig.json
+  h_78e539a96187c3 1-5
+packages/web/src/app/app/[orgId]/error.tsx
+  h_78e539a96187c3 4-5,8
+packages/web/src/components/members/members-table.tsx
+  h_78e539a96187c3 39,52-57,59-66,80-81
+packages/web/src/components/reconciliation/start-run-form.tsx
+  h_78e539a96187c3 18,52,58,74
+packages/web/src/components/scenarios/scenario-lab.tsx
+  h_78e539a96187c3 25,38-41,64-69
+packages/web/src/components/shell/org-switcher.tsx
+  h_78e539a96187c3 27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c35096e7b19c90bf2895d4ea4034262e97d31432",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
