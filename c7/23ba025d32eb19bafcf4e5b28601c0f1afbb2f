@@ -1,0 +1,36 @@
+docs/architecture.md
+  h_78e539a96187c3 143-144,155,163
+docs/demo.md
+  h_78e539a96187c3 59,96
+packages/api/src/events/apply-event.integration.test.ts
+  h_78e539a96187c3 81,83-84,87,89-105,107
+packages/api/src/events/apply-event.ts
+  h_78e539a96187c3 9,19
+packages/api/src/events/derived-entitlements.integration.test.ts
+  h_78e539a96187c3 59-95
+packages/api/src/events/entitlements.ts
+  h_78e539a96187c3 1-5,74-111
+packages/api/src/events/payments.ts
+  h_78e539a96187c3 2,23,32-33,40
+packages/api/src/events/refunds.ts
+  h_78e539a96187c3 1-68
+packages/api/src/scenarios/failure-scenarios.ts
+  h_78e539a96187c3 17
+packages/api/src/scenarios/payment-scenarios.ts
+  h_78e539a96187c3 2,42-56,59-63
+packages/api/src/seed/seed-situations.ts
+  h_78e539a96187c3 48-50
+packages/shared/src/scenario-schemas.ts
+  h_78e539a96187c3 67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c723ba025d32eb19bafcf4e5b28601c0f1afbb2f",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
