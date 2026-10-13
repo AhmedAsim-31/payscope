@@ -1,0 +1,20 @@
+README.md
+  h_78e539a96187c3 1-69
+docs/api.md
+  h_78e539a96187c3 1-166
+docs/architecture.md
+  h_78e539a96187c3 3-45
+docs/deployment.md
+  h_78e539a96187c3 1-100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "991d3f9b69ba9ac4ce87bf4b62869bc1e4d0454e",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
