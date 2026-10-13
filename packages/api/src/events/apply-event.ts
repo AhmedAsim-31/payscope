@@ -6,6 +6,7 @@ import { applyDispute } from './disputes';
 import { deriveEntitlements } from './derived-entitlements';
 import { applyEntitlements } from './entitlements';
 import { applyPayment } from './payments';
+import { applyRefund } from './refunds';
 import { applySubscription } from './subscriptions';
 
 export type StoredEvent = { id: string; orgId: string; connectionId: string };
@@ -15,6 +16,7 @@ export type ApplyResult = ApplyOutcome | { kind: 'already_handled' } | { kind: '
 async function applyObject(ctx: ApplyContext): Promise<ApplyOutcome> {
   switch (ctx.event.objectType) {
     case 'payment': {
+      if (ctx.event.normalizedType === 'payment.refunded') return applyRefund(ctx);
       const outcome = await applyPayment(ctx);
       if (outcome.kind === 'applied') await applyEntitlements(ctx, null);
       return outcome;

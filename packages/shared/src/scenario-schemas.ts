@@ -64,7 +64,7 @@ export const SCENARIOS = [
     simulates: 'A refund event arrives before the payment event it refers to.',
     recordsChanged: 'provider events, jobs, payment record',
     expectedOutcome:
-      'The late payment event is recognised as stale and the payment ends refunded, not succeeded.',
+      'Early refund waits for its payment event; the payment keeps its real amount, ends refunded.',
     evidence: 'events, jobs, payment',
   },
   {

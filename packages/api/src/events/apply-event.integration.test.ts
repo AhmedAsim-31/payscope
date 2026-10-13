@@ -78,20 +78,34 @@ describe('stripe payments', () => {
     });
   });
 
-  it('keeps a newer refund when the older succeeded event arrives late', async () => {
+  it('defers a refund that arrives before its payment instead of inventing the amount', async () => {
     const seed = await seedConnection(sql, 'stripe');
-    await run(
+    const refund = await storeEvent(
+      sql,
       seed,
       stripeAdapter,
-      stripe('charge-refunded', 1760000500, (o) => (o['amount_refunded'] = 4999)),
+      stripe('charge-refunded', 1760000500),
     );
-    const late = await run(seed, stripeAdapter, stripe('payment-intent-succeeded', 1760000001));
-    const [payment] = await payments(sql, seed);
-    expect(payment).toMatchObject({ status: 'refunded', version: 0 });
-    expect((await eventRow(sql, late.eventId))?.status).toBe('ignored');
-    expect(await attemptRows(sql, late.eventId)).toMatchObject([
-      { outcome: 'skipped', error_message: 'stale_event' },
+    await expect(handler(refund.job, ctx)).rejects.toThrow('refund_payment_unknown');
+    expect(await payments(sql, seed)).toHaveLength(0);
+    expect((await eventRow(sql, refund.eventId))?.status).toBe('failed');
+    expect(await attemptRows(sql, refund.eventId)).toMatchObject([
+      { outcome: 'failed', failure_category: 'transient' },
     ]);
+
+    await run(seed, stripeAdapter, stripe('payment-intent-succeeded', 1760000001));
+    await handler({ ...refund.job, attemptCount: 2 }, ctx);
+    expect((await payments(sql, seed))[0]).toMatchObject({
+      status: 'partially_refunded',
+      amount_minor: '4999',
+      amount_refunded_minor: '1500',
+      version: 1,
+    });
+    expect((await eventRow(sql, refund.eventId))?.status).toBe('processed');
+
+    const late = await run(seed, stripeAdapter, stripe('payment-intent-succeeded', 1760000001));
+    expect((await payments(sql, seed))[0]).toMatchObject({ status: 'partially_refunded' });
+    expect((await eventRow(sql, late.eventId))?.status).toBe('ignored');
   });
 
   it('applies a concurrent duplicate run once', async () => {
