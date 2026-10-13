@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx src/db/migrate-cli.ts"
+    "db:migrate": "tsx src/db/migrate-cli.ts",
+    "db:seed": "tsx src/seed/seed-cli.ts"
   },
   "dependencies": {
     "@fastify/cors": "^11.3.1",

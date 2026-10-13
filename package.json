@@ -13,7 +13,9 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "db:seed": "pnpm --filter @payscope/api db:seed",
+    "db:reset-demo": "pnpm --filter @payscope/api db:seed --reset"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",
