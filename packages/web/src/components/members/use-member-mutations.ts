@@ -37,5 +37,13 @@ export function useMemberMutations(orgId: string) {
     onSettled: refresh,
   });
 
-  return { add, changeRole, remove };
+  const transferOwnership = useMutation({
+    mutationFn: async (input: { userId: string }) =>
+      memberSchema.parse(
+        await apiFetch(`${base}/${input.userId}/transfer-ownership`, { method: 'POST' }),
+      ),
+    onSettled: refresh,
+  });
+
+  return { add, changeRole, remove, transferOwnership };
 }

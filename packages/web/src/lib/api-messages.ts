@@ -5,6 +5,7 @@ export type ErrorContext =
   | 'add-member'
   | 'change-role'
   | 'remove-member'
+  | 'transfer-ownership'
   | 'retry-event'
   | 'start-run'
   | 'triage-finding'
@@ -28,11 +29,15 @@ const CONFLICT_MESSAGES: Record<string, string> = {
     'The subscription is no longer active, so the entitlement cannot be granted.',
   EVENT_IN_FLIGHT: 'This event is already pending or processing. Wait for it to finish.',
   SIMULATED_CONNECTION: 'Simulated connections have no provider account to test.',
+  ALREADY_OWNER: 'That member is already an owner.',
+  OWNERSHIP_CHANGED:
+    'You are no longer an owner of this organization. Refresh to see current roles.',
   INVALID_TRANSITION:
     'That action is no longer allowed for this incident. Refresh to see its state.',
 };
 
 const UNPROCESSABLE_MESSAGES: Record<string, string> = {
+  SELF_TRANSFER: 'Choose another member to receive ownership.',
   IDEMPOTENCY_KEY_REUSED:
     'This request was already submitted with different details. Close the dialog and start again.',
   PLAN_UNMAPPED:

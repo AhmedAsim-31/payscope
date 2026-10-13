@@ -1,6 +1,6 @@
 'use client';
 
-import { Trash2 } from 'lucide-react';
+import { Crown, Trash2 } from 'lucide-react';
 import type { Member } from '@payscope/shared/org-schemas';
 import type { Role } from '@payscope/shared/permissions';
 import { RoleBadge } from '@/components/role-badge';
@@ -20,16 +20,20 @@ export function MembersTable({
   members,
   callerRole,
   canManage,
+  canTransfer,
   busyUserId,
   onChangeRole,
   onRemove,
+  onTransfer,
 }: {
   members: readonly Member[];
   callerRole: Role;
   canManage: boolean;
+  canTransfer: boolean;
   busyUserId: string | null;
   onChangeRole: (member: Member, role: Role) => void;
   onRemove: (member: Member) => void;
+  onTransfer: (member: Member) => void;
 }) {
   const roles = assignableRoles(callerRole);
 
@@ -80,16 +84,30 @@ export function MembersTable({
                 <TableCell className="max-md:flex max-md:items-center max-md:justify-between max-md:gap-4 max-md:py-1 max-md:whitespace-normal">
                   <span className="text-muted-foreground text-xs md:hidden">Actions</span>
                   {editable ? (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      disabled={busy}
-                      onClick={() => onRemove(member)}
-                      aria-label={`Remove ${member.email}`}
-                    >
-                      <Trash2 aria-hidden="true" />
-                      Remove
-                    </Button>
+                    <span className="flex flex-wrap justify-end gap-1 md:justify-start">
+                      {canTransfer && member.role !== 'OWNER' ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={busy}
+                          onClick={() => onTransfer(member)}
+                          aria-label={`Transfer ownership to ${member.email}`}
+                        >
+                          <Crown aria-hidden="true" />
+                          Make owner
+                        </Button>
+                      ) : null}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled={busy}
+                        onClick={() => onRemove(member)}
+                        aria-label={`Remove ${member.email}`}
+                      >
+                        <Trash2 aria-hidden="true" />
+                        Remove
+                      </Button>
+                    </span>
                   ) : (
                     <span className="text-muted-foreground text-sm">Owner only</span>
                   )}
