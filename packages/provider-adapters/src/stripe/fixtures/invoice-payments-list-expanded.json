@@ -1,0 +1,45 @@
+{
+  "object": "list",
+  "url": "/v1/invoice_payments",
+  "has_more": false,
+  "data": [
+    {
+      "id": "inpay_test_1Su7vWy",
+      "object": "invoice_payment",
+      "amount_paid": 4999,
+      "amount_requested": 4999,
+      "created": 1760000001,
+      "currency": "usd",
+      "invoice": {
+        "id": "in_test_1Su7vWy",
+        "object": "invoice",
+        "amount_due": 4999,
+        "amount_paid": 4999,
+        "billing_reason": "subscription_create",
+        "currency": "usd",
+        "customer": "cus_test_Nx81aB",
+        "livemode": false,
+        "status": "paid",
+        "parent": {
+          "type": "subscription_details",
+          "subscription_details": {
+            "subscription": "sub_test_1Pq9zXy",
+            "metadata": {}
+          },
+          "quote_details": null
+        }
+      },
+      "is_default": true,
+      "livemode": false,
+      "payment": {
+        "type": "payment_intent",
+        "payment_intent": "pi_test_3Qa1b2c3d4"
+      },
+      "status": "paid",
+      "status_transitions": {
+        "canceled_at": null,
+        "paid_at": 1760000001
+      }
+    }
+  ]
+}

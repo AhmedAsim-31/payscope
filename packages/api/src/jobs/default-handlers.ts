@@ -14,7 +14,7 @@ export function createDefaultHandlers(
   cipher?: CredentialsCipher,
 ): JobHandlers {
   return {
-    [PROCESS_EVENT_JOB_KIND]: createProcessProviderEventHandler(adapters),
+    [PROCESS_EVENT_JOB_KIND]: createProcessProviderEventHandler(adapters, cipher),
     [RUN_RECONCILIATION_JOB_KIND]: createRunReconciliationHandler(adapters, cipher),
     [RUN_SCENARIO_JOB_KIND]: createRunScenarioHandler(adapters, cipher),
   };

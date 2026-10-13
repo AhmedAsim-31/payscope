@@ -160,7 +160,12 @@ Stripe, Paddle and PayPal events carry no entitlement keys.
 For them the entitlements are derived in the same transaction as a successful subscription upsert, from the connection's `entitlement_map` (`{ "<planRef>": ["key", ...] }`) and the subscription's `plan_ref`.
 `active` and `trialing` set `active` with `expires_at` at the period end; `canceled` stays `active` until the period end and is `expired` once it has passed; `expired` sets `expired`; `past_due` and `paused` leave entitlements unchanged.
 A plan with no mapping creates nothing and appends `plan_unmapped` to the attempt row's reason without failing the event.
-A payment record stores the provider subscription id its event carries in `provider_subscription_id` (Paddle `subscription_id` on transactions and refund adjustments, PayPal `billing_agreement_id` on captures); Stripe payment intents and charges carry no subscription id, so Stripe payments stay unlinked.
+A payment record stores the provider subscription id its event carries in `provider_subscription_id` (Paddle `subscription_id` on transactions and refund adjustments, PayPal `billing_agreement_id` on captures); Stripe is resolved separately (below).
+Stripe payment intents and charges carry no subscription id since API version basil, and `invoice.paid` webhooks omit the includable `payments` list, so no ingested event links a Stripe payment to its subscription.
+Instead, before the apply transaction of a refund whose stored payment is still unlinked, the worker asks Stripe once through `GET /v1/invoice_payments?payment[type]=payment_intent&payment[payment_intent]=<pi>&expand[]=data.invoice` and reads `invoice.parent.subscription_details.subscription`.
+The lookup is scoped to the event's org and connection, uses the connection's stored credentials and the client's existing timeout and body caps, and is skipped when the payment is already linked or the connection has no usable credentials.
+A transient lookup failure fails the event retryably; an empty result means a one-off payment.
+The result goes through the same `COALESCE` write as event-carried ids, so an existing link is never cleared.
 A full refund without entitlement keys revokes only the active entitlements of that subscription, resolved through `(connection_id, provider_subscription_id)` at refund time, so a payment that arrived before its subscription still links.
 A full refund of a payment with no subscription id is a one-off refund and revokes nothing.
 
