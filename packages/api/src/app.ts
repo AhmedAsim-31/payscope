@@ -21,6 +21,7 @@ import { tickRoutes } from './jobs/tick-routes';
 import type { Worker } from './jobs/worker';
 import { identityRoutes } from './orgs/identity-routes';
 import { eventInboxRoutes } from './events/event-inbox-routes';
+import { overviewRoutes } from './overview/overview-routes';
 import { recordsRoutes } from './records/records-routes';
 import { reconciliationRoutes } from './reconciliation/reconciliation-routes';
 import { createDefaultAdapterRegistry } from './providers/adapter-registry';
@@ -97,6 +98,7 @@ export async function buildApp(opts: BuildAppOptions = {}) {
     if (opts.db) await app.register(identityRoutes, { db: opts.db });
     if (opts.db) await app.register(recordsRoutes, { db: opts.db });
     if (opts.db) await app.register(eventInboxRoutes, { db: opts.db });
+    if (opts.db) await app.register(overviewRoutes, { db: opts.db });
     if (opts.db && opts.credentialsCipher) {
       await app.register(connectionRoutes, { db: opts.db, cipher: opts.credentialsCipher });
       await app.register(reconciliationRoutes, {

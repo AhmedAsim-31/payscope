@@ -58,3 +58,29 @@ The client IP used for IP-keyed policies is `request.ip`, which Fastify derives 
 Set `TRUST_PROXY=true` only when the API sits behind a proxy that overwrites `X-Forwarded-For`, otherwise clients can mint unlimited buckets.
 IPv6 addresses are normalised to their /64 prefix so a client cannot rotate addresses within its subnet.
 Authenticated policies never use the IP; they key on the verified token subject and, where relevant, the organization resolved from membership.
+
+## Overview queries
+
+`GET /api/v1/orgs/:orgId/overview` runs seven independent statements in parallel: payments grouped by currency and status, subscriptions by status, entitlements by state, events in range by status, open findings by severity, the existing jobs summary, and the latest 10 events.
+Each is one `GROUP BY` over rows of a single org, so the response cost is bounded by the number of distinct groups, not the number of rows returned.
+Sums are computed in Postgres and returned as text, then added as `BigInt` per currency in the API, so amounts above 2^53 stay exact and currencies are never summed together.
+
+The result is cached in process for 15 seconds per org and range, and concurrent requests for the same key share one in-flight load.
+A failed load is evicted so the next request retries.
+The response carries `Cache-Control: private, no-store` so browsers and shared caches never keep it; only the API process cache does.
+
+### Plans on the seeded dev database
+
+Largest seeded org: 82 payments in range, 132 events in range, 17 entitlements.
+
+| Query                         | Plan                                                         | Execution |
+| ----------------------------- | ------------------------------------------------------------ | --------- |
+| Payments by currency, 30 days | Seq Scan, HashAggregate, Sort (16 groups, 7 buffers)         | 0.21 ms   |
+| Events by status, 30 days     | Seq Scan, HashAggregate (35 buffers)                         | 0.40 ms   |
+| Open findings by severity     | Index Scan on `reconciliation_findings_open_fingerprint_idx` | 0.05 ms   |
+| Entitlements by state         | Seq Scan, HashAggregate (1 buffer)                           | 0.09 ms   |
+
+The sequential scans are the planner's correct choice at this size: each table fits in a few pages, so an index lookup would cost more than reading them.
+At production volume the filters match existing indexes: `payment_records_org_created_idx (org_id, created_at desc)` and `provider_events_org_received_idx (org_id, received_at desc)` bound the range scans, and `*_org_status_idx` covers the status counts.
+No index was added, because no plan on this data shows a cost an index would remove.
+Revisit if a single org grows past roughly a million payments in the 90 day range; the next step would be a covering index on `(org_id, created_at) INCLUDE (currency, status, amount_minor, amount_refunded_minor)`.
