@@ -1,0 +1,44 @@
+docs/backend-performance.md
+  h_78e539a96187c3 61-86
+packages/api/src/app.ts
+  h_78e539a96187c3 24,101
+packages/api/src/overview/overview-cache.test.ts
+  h_78e539a96187c3 1-31
+packages/api/src/overview/overview-cache.ts
+  h_78e539a96187c3 1-19
+packages/api/src/overview/overview-repo.ts
+  h_78e539a96187c3 1-147
+packages/api/src/overview/overview-routes.ts
+  h_78e539a96187c3 1-42
+packages/api/src/overview/overview.integration.test.ts
+  h_78e539a96187c3 1-162
+packages/shared/src/overview-schemas.ts
+  h_78e539a96187c3 1-49
+packages/web/src/app/app/[orgId]/page.tsx
+  h_78e539a96187c3 2
+packages/web/src/components/overview/bar-list.tsx
+  h_78e539a96187c3 1-32
+packages/web/src/components/overview/currency-card.tsx
+  h_78e539a96187c3 1-38
+packages/web/src/components/overview/overview-tiles.tsx
+  h_78e539a96187c3 1-77
+packages/web/src/components/overview/overview-view.test.tsx
+  h_78e539a96187c3 1-122
+packages/web/src/components/overview/overview-view.tsx
+  h_78e539a96187c3 3,5-7,9-10,12-125,129,132-138,140-142
+packages/web/src/components/overview/recent-activity.tsx
+  h_78e539a96187c3 1-42
+packages/web/src/lib/overview-queries.ts
+  h_78e539a96187c3 1-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f32e26b9b1ace2d1afc19f7ce794ec1d9595b993",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
