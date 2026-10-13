@@ -30,6 +30,9 @@ DATABASE_URL=postgresql://localhost:5432/payscope CREDENTIALS_ENCRYPTION_KEY=<ba
 DATABASE_URL=postgresql://localhost:5432/payscope CREDENTIALS_ENCRYPTION_KEY=<base64> pnpm db:reset-demo
 ```
 
+`pnpm demo:reset` does both in one step: it runs the seed guard first, then migrations, then the reset.
+A walkthrough of the seeded data is in [demo-script.md](demo-script.md).
+
 Seeding is deterministic and idempotent.
 Ids are UUID v5 values derived from stable names, and re-running converges on the same rows.
 `db:reset-demo` deletes only the two demo orgs (cascading) and seeds them again.
