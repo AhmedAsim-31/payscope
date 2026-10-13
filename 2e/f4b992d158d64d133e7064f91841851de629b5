@@ -1,0 +1,26 @@
+packages/api/src/connections/connection-routes.ts
+  h_78e539a96187c3 49-51,250-302
+packages/api/src/connections/connections.integration.test.ts
+  h_78e539a96187c3 6,180-234
+packages/api/src/security/tenant-isolation.integration.test.ts
+  h_78e539a96187c3 45,74,126,141-146
+packages/web/src/components/connections/connection-card.tsx
+  h_78e539a96187c3 17,19,27-57,68-69,79-85,116-120,123-127,199,210-229
+packages/web/src/components/connections/connections-view.test.tsx
+  h_78e539a96187c3 1,110-128,137
+packages/web/src/components/connections/use-connection-mutations.ts
+  h_78e539a96187c3 17,48-56
+packages/web/src/lib/api-messages.ts
+  h_78e539a96187c3 18-19,67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2ef4b992d158d64d133e7064f91841851de629b5",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
