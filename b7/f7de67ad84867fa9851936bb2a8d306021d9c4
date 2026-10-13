@@ -1,0 +1,36 @@
+docs/database.md
+  h_78e539a96187c3 47-122
+packages/api/package.json
+  h_78e539a96187c3 21
+packages/api/src/db/domain-schema.integration.test.ts
+  h_78e539a96187c3 1-161
+packages/api/src/db/schema/events.ts
+  h_78e539a96187c3 1-106
+packages/api/src/db/schema/jobs.ts
+  h_78e539a96187c3 1-64
+packages/api/src/db/schema/providers.ts
+  h_78e539a96187c3 1-106
+packages/api/src/db/schema/records.ts
+  h_78e539a96187c3 1-171
+supabase/migrations/20261013011346_domain.sql
+  h_78e539a96187c3 1-223
+supabase/migrations/20261013011354_domain_rls.sql
+  h_78e539a96187c3 1-30
+supabase/migrations/meta/20261013011346_snapshot.json
+  h_78e539a96187c3 1-1935
+supabase/migrations/meta/20261013011354_snapshot.json
+  h_78e539a96187c3 1-1935
+supabase/migrations/meta/_journal.json
+  h_78e539a96187c3 25-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b7f7de67ad84867fa9851936bb2a8d306021d9c4",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
