@@ -140,7 +140,8 @@ Payments are keyed by `(connection_id, provider_payment_id)`.
 Amount and currency are set on insert and never overwritten.
 A refund sets `amount_refunded_minor`, capped at `amount_minor`, and the status becomes `refunded` or `partially_refunded`.
 Stripe refund amounts are cumulative; other providers' refund amounts are added.
-If a refund is the first event seen for a payment, the row is created with the refunded amount as its amount.
+A refund never creates a payment, because it carries only the refunded amount.
+A refund for an unknown payment fails as `transient` and retries with backoff until the payment event has arrived; a refund that names entitlement keys still revokes them and is noted `refund_payment_unknown`.
 Subscriptions are keyed by `(connection_id, provider_subscription_id)` and take `current_period_end` from event metadata when present.
 A subscription event with no provider customer for an unknown subscription fails with `state_conflict` and the event needs attention.
 Customers are resolved through `provider_customer_mappings`; a missing mapping creates a `customers` row in the same transaction, and a lost race deletes that row and re-selects the winner.
@@ -151,7 +152,7 @@ A dispute marks the matching payment `disputed`; with no matching payment the ev
 Entitlements are written only for events that carry `entitlementKeys`, per key, with source `provider_event`.
 Created and renewed events set `active`, keep the original `granted_at`, and set `expires_at` when the event carries an expiry.
 An expiration sets `expired`.
-A refund sets `revoked` and `revoked_at`.
+A full refund sets `revoked` and `revoked_at`; a partial refund leaves entitlements unchanged.
 A cancellation never changes an entitlement: access continues until the expiration event arrives.
 Entitlement writes use the same `last_event_at` guard.
 
@@ -159,7 +160,7 @@ Stripe, Paddle and PayPal events carry no entitlement keys.
 For them the entitlements are derived in the same transaction as a successful subscription upsert, from the connection's `entitlement_map` (`{ "<planRef>": ["key", ...] }`) and the subscription's `plan_ref`.
 `active` and `trialing` set `active` with `expires_at` at the period end; `canceled` stays `active` until the period end and is `expired` once it has passed; `expired` sets `expired`; `past_due` and `paused` leave entitlements unchanged.
 A plan with no mapping creates nothing and appends `plan_unmapped` to the attempt row's reason without failing the event.
-Provider refunds do not revoke derived entitlements, because a payment record is not linked to its subscription.
+A payment record is not linked to its subscription, so a full refund without entitlement keys revokes every active entitlement the customer holds through a subscription on the same connection.
 
 ### Attempt categories
 

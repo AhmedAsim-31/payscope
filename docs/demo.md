@@ -56,7 +56,7 @@ The Acme Stripe connection maps `price_demo_pro` to the `pro` entitlement.
 
 Duplicate delivery: one Stripe payment event for Ava Chen is delivered twice, and the second delivery is deduplicated into a single event row.
 
-Out of order: the Stripe refund for Emma Larsen's payment is processed before the payment succeeded event, so the late succeeded event is marked ignored as stale.
+Out of order: an older Stripe payment succeeded event for Emma Larsen's payment is redelivered after its full refund, so it is marked ignored as stale and the payment stays refunded.
 
 Failed events: three Acme Stripe events carry a payload that fails validation, so they sit in `needs_attention` with a dead job and a recorded failed attempt.
 
@@ -93,7 +93,7 @@ Only runs are stored, in `demo_scenario_runs`.
 | 3   | Subscription lifecycle transition            | A subscription is created, goes past due, then ends.                           | Subscription ends expired and the granted entitlement is no longer active.                  | events, jobs, subscription, entitlement         |
 | 4   | Refund                                       | A succeeded payment is later fully refunded.                                   | Payment is refunded with the full amount recorded as refunded.                              | events, jobs, payment                           |
 | 5   | Duplicate webhook                            | The same signed webhook is delivered twice over HTTP.                          | Second delivery is acknowledged as duplicate; one event and one payment exist.              | event, job, payment, HTTP responses             |
-| 6   | Out-of-order webhook                         | A refund event arrives before the payment event it refers to.                  | The late payment event is recognised as stale and the payment ends refunded, not succeeded. | events, jobs, payment                           |
+| 6   | Out-of-order webhook                         | A refund event arrives before the payment event it refers to.                  | Early refund waits for its payment event; the payment keeps its real amount, ends refunded. | events, jobs, payment                           |
 | 7   | Provider API failure                         | The provider API is unreachable during a provider-mode reconciliation run.     | Run finishes partial with a low-severity provider_unavailable finding, not a crash.         | run, finding, payment                           |
 | 8   | Processing failure                           | A verified event carries a malformed payload the processor cannot apply.       | Event needs attention, the job is dead, and the failed attempt is recorded.                 | event, job                                      |
 | 9   | Successful payment with inactive entitlement | A customer paid and has an active subscription but no entitlement was granted. | Local reconciliation raises an entitlement_missing_or_stale finding.                        | events, payment, subscription, run, finding     |

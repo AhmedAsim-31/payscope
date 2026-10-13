@@ -1,5 +1,8 @@
-import { sql } from 'drizzle-orm';
-import { entitlementRecordsTable as t } from '../db/schema/records';
+import { and, eq, inArray, isNull, lte, or, sql } from 'drizzle-orm';
+import {
+  entitlementRecordsTable as t,
+  subscriptionRecordsTable as sub,
+} from '../db/schema/records';
 import type { ApplyContext, Tx } from './apply-types';
 import { resolveCustomerId } from './customers';
 import { periodEndOf } from './period-end';
@@ -66,6 +69,44 @@ export async function upsertEntitlements(input: UpsertInput): Promise<boolean> {
     })
     .returning({ id: t.id });
   return rows.length > 0;
+}
+
+type RevokeInput = {
+  tx: Tx;
+  orgId: string;
+  connectionId: string;
+  customerId: string;
+  occurredAt: Date;
+};
+
+/** Payments carry no subscription link, so this revokes every active entitlement the customer holds through the payment's connection. */
+export async function revokeConnectionEntitlements(input: RevokeInput): Promise<void> {
+  const { tx, orgId, connectionId, customerId, occurredAt } = input;
+  const subscriptions = tx
+    .select({ id: sub.id })
+    .from(sub)
+    .where(
+      and(eq(sub.orgId, orgId), eq(sub.connectionId, connectionId), eq(sub.customerId, customerId)),
+    );
+  await tx
+    .update(t)
+    .set({
+      state: 'revoked',
+      source: 'provider_event',
+      revokedAt: occurredAt,
+      lastEventAt: occurredAt,
+      version: sql`${t.version} + 1`,
+      updatedAt: sql`now()`,
+    })
+    .where(
+      and(
+        eq(t.orgId, orgId),
+        eq(t.customerId, customerId),
+        eq(t.state, 'active'),
+        inArray(t.subscriptionId, subscriptions),
+        or(isNull(t.lastEventAt), lte(t.lastEventAt, occurredAt)),
+      ),
+    );
 }
 
 /** Cancellation is deliberately absent from stateOf: access lasts until the period ends. */

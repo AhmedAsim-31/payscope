@@ -14,7 +14,7 @@ async function deliverPayment(lab: Lab, key = 'buyer') {
   return { payment, record };
 }
 
-async function makeRetryableNow(lab: Lab, jobId: string): Promise<void> {
+export async function makeRetryableNow(lab: Lab, jobId: string): Promise<void> {
   await lab.env.db
     .update(backgroundJobsTable)
     .set({ availableAt: sql`now()` })

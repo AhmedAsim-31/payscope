@@ -44,8 +44,10 @@ async function outOfOrderPair(d: Deliverer, anchor: Date): Promise<void> {
     daysBefore(anchor, 3, 10),
   );
   const refundAt = new Date(payment.at.getTime() + 30 * 60_000);
-  await d.deliver(acmeStripe(), stripeRefund(payment, payment.amount, refundAt));
   await d.deliver(acmeStripe(), stripePayment(payment));
+  await d.deliver(acmeStripe(), stripeRefund(payment, payment.amount, refundAt));
+  const late = { ...stripePayment(payment), id: `evt_demo_late_${payment.id}` };
+  await d.deliver(acmeStripe(), late);
 }
 
 async function brokenEvents(d: Deliverer, anchor: Date): Promise<void> {
