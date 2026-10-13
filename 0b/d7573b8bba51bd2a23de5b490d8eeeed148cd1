@@ -1,0 +1,19 @@
+packages/api/src/db/schema/providers.ts
+  s_0a96220d76ae13::t_962cd8cef492db 74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0bd7573b8bba51bd2a23de5b490d8eeeed148cd1",
+  "prompts": {},
+  "sessions": {
+    "s_0a96220d76ae13": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8ac5338f-596d-48f5-b1ca-f3da648be95c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
