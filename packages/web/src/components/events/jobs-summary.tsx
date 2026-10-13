@@ -1,5 +1,6 @@
 'use client';
 
+import { PageHeader } from '@/components/page-header';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { jobSummarySchema } from '@payscope/shared/events-schemas';
 import { formatAge } from '@/components/records/format';
@@ -31,12 +32,10 @@ export function JobsSummary({ orgId }: { orgId: string }) {
 
   return (
     <div className="grid gap-6">
-      <div className="grid gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Jobs</h1>
-        <p className="text-muted-foreground text-sm">
-          Background work that processes incoming provider events.
-        </p>
-      </div>
+      <PageHeader
+        title="Jobs"
+        description="Background work that processes incoming provider events."
+      />
       {total === 0 ? (
         <div className="rounded-lg border border-dashed p-8 text-center">
           <h2 className="text-base font-medium">No jobs yet</h2>

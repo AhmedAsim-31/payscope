@@ -15,6 +15,8 @@ import {
 import { cn } from '@/lib/utils';
 import { recordsListOptions, type RecordPage, type RecordResource } from '@/lib/records-queries';
 
+const POLL_MS = 2000;
+
 export type Column<T> = {
   header: string;
   cell: (item: T) => ReactNode;
@@ -32,6 +34,8 @@ type RecordsListProps<T extends { id: string }> = {
   caption: string;
   isFiltered: boolean;
   empty: EmptyCopy;
+  /** Refetch every few seconds while any loaded item matches. */
+  pollWhile?: (item: T) => boolean;
 };
 
 export function RecordsList<T extends { id: string }>({
@@ -43,9 +47,16 @@ export function RecordsList<T extends { id: string }>({
   caption,
   isFiltered,
   empty,
+  pollWhile,
 }: RecordsListProps<T>) {
   const { data, hasNextPage, isFetchingNextPage, isFetchNextPageError, fetchNextPage } =
-    useSuspenseInfiniteQuery(recordsListOptions(orgId, resource, schema, params));
+    useSuspenseInfiniteQuery({
+      ...recordsListOptions(orgId, resource, schema, params),
+      refetchInterval: (query) =>
+        pollWhile && query.state.data?.pages.some((page) => page.items.some(pollWhile))
+          ? POLL_MS
+          : false,
+    });
   const items = data.pages.flatMap((page) => page.items);
 
   if (items.length === 0) {

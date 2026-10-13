@@ -1,5 +1,6 @@
 'use client';
 
+import { PageHeader } from '@/components/page-header';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { Member } from '@payscope/shared/org-schemas';
@@ -58,14 +59,14 @@ export function MembersView({ orgId }: { orgId: string }) {
 
   return (
     <div className="grid gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Members</h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          {canManage
+      <PageHeader
+        title="Members"
+        description={
+          canManage
             ? `People with access to ${org.name}.`
-            : `People with access to ${org.name}. Only owners and admins can change membership.`}
-        </p>
-      </div>
+            : `People with access to ${org.name}. Only owners and admins can change membership.`
+        }
+      />
 
       {canManage ? <AddMemberForm roles={assignableRoles(org.role)} add={add} /> : null}
 

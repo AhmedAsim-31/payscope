@@ -1,5 +1,6 @@
 'use client';
 
+import { PageHeader } from '@/components/page-header';
 import Link from 'next/link';
 import { runPageSchema, type ReconciliationRun } from '@payscope/shared/reconciliation-schemas';
 import { formatTimestamp, humanize } from '@/components/records/format';
@@ -28,17 +29,19 @@ export function RunsView({ orgId }: { orgId: string }) {
   const org = useCurrentOrg(orgId);
   return (
     <div className="grid gap-6">
-      <div className="grid gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Reconciliation</h1>
-        <p className="text-muted-foreground text-sm">
-          Runs compare PayScope records with each other and, in provider mode, with the provider.
-          Results appear as{' '}
-          <Link className="underline" href={`/app/${orgId}/findings`}>
-            findings
-          </Link>
-          .
-        </p>
-      </div>
+      <PageHeader
+        title="Reconciliation"
+        description={
+          <>
+            Runs compare PayScope records with each other and, in provider mode, with the provider.
+            Results appear as{' '}
+            <Link className="underline" href={`/app/${orgId}/findings`}>
+              findings
+            </Link>
+            .
+          </>
+        }
+      />
       <Suspense fallback={<Skeleton className="h-16 w-full" />}>
         <StartRunForm orgId={orgId} role={org.role} />
       </Suspense>
@@ -50,6 +53,7 @@ export function RunsView({ orgId }: { orgId: string }) {
           params={{}}
           columns={COLUMNS}
           caption="Reconciliation runs"
+          pollWhile={(run) => run.status === 'running'}
           isFiltered={false}
           empty={{
             title: 'No runs yet',

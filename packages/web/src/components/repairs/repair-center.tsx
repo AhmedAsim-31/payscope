@@ -1,5 +1,6 @@
 'use client';
 
+import { PageHeader } from '@/components/page-header';
 import { Suspense } from 'react';
 import { findingPageSchema } from '@payscope/shared/reconciliation-schemas';
 import { can } from '@payscope/shared/permissions';
@@ -16,13 +17,10 @@ export function RepairCenter({ orgId }: { orgId: string }) {
 
   return (
     <div className="grid gap-8">
-      <div className="grid gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Repair center</h1>
-        <p className="text-muted-foreground text-sm">
-          Repairs change PayScope records only and never write to a provider. Every repair needs a
-          reason and is recorded in the audit log.
-        </p>
-      </div>
+      <PageHeader
+        title="Repair center"
+        description="Repairs change PayScope records only and never write to a provider. Every repair needs a reason and is recorded in the audit log."
+      />
 
       <DetailSection title="Open findings">
         <p className="text-muted-foreground text-sm">

@@ -1,5 +1,6 @@
 'use client';
 
+import { PageHeader } from '@/components/page-header';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -130,13 +131,11 @@ export function OverviewView({ orgId }: { orgId: string }) {
 
   return (
     <div className="grid gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight">{org.name}</h1>
-          <RoleBadge role={org.role} />
-        </div>
-        <RangeControl orgId={org.id} active={range} />
-      </div>
+      <PageHeader
+        title={org.name}
+        badge={<RoleBadge role={org.role} />}
+        actions={<RangeControl orgId={org.id} active={range} />}
+      />
       <QuerySuspense fallback={<OverviewSkeleton />}>
         <OverviewData orgId={org.id} range={range} />
       </QuerySuspense>
