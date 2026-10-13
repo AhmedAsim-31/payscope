@@ -160,7 +160,9 @@ Stripe, Paddle and PayPal events carry no entitlement keys.
 For them the entitlements are derived in the same transaction as a successful subscription upsert, from the connection's `entitlement_map` (`{ "<planRef>": ["key", ...] }`) and the subscription's `plan_ref`.
 `active` and `trialing` set `active` with `expires_at` at the period end; `canceled` stays `active` until the period end and is `expired` once it has passed; `expired` sets `expired`; `past_due` and `paused` leave entitlements unchanged.
 A plan with no mapping creates nothing and appends `plan_unmapped` to the attempt row's reason without failing the event.
-A payment record is not linked to its subscription, so a full refund without entitlement keys revokes every active entitlement the customer holds through a subscription on the same connection.
+A payment record stores the provider subscription id its event carries in `provider_subscription_id` (Paddle `subscription_id` on transactions and refund adjustments, PayPal `billing_agreement_id` on captures); Stripe payment intents and charges carry no subscription id, so Stripe payments stay unlinked.
+A full refund without entitlement keys revokes only the active entitlements of that subscription, resolved through `(connection_id, provider_subscription_id)` at refund time, so a payment that arrived before its subscription still links.
+A full refund of a payment with no subscription id is a one-off refund and revokes nothing.
 
 ### Attempt categories
 

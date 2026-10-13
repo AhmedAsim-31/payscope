@@ -64,6 +64,7 @@ export const paymentRecordsTable = pgTable(
     connectionId: uuid('connection_id').notNull(),
     customerId: uuid('customer_id'),
     providerPaymentId: text('provider_payment_id').notNull(),
+    providerSubscriptionId: text('provider_subscription_id'),
     status: paymentStatus('status').notNull(),
     amountMinor: bigint('amount_minor', { mode: 'bigint' }).notNull(),
     amountRefundedMinor: bigint('amount_refunded_minor', { mode: 'bigint' })

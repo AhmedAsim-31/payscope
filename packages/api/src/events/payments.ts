@@ -4,6 +4,12 @@ import { paymentRecordsTable as t } from '../db/schema/records';
 import type { ApplyContext, ApplyOutcome } from './apply-types';
 import { resolveCustomerId } from './customers';
 
+/** Provider subscription id a payment belongs to; resolved to a local subscription only when revoking. */
+export function subscriptionRefOf(metadata: ApplyContext['event']['metadata']): string | null {
+  const value = metadata?.['subscriptionId'];
+  return typeof value === 'string' && value ? value : null;
+}
+
 type PaymentStatus = typeof t.$inferInsert.status;
 
 function plainStatus(type: string): PaymentStatus | undefined {
@@ -29,6 +35,7 @@ export async function applyPayment(ctx: ApplyContext): Promise<ApplyOutcome> {
       connectionId,
       customerId,
       providerPaymentId: event.objectId,
+      providerSubscriptionId: subscriptionRefOf(event.metadata),
       status,
       amountMinor: event.amountMinor ?? 0n,
       currency: event.currency,
@@ -39,6 +46,7 @@ export async function applyPayment(ctx: ApplyContext): Promise<ApplyOutcome> {
       set: {
         status,
         customerId: sql`COALESCE(${t.customerId}, excluded.customer_id)`,
+        providerSubscriptionId: sql`COALESCE(${t.providerSubscriptionId}, excluded.provider_subscription_id)`,
         lastEventAt: event.occurredAt,
         version: sql`${t.version} + 1`,
         updatedAt: sql`now()`,

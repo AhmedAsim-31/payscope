@@ -75,18 +75,22 @@ type RevokeInput = {
   tx: Tx;
   orgId: string;
   connectionId: string;
-  customerId: string;
+  providerSubscriptionId: string;
   occurredAt: Date;
 };
 
-/** Payments carry no subscription link, so this revokes every active entitlement the customer holds through the payment's connection. */
-export async function revokeConnectionEntitlements(input: RevokeInput): Promise<void> {
-  const { tx, orgId, connectionId, customerId, occurredAt } = input;
+/** Resolves the provider ref at revocation time, so a payment that arrived before its subscription still links. */
+export async function revokeSubscriptionEntitlements(input: RevokeInput): Promise<void> {
+  const { tx, orgId, connectionId, providerSubscriptionId, occurredAt } = input;
   const subscriptions = tx
     .select({ id: sub.id })
     .from(sub)
     .where(
-      and(eq(sub.orgId, orgId), eq(sub.connectionId, connectionId), eq(sub.customerId, customerId)),
+      and(
+        eq(sub.orgId, orgId),
+        eq(sub.connectionId, connectionId),
+        eq(sub.providerSubscriptionId, providerSubscriptionId),
+      ),
     );
   await tx
     .update(t)
@@ -101,7 +105,6 @@ export async function revokeConnectionEntitlements(input: RevokeInput): Promise<
     .where(
       and(
         eq(t.orgId, orgId),
-        eq(t.customerId, customerId),
         eq(t.state, 'active'),
         inArray(t.subscriptionId, subscriptions),
         or(isNull(t.lastEventAt), lte(t.lastEventAt, occurredAt)),

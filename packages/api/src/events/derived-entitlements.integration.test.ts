@@ -9,6 +9,7 @@ import { createProcessProviderEventHandler } from '../jobs/handlers/process-prov
 import {
   attemptRows,
   paddle,
+  payments,
   registry,
   seedConnection,
   silent,
@@ -56,41 +57,19 @@ const items =
   };
 
 describe('stripe derived entitlements', () => {
-  it('revokes derived entitlements on a full refund but not on a partial one', async () => {
+  it('revokes nothing when a one-off payment is fully refunded', async () => {
     const seed = await seedMapped('stripe', 'price_test_pro_monthly');
     await run(seed, stripeAdapter, stripe('customer-subscription-created', 1760000006));
     await run(seed, stripeAdapter, stripe('payment-intent-succeeded', 1760000001));
-    await run(seed, stripeAdapter, stripe('charge-refunded', 1760000010));
-    expect((await pro(seed))?.state).toBe('active');
-
     await run(
       seed,
       stripeAdapter,
       stripe('charge-refunded', 1760000020, (o) => (o['amount_refunded'] = 4999)),
     );
-    const rows = await sql<{ state: string; revoked_at: Date | null }[]>`
-      select state, revoked_at from entitlement_records where org_id = ${seed.orgId}`;
-    expect(rows).toHaveLength(2);
-    for (const row of rows) {
-      expect(row.state).toBe('revoked');
-      expect(iso(row.revoked_at)).toBe(new Date(1760000020 * 1000).toISOString());
-    }
-  });
-
-  it('leaves another org untouched when a full refund revokes entitlements', async () => {
-    const a = await seedMapped('stripe', 'price_test_pro_monthly');
-    const b = await seedMapped('stripe', 'price_test_pro_monthly');
-    for (const seed of [a, b]) {
-      await run(seed, stripeAdapter, stripe('customer-subscription-created', 1760000006));
-      await run(seed, stripeAdapter, stripe('payment-intent-succeeded', 1760000001));
-    }
-    await run(
-      a,
-      stripeAdapter,
-      stripe('charge-refunded', 1760000020, (o) => (o['amount_refunded'] = 4999)),
-    );
-    expect((await pro(a))?.state).toBe('revoked');
-    expect((await pro(b))?.state).toBe('active');
+    expect((await payments(sql, seed))[0]?.status).toBe('refunded');
+    const rows = await sql<{ state: string }[]>`
+      select state from entitlement_records where org_id = ${seed.orgId}`;
+    expect(rows.map((r) => r.state)).toEqual(['active', 'active']);
   });
 
   it('grants on create, extends on renewal, keeps on cancel_at_period_end, expires on delete', async () => {
@@ -155,6 +134,90 @@ describe('paddle derived entitlements', () => {
       paddle('subscription-canceled', '2026-10-20T00:00:00.000000Z', withPrice),
     );
     expect((await pro(seed))?.state).toBe('active');
+  });
+});
+
+describe('paddle refund revocation', () => {
+  const SUB_A = 'sub_01k00000000000000000000001';
+  const SUB_B = 'sub_01k0000000000000000000000b';
+  const at = (minute: number) => `2026-10-01T10:${String(minute).padStart(2, '0')}:00.000000Z`;
+  const subscription = (id: string, price: string) => (d: Obj) => {
+    d['id'] = id;
+    d['items'] = [{ price: { id: price } }];
+  };
+  const refund = (total: string) => (d: Obj) => {
+    (d['totals'] as Obj)['total'] = total;
+  };
+
+  async function seedTwoSubscriptions() {
+    const seed = await seedConnection(sql, 'paddle');
+    const map = JSON.stringify({ pri_pro: ['pro'], pri_team: ['team'] });
+    await sql`update provider_connections set entitlement_map = ${map}::jsonb where id = ${seed.connectionId}`;
+    // The payment lands before either subscription, so the link must resolve at refund time.
+    await run(seed, paddleAdapter, paddle('transaction-completed-subscription-first', at(1)));
+    await run(
+      seed,
+      paddleAdapter,
+      paddle('subscription-created', at(2), subscription(SUB_A, 'pri_pro')),
+    );
+    await run(
+      seed,
+      paddleAdapter,
+      paddle('subscription-created', at(3), subscription(SUB_B, 'pri_team')),
+    );
+    return seed;
+  }
+
+  async function states(seed: Seed) {
+    const rows = await sql<{ entitlement_key: string; state: string }[]>`
+      select entitlement_key, state from entitlement_records
+      where org_id = ${seed.orgId} order by entitlement_key`;
+    return Object.fromEntries(rows.map((r) => [r.entitlement_key, r.state]));
+  }
+
+  it('revokes only the refunded subscription and ignores a partial refund', async () => {
+    const seed = await seedTwoSubscriptions();
+    expect(await states(seed)).toEqual({ pro: 'active', team: 'active' });
+
+    await run(
+      seed,
+      paddleAdapter,
+      paddle('adjustment-created-refund-approved', at(4), refund('1000')),
+    );
+    expect(await states(seed)).toEqual({ pro: 'active', team: 'active' });
+
+    await run(
+      seed,
+      paddleAdapter,
+      paddle('adjustment-created-refund-approved', at(5), refund('1499')),
+    );
+    expect((await payments(sql, seed))[0]?.status).toBe('refunded');
+    expect(await states(seed)).toEqual({ pro: 'revoked', team: 'active' });
+  });
+
+  it('leaves another org untouched when a full refund revokes entitlements', async () => {
+    const a = await seedTwoSubscriptions();
+    const b = await seedTwoSubscriptions();
+    await run(a, paddleAdapter, paddle('adjustment-created-refund-approved', at(5)));
+    expect(await states(a)).toEqual({ pro: 'revoked', team: 'active' });
+    expect(await states(b)).toEqual({ pro: 'active', team: 'active' });
+  });
+
+  it('revokes nothing when a one-off transaction is fully refunded', async () => {
+    const seed = await seedTwoSubscriptions();
+    await run(
+      seed,
+      paddleAdapter,
+      paddle('transaction-completed', at(6), (d) => (d['id'] = 'txn_01k0000000000000000000000c')),
+    );
+    await run(
+      seed,
+      paddleAdapter,
+      paddle('adjustment-created-refund-approved', at(7), (d) => {
+        d['transaction_id'] = 'txn_01k0000000000000000000000c';
+      }),
+    );
+    expect(await states(seed)).toEqual({ pro: 'active', team: 'active' });
   });
 });
 

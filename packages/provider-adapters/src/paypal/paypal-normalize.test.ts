@@ -85,6 +85,17 @@ describe('normalizePayPalEvent', () => {
     });
   });
 
+  it('carries a billing agreement id on a capture as its subscription', () => {
+    const fixture = loadPayPalFixture('capture-completed');
+    const resource = {
+      ...(fixture['resource'] as object),
+      billing_agreement_id: 'I-SANDBOXSUB001',
+    };
+    expect(normalizePayPalEvent({ ...fixture, resource }).metadata).toMatchObject({
+      subscriptionId: 'I-SANDBOXSUB001',
+    });
+  });
+
   it('falls back to the refund id when no capture link exists', () => {
     const fixture = loadPayPalFixture('capture-refunded');
     const resource = { ...(fixture['resource'] as object), links: [] };
