@@ -126,8 +126,13 @@ export function createWorker(opts: WorkerOptions) {
     }
   }
 
-  async function drainOnce(): Promise<{ claimed: number }> {
-    const jobs = await claimJobs(db, { workerId, limit: concurrency, leaseSeconds });
+  async function drainOnce(onlyJobIds?: string[]): Promise<{ claimed: number }> {
+    const jobs = await claimJobs(db, {
+      workerId,
+      limit: concurrency,
+      leaseSeconds,
+      ...(onlyJobIds ? { onlyJobIds } : {}),
+    });
     await track(Promise.all(jobs.map((job) => runJob(job))));
     return { claimed: jobs.length };
   }

@@ -22,7 +22,12 @@ const RESOURCE_PARAMS = [
   'eventId',
   'runId',
   'findingId',
+  'incidentId',
+  'scenarioId',
 ] as const;
+
+const SOME_ID = '00000000-0000-4000-8000-000000000001';
+const REASON = 'Checked against the provider dashboard';
 
 const BODIES: Record<string, unknown> = {
   'POST /members': { email: 'nobody@example.test', role: 'VIEWER' },
@@ -38,6 +43,12 @@ const BODIES: Record<string, unknown> = {
   'POST /events/:eventId/retry': undefined,
   'POST /reconciliation/runs': { mode: 'local' },
   'PATCH /reconciliation/findings/:findingId': { status: 'reviewed', note: 'n' },
+  'POST /incidents/:incidentId/actions': { action: 'note', note: 'n' },
+  'POST /repairs/reprocess-event': { eventId: SOME_ID, reason: REASON },
+  'POST /repairs/correct-entitlement': { findingId: SOME_ID, reason: REASON },
+  'POST /repairs/resolve-finding': { findingId: SOME_ID, reason: REASON },
+  'POST /scenarios/:scenarioId/run': undefined,
+  'POST /scenarios/reset': undefined,
 };
 
 /** Retry is a conditional write scoped by org; unknown and foreign ids both yield 409, never a hint of existence. */
@@ -52,6 +63,12 @@ const MUTATION_ACTIONS: Record<string, Action> = {
   'POST /events/:eventId/retry': 'jobs:retry',
   'POST /reconciliation/runs': 'reconciliation:run',
   'PATCH /reconciliation/findings/:findingId': 'findings:update',
+  'POST /incidents/:incidentId/actions': 'findings:update',
+  'POST /repairs/reprocess-event': 'repairs:execute',
+  'POST /repairs/correct-entitlement': 'repairs:execute',
+  'POST /repairs/resolve-finding': 'repairs:execute',
+  'POST /scenarios/:scenarioId/run': 'scenarios:run',
+  'POST /scenarios/reset': 'scenarios:run',
 };
 
 type Spec = { method: string; suffix: string; key: string; params: string[] };
@@ -77,11 +94,14 @@ function send(
   values: Record<string, string>,
   headers?: { authorization: string },
 ) {
+  const idempotency = spec.suffix.startsWith('/repairs/')
+    ? { 'idempotency-key': randomUUID() }
+    : undefined;
   const body = BODIES[spec.key];
   return app.inject({
     method: spec.method as 'GET',
     url: fill(spec, orgId, values),
-    headers,
+    headers: { ...headers, ...idempotency },
     ...(body === undefined ? {} : { payload: body as Record<string, unknown> }),
   });
 }
@@ -131,7 +151,8 @@ describe('route matrix', () => {
 
   it("returns 404 when another org's resource id is used under own orgId", async () => {
     const failures: string[] = [];
-    for (const spec of orgRoutes().filter((r) => r.params.length > 0)) {
+    // scenarioId is a global catalog id, not a tenant-owned resource
+    for (const spec of orgRoutes().filter((r) => r.params.some((p) => p !== 'scenarioId'))) {
       const res = await send(spec, b.orgId, resourceValues(a), b.users.OWNER.headers);
       const expected = FOREIGN_ID_STATUS[spec.key] ?? 404;
       if (res.statusCode !== expected) failures.push(`${spec.key} -> ${res.statusCode}`);

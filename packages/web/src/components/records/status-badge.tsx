@@ -38,6 +38,8 @@ const TONES: Record<string, string> = {
   resolved: SUCCESS,
   dismissed: NEUTRAL,
   completed: SUCCESS,
+  passed: SUCCESS,
+  errored: DANGER,
   partial: WARNING,
   success: SUCCESS,
   failure: DANGER,

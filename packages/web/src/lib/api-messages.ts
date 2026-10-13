@@ -9,9 +9,12 @@ export type ErrorContext =
   | 'start-run'
   | 'triage-finding'
   | 'incident-action'
-  | 'repair';
+  | 'repair'
+  | 'run-scenario'
+  | 'reset-scenarios';
 
 const CONFLICT_MESSAGES: Record<string, string> = {
+  SCENARIO_RUNNING: 'A scenario is already running. Wait for it to finish.',
   RUN_IN_PROGRESS: 'A reconciliation run is already running. Wait for it to finish.',
   FINDING_CLOSED: 'This finding is already resolved or dismissed. Refresh to see its state.',
   STILL_DETECTED:
@@ -60,6 +63,7 @@ export function describeError(error: unknown, context: ErrorContext): string {
     }
     if (error.status === 404) return 'That event no longer exists.';
   }
+  if (error.status === 429) return 'Too many scenario runs. Wait a few minutes and try again.';
   if (error.status === 403) return error.message || 'You do not have permission to do that.';
   if (error.status === 404 && TARGET_CONTEXTS.includes(context)) {
     return 'That record no longer exists. Refresh and try again.';

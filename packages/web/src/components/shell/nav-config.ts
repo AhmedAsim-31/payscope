@@ -5,6 +5,7 @@ import {
   Scale,
   SearchCheck,
   Siren,
+  FlaskConical,
   Wrench,
   KeyRound,
   LayoutDashboard,
@@ -34,6 +35,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { title: 'Findings', path: '/findings', icon: SearchCheck },
   { title: 'Incidents', path: '/incidents', icon: Siren },
   { title: 'Repair center', path: '/repairs', icon: Wrench },
+  { title: 'Scenario lab', path: '/scenarios', icon: FlaskConical },
   { title: 'Audit', path: '/audit', icon: History },
   { title: 'Members', path: '/members', icon: Users },
 ];

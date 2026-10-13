@@ -28,7 +28,9 @@ export type Tenant = {
     | 'entitlementId'
     | 'eventId'
     | 'runId'
-    | 'findingId',
+    | 'findingId'
+    | 'incidentId'
+    | 'scenarioId',
     string
   >;
 };
@@ -72,6 +74,10 @@ export async function seedTenant(harness: Harness, app: FastifyInstance): Promis
     values (${orgId}, 'status_mismatch', 'low', 'payment', ${payment.id}, ${randomUUID()}, 'review',
       ${run?.id ?? ''}, ${run?.id ?? ''})
     returning id`;
+  const [incident] = await sql<{ id: string }[]>`
+    insert into incidents (org_id, category, severity, title, fingerprint)
+    values (${orgId}, 'processing', 'low', 'Isolation incident', ${randomUUID()})
+    returning id`;
   await sql`insert into event_processing_attempts (org_id, event_id, attempt_number, outcome)
     values (${orgId}, ${event?.id ?? ''}, 1, 'failed')`;
   await sql`insert into idempotency_records (org_id, scope, key, request_hash, expires_at)
@@ -88,6 +94,8 @@ export async function seedTenant(harness: Harness, app: FastifyInstance): Promis
       eventId: event?.id ?? '',
       runId: run?.id ?? '',
       findingId: finding?.id ?? '',
+      incidentId: incident?.id ?? '',
+      scenarioId: 'successful-payment',
     },
   };
 }

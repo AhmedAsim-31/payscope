@@ -28,6 +28,7 @@ export function resolveProviderTarget(
   connection: ConnectionLike,
   adapters: AdapterRegistry,
   cipher: CredentialsCipher | undefined,
+  fetchImpl: typeof fetch = fetch,
 ): Resolved {
   const adapter = findAdapter(adapters, connection.provider);
   if (!adapter) return { ok: false, reason: 'no_adapter_for_provider' };
@@ -50,7 +51,7 @@ export function resolveProviderTarget(
     ok: true,
     target: {
       adapter,
-      ctx: { credentials: { apiKey }, baseUrl: BASE_URLS[connection.provider], fetch },
+      ctx: { credentials: { apiKey }, baseUrl: BASE_URLS[connection.provider], fetch: fetchImpl },
     },
   };
 }

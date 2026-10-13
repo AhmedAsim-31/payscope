@@ -37,9 +37,20 @@ export async function enqueueJob(
   return row;
 }
 
-export type ClaimInput = { workerId: string; limit: number; leaseSeconds: number };
+export type ClaimInput = {
+  workerId: string;
+  limit: number;
+  leaseSeconds: number;
+  onlyJobIds?: string[];
+};
 
 export async function claimJobs(db: Db, input: ClaimInput): Promise<Job[]> {
+  const only = input.onlyJobIds
+    ? sql`AND id IN (${sql.join(
+        input.onlyJobIds.map((id) => sql`${id}::uuid`),
+        sql`, `,
+      )})`
+    : sql``;
   const rows = await db.execute<Job>(sql`
     UPDATE background_jobs
     SET status = 'running',
@@ -50,6 +61,7 @@ export async function claimJobs(db: Db, input: ClaimInput): Promise<Job[]> {
     WHERE id IN (
       SELECT id FROM background_jobs
       WHERE status = 'queued' AND available_at <= now()
+        ${only}
       ORDER BY available_at
       LIMIT ${input.limit}::int
       FOR UPDATE SKIP LOCKED

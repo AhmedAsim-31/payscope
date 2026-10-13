@@ -34,6 +34,7 @@ describe('SidebarNav', () => {
       `/app/${ORG_ID}/findings`,
       `/app/${ORG_ID}/incidents`,
       `/app/${ORG_ID}/repairs`,
+      `/app/${ORG_ID}/scenarios`,
       `/app/${ORG_ID}/audit`,
       `/app/${ORG_ID}/members`,
     ]);

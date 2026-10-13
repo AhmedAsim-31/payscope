@@ -26,6 +26,7 @@ export type ExecutorOptions = {
   batchSize: number;
   concurrency: number;
   requestCap: number;
+  fetch?: typeof fetch;
   onBatchCommitted?: () => Promise<void> | void;
 };
 
@@ -150,7 +151,7 @@ async function resolveTarget(deps: ExecutorDeps, run: RunRef) {
       ),
     );
   if (!connection) return { ok: false, reason: 'connection_not_found' } as const;
-  return resolveProviderTarget(connection, deps.adapters, deps.cipher);
+  return resolveProviderTarget(connection, deps.adapters, deps.cipher, deps.options.fetch);
 }
 
 export async function executeRun(deps: ExecutorDeps, orgId: string, runId: string): Promise<void> {
