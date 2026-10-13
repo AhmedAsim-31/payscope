@@ -262,20 +262,22 @@ A dismissed finding that is detected again opens a new finding.
 Every mutation that changes org state writes an `audit_logs` row through `writeAudit(tx, ...)` inside the same transaction as the change.
 A rollback therefore removes the audit row with the mutation, and a committed change always has its row.
 `audited()` wraps a handler: success is audited in the work transaction, and a request that passed authorization but was rejected (an `ApiHttpError`) is audited afterwards with outcome `failure`.
-Audited actions: org create, member add, role change and remove, connection create and update (credential rotation, entitlement map), event retry, finding review and dismiss, reconciliation run start, incident actions, and the three repairs.
-Connection credentials are never stored in audit state, only flags such as `webhookSecretRotated`.
+Audited actions: org create, member add, role change and remove, ownership transfer, connection create, update (credential rotation, entitlement map), verify, and credential removal, entitlement ingestion, event retry, finding review and dismiss, reconciliation run start, incident actions, scenario run and reset, and the four repairs.
+Connection credentials are never stored in audit state, only flags such as `webhookSecretRotated` and `apiKeyRemoved`.
 
 ### Repair center
 
 All repairs require `repairs:execute`, a `reason` of 10 to 500 characters, and an `Idempotency-Key` header.
 No repair writes to a provider.
 Each repair runs in one transaction that holds the idempotency claim, the state change, the finding update, the audit row, and the stored response.
+`refresh-from-provider` reads the provider before that transaction, and its write requires the record `version` it read, so a change in between answers `409 CONCURRENT_UPDATE`.
 
-| Endpoint                            | Effect                                                                                                                                                                                                         |
-| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `POST /repairs/reprocess-event`     | Sets a stored event back to `pending` and re-queues its job. Apply-step guards prevent double effects.                                                                                                         |
-| `POST /repairs/correct-entitlement` | For `entitlement_missing_or_stale` grants the plan-mapped entitlements; for `expired_externally_active_locally` expires the entitlement. Source is `manual_repair`. Marks the finding resolved.                |
-| `POST /repairs/resolve-finding`     | Re-runs the finding's local rule scoped to its subject. Resolves only if the fingerprint is no longer detected, otherwise `409 STILL_DETECTED`. Provider-derived findings answer `422 NOT_LOCALLY_VERIFIABLE`. |
+| Endpoint                              | Effect                                                                                                                                                                                                                                                                    |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /repairs/reprocess-event`       | Sets a stored event back to `pending` and re-queues its job. Apply-step guards prevent double effects.                                                                                                                                                                    |
+| `POST /repairs/correct-entitlement`   | For `entitlement_missing_or_stale` grants the plan-mapped entitlements; for `expired_externally_active_locally` expires the entitlement. Source is `manual_repair`. Marks the finding resolved.                                                                           |
+| `POST /repairs/resolve-finding`       | Re-runs the finding's local rule scoped to its subject. Resolves only if the fingerprint is no longer detected, otherwise `409 STILL_DETECTED`. Provider-derived findings answer `422 NOT_LOCALLY_VERIFIABLE`.                                                            |
+| `POST /repairs/refresh-from-provider` | Reads one payment or subscription from the provider and overwrites the local status (payment amount and currency too). When the result matches the provider, resolves open or reviewed `status_mismatch` findings on the record and returns them as `resolvedFindingIds`. |
 
 Idempotency: the first request claims `(org_id, scope, key)` in `idempotency_records` with a SHA-256 of the request body.
 The same key and body replays the stored response and writes no second audit row; the same key with a different body answers `422 IDEMPOTENCY_KEY_REUSED`.
