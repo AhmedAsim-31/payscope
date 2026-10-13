@@ -14,8 +14,9 @@ import {
   type Connection,
 } from '@/lib/connection-queries';
 import { getPublicEnv } from '@/lib/env';
+import { ConfirmDialog } from '@/components/members/confirm-dialog';
 import { EditCredentialsForm } from './edit-credentials-form';
-import type { useConnectionMutations } from './use-connection-mutations';
+import type { CredentialName, useConnectionMutations } from './use-connection-mutations';
 
 type Props = {
   connection: Connection;
@@ -23,8 +24,37 @@ type Props = {
   mutations: ReturnType<typeof useConnectionMutations>;
 };
 
-function CredentialStatus({ isSet }: { isSet: boolean }) {
-  return isSet ? <span>Set</span> : <span className="text-muted-foreground">Not set</span>;
+const CREDENTIAL_LABELS: Record<CredentialName, string> = {
+  apiKey: 'API key',
+  webhookSecret: 'webhook secret',
+};
+
+function CredentialStatus({
+  isSet,
+  credential,
+  onRemove,
+}: {
+  isSet: boolean;
+  credential: CredentialName;
+  onRemove?: () => void;
+}) {
+  if (!isSet) return <span className="text-muted-foreground">Not set</span>;
+  return (
+    <span className="flex items-center gap-2">
+      Set
+      {onRemove ? (
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          aria-label={`Remove ${CREDENTIAL_LABELS[credential]}`}
+          onClick={onRemove}
+        >
+          Remove
+        </Button>
+      ) : null}
+    </span>
+  );
 }
 
 function testBlocker(connection: Connection): string | null {
@@ -35,7 +65,8 @@ function testBlocker(connection: Connection): string | null {
 
 export function ConnectionCard({ connection, canManage, mutations }: Props) {
   const [editing, setEditing] = useState(false);
-  const { verify } = mutations;
+  const [pendingRemoval, setPendingRemoval] = useState<CredentialName | null>(null);
+  const { verify, removeCredential } = mutations;
   const provider = PROVIDER_LABELS[connection.provider];
   const simulated = connection.mode === 'simulation';
   const webhookUrl = `${getPublicEnv().NEXT_PUBLIC_API_URL}${connection.webhookUrl}`;
@@ -45,6 +76,13 @@ export function ConnectionCard({ connection, canManage, mutations }: Props) {
     verify.isError && verify.variables === connection.id
       ? describeError(verify.error, 'verify-connection')
       : null;
+  const removeError =
+    removeCredential.isError && removeCredential.variables?.id === connection.id
+      ? describeError(removeCredential.error, 'remove-credential')
+      : null;
+  const removable = canManage && !simulated;
+  const removeHandler = (credential: CredentialName) =>
+    removable ? () => setPendingRemoval(credential) : undefined;
 
   return (
     <Card>
@@ -75,10 +113,18 @@ export function ConnectionCard({ connection, canManage, mutations }: Props) {
             )}
           </DetailField>
           <DetailField label="API key">
-            <CredentialStatus isSet={connection.hasApiKey} />
+            <CredentialStatus
+              isSet={connection.hasApiKey}
+              credential="apiKey"
+              onRemove={removeHandler('apiKey')}
+            />
           </DetailField>
           <DetailField label="Webhook secret">
-            <CredentialStatus isSet={connection.hasWebhookSecret} />
+            <CredentialStatus
+              isSet={connection.hasWebhookSecret}
+              credential="webhookSecret"
+              onRemove={removeHandler('webhookSecret')}
+            />
           </DetailField>
           <DetailField label="Last error">
             {connection.lastError ?? <span className="text-muted-foreground">None</span>}
@@ -150,7 +196,7 @@ export function ConnectionCard({ connection, canManage, mutations }: Props) {
               {blocker ? <span className="text-muted-foreground">{blocker}</span> : null}
             </div>
             <p role="alert" className="text-destructive empty:hidden">
-              {verifyError}
+              {verifyError ?? removeError}
             </p>
             {editing ? (
               <EditCredentialsForm
@@ -161,6 +207,26 @@ export function ConnectionCard({ connection, canManage, mutations }: Props) {
             ) : null}
           </div>
         ) : null}
+        <ConfirmDialog
+          open={pendingRemoval !== null}
+          title={`Remove ${pendingRemoval ? CREDENTIAL_LABELS[pendingRemoval] : ''}?`}
+          description={
+            pendingRemoval === 'webhookSecret'
+              ? `Webhooks for ${connection.displayName} will fail verification until a new secret is added.`
+              : `${connection.displayName} will be unverified, and credential tests and provider checks will stop until a new key is added.`
+          }
+          confirmLabel={`Remove ${pendingRemoval ? CREDENTIAL_LABELS[pendingRemoval] : ''}`}
+          destructive
+          isPending={removeCredential.isPending}
+          onConfirm={() =>
+            pendingRemoval &&
+            removeCredential.mutate(
+              { id: connection.id, credential: pendingRemoval },
+              { onSettled: () => setPendingRemoval(null) },
+            )
+          }
+          onCancel={() => setPendingRemoval(null)}
+        />
       </CardContent>
     </Card>
   );

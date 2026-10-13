@@ -46,6 +46,9 @@ const patchBody = z
 
 const orgParams = z.object({ orgId: z.uuid() });
 const connectionParams = z.object({ orgId: z.uuid(), connectionId: z.uuid() });
+const credentialParams = connectionParams.extend({
+  credential: z.enum(['webhookSecret', 'apiKey']),
+});
 
 export const viewColumns = {
   id: providerConnectionsTable.id,
@@ -240,6 +243,59 @@ export const connectionRoutes: FastifyPluginCallbackZod<Options> = (app, { db, c
             ...(apiKey !== undefined ? { apiKeyRotated: true } : {}),
           },
         };
+      });
+    },
+  );
+
+  app.delete(
+    '/api/v1/orgs/:orgId/connections/:connectionId/credentials/:credential',
+    {
+      preHandler: [requireOrg(db, 'connections:manage'), app.rateLimitFor('credentialTest')],
+      schema: { params: credentialParams, response: { 200: connectionViewSchema } },
+    },
+    async (request) => {
+      const orgId = currentOrg(request).id;
+      const { connectionId, credential } = request.params;
+      const base = { ...auditContext(request), targetType: 'connection', targetId: connectionId };
+      return audited(db, { ...base, action: 'connection.credential_remove' }, async (tx) => {
+        const [current] = await tx
+          .select(viewColumns)
+          .from(providerConnectionsTable)
+          .where(
+            and(
+              eq(providerConnectionsTable.id, connectionId),
+              eq(providerConnectionsTable.orgId, orgId),
+            ),
+          )
+          .for('update');
+        if (!current) throw notFound();
+        const { apiKey, webhookSecrets }: Credentials = current.credentialsCiphertext
+          ? cipher.decrypt(current.credentialsCiphertext, connectionId)
+          : { webhookSecrets: [] };
+        const removed = credential === 'apiKey' ? apiKey !== undefined : webhookSecrets.length > 0;
+        const resultingState = { [`${credential}Removed`]: removed };
+        if (!removed) return { value: toConnectionView(current, cipher), resultingState };
+        const encrypted = cipher.encrypt(
+          credential === 'apiKey'
+            ? { webhookSecrets }
+            : { webhookSecrets: [], ...(apiKey === undefined ? {} : { apiKey }) },
+          connectionId,
+        );
+        // A verified status no longer holds once the key it was verified with is gone.
+        const resetsStatus =
+          credential === 'apiKey' && current.mode === 'sandbox' && current.status !== 'disabled';
+        const [row] = await tx
+          .update(providerConnectionsTable)
+          .set({
+            credentialsCiphertext: encrypted.ciphertext,
+            credentialsKeyVersion: encrypted.keyVersion,
+            ...(resetsStatus ? { status: 'unverified' as const, lastError: null } : {}),
+            updatedAt: new Date(),
+          })
+          .where(eq(providerConnectionsTable.id, connectionId))
+          .returning(viewColumns);
+        if (!row) throw notFound();
+        return { value: toConnectionView(row, cipher), resultingState };
       });
     },
   );

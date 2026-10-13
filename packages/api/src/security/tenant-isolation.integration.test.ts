@@ -42,6 +42,7 @@ const BODIES: Record<string, unknown> = {
   },
   'PATCH /connections/:connectionId': { webhookSecret: 'whsec_matrix' },
   'POST /connections/:connectionId/verify': undefined,
+  'DELETE /connections/:connectionId/credentials/:credential': undefined,
   'POST /events/:eventId/retry': undefined,
   'POST /reconciliation/runs': { mode: 'local' },
   'PATCH /reconciliation/findings/:findingId': { status: 'reviewed', note: 'n' },
@@ -70,6 +71,7 @@ const MUTATION_ACTIONS: Record<string, Action> = {
   'POST /connections': 'connections:manage',
   'PATCH /connections/:connectionId': 'connections:manage',
   'POST /connections/:connectionId/verify': 'connections:manage',
+  'DELETE /connections/:connectionId/credentials/:credential': 'connections:manage',
   'POST /events/:eventId/retry': 'jobs:retry',
   'POST /reconciliation/runs': 'reconciliation:run',
   'PATCH /reconciliation/findings/:findingId': 'findings:update',
@@ -121,6 +123,7 @@ function send(
 const resourceValues = (t: Tenant): Record<string, string> => ({
   ...t.ids,
   userId: t.users.OWNER.id,
+  credential: 'apiKey',
 });
 
 beforeAll(async () => {
@@ -135,7 +138,12 @@ describe('route matrix', () => {
     const routes = orgRoutes();
     expect(routes.length).toBeGreaterThan(25);
     const unknownParams = routes.flatMap((r) =>
-      r.params.filter((p) => p !== 'userId' && !(RESOURCE_PARAMS as readonly string[]).includes(p)),
+      r.params.filter(
+        (p) =>
+          p !== 'userId' &&
+          p !== 'credential' &&
+          !(RESOURCE_PARAMS as readonly string[]).includes(p),
+      ),
     );
     expect(unknownParams).toEqual([]);
     const mutations = routes.filter((r) => r.method !== 'GET').map((r) => r.key);
