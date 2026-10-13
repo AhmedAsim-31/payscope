@@ -56,6 +56,7 @@ export const providerEventsTable = pgTable(
     signatureVerified: boolean('signature_verified').notNull(),
     payload: jsonb('payload').notNull(),
     objectRef: text('object_ref'),
+    payloadPrunedAt: timestamp('payload_pruned_at', { withTimezone: true }),
   },
   (t) => [
     foreignKey({
@@ -75,6 +76,11 @@ export const providerEventsTable = pgTable(
       t.receivedAt,
       t.id,
     ),
+    index('provider_events_payload_retention_idx')
+      .on(t.receivedAt)
+      .where(
+        sql`${t.payloadPrunedAt} IS NULL AND ${t.status} IN ('processed', 'duplicate', 'ignored')`,
+      ),
   ],
 ).enableRLS();
 
@@ -109,5 +115,8 @@ export const eventProcessingAttemptsTable = pgTable(
       foreignColumns: [backgroundJobsTable.orgId, backgroundJobsTable.id],
     }),
     unique('event_processing_attempts_event_attempt_unique').on(t.eventId, t.attemptNumber),
+    index('event_processing_attempts_job_idx')
+      .on(t.jobId)
+      .where(sql`${t.jobId} IS NOT NULL`),
   ],
 ).enableRLS();

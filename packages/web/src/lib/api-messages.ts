@@ -28,6 +28,8 @@ const CONFLICT_MESSAGES: Record<string, string> = {
   SUBSCRIPTION_NOT_ACTIVE:
     'The subscription is no longer active, so the entitlement cannot be granted.',
   EVENT_IN_FLIGHT: 'This event is already pending or processing. Wait for it to finish.',
+  PAYLOAD_PRUNED:
+    'The raw payload of this event was removed by retention, so it cannot be reprocessed.',
   SIMULATED_CONNECTION: 'Simulated connections have no provider account to test.',
   ALREADY_OWNER: 'That member is already an owner.',
   OWNERSHIP_CHANGED:

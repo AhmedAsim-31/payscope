@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { loadConfig } from './config';
 import { DEFAULT_POLICIES } from './rate-limit/policies';
+import { DEFAULT_RETENTION_POLICY } from './retention/retention-prune';
 
 const SUPABASE_URL = 'https://abc.supabase.co';
 const DATABASE_URL = 'postgresql://postgres@localhost:5432/payscope';
@@ -25,6 +26,7 @@ describe('loadConfig', () => {
       credentialsPreviousKeys: new Map(),
       runWorkerInProcess: true,
       reconciliationIntervalHours: 24,
+      retention: DEFAULT_RETENTION_POLICY,
       rateLimits: DEFAULT_POLICIES,
     });
   });
@@ -137,6 +139,18 @@ describe('loadConfig', () => {
     );
     expect(() => loadConfig({ ...BASE, INTERNAL_TICK_TOKEN: 'short' })).toThrow(
       /INTERNAL_TICK_TOKEN/,
+    );
+  });
+
+  it('reads retention periods, with 0 keeping rows forever', () => {
+    const config = loadConfig({
+      ...BASE,
+      RETENTION_AUDIT_LOG_DAYS: '0',
+      RETENTION_EVENT_PAYLOAD_DAYS: '7',
+    });
+    expect(config.retention).toMatchObject({ auditLogDays: 0, eventPayloadDays: 7 });
+    expect(() => loadConfig({ ...BASE, RETENTION_FINISHED_JOB_DAYS: '-1' })).toThrow(
+      /RETENTION_FINISHED_JOB_DAYS/,
     );
   });
 });

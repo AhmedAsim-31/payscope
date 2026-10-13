@@ -18,7 +18,7 @@ Call it from a scheduler or keep-alive when the host sleeps between requests.
 curl -X POST "$API_URL/internal/tick" -H "x-internal-token: $INTERNAL_TICK_TOKEN"
 ```
 
-The response is `{"claimed": <jobs run>, "recovered": <expired leases re-queued>, "scheduled": <reconciliation runs started>}`.
+The response is `{"claimed": <jobs run>, "recovered": <expired leases re-queued>, "scheduled": <reconciliation runs started>, "pruned": <rows pruned per table>}`.
 One tick runs at most one concurrency-sized batch, so call it again while `claimed` is not zero.
 A missing or wrong token returns 401.
 
@@ -30,6 +30,28 @@ Scheduled runs have `trigger = 'scheduled'` and no `triggered_by`; the runs page
 Concurrent ticks are serialized by a transaction-scoped advisory lock, so overlapping calls start at most one run per org.
 Set `RECONCILIATION_SCHEDULE_INTERVAL_HOURS=0` to turn scheduling off.
 Provider-mode runs are still started by hand.
+
+## Data retention
+
+Each tick also runs one retention pass, reported as `pruned` in the tick response.
+The PRD asks for a policy but sets no periods, so these defaults are conservative choices:
+
+| Data                     | Env var                            | Default   | Action                                                                                                                            |
+| ------------------------ | ---------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Raw provider payloads    | `RETENTION_EVENT_PAYLOAD_DAYS`     | 30 days   | `processed`, `duplicate` and `ignored` events older than this get `payload = {}` and `payload_pruned_at` set; the event row stays |
+| Finished background jobs | `RETENTION_FINISHED_JOB_DAYS`      | 30 days   | `succeeded`, `failed` and `dead` jobs not updated for this long are deleted; their attempts keep the event link and lose `job_id` |
+| Idempotency records      | `RETENTION_IDEMPOTENCY_GRACE_DAYS` | 7 days    | Deleted this long after `expires_at`                                                                                              |
+| Demo scenario runs       | `RETENTION_SCENARIO_RUN_DAYS`      | 30 days   | Finished runs started before this are deleted                                                                                     |
+| Audit logs               | `RETENTION_AUDIT_LOG_DAYS`         | 2555 days | Rows older than about seven years are deleted                                                                                     |
+
+Set any period to `0` to keep that data forever.
+Payment, subscription, entitlement, reconciliation finding, reconciliation run and incident rows are never pruned.
+Payloads of `pending`, `processing`, `failed` and `needs_attention` events are kept so they can still be processed or reprocessed.
+Reprocessing an event whose payload was pruned returns 409 `PAYLOAD_PRUNED`.
+
+Each pass handles at most 500 rows per table, oldest first, using a dedicated index, so a backlog drains over several ticks.
+Batches select rows with `FOR UPDATE SKIP LOCKED`, so concurrent ticks prune disjoint rows.
+Audit logs stay append-only: the trigger allows a delete only inside a transaction that sets `app.retention_prune = 'on'`, which the prune does and the `authenticated` role cannot use because it has no delete grant.
 
 ## Dead jobs
 

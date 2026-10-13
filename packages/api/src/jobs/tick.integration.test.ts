@@ -144,6 +144,28 @@ describe('POST /internal/tick', () => {
     await scheduling.stop();
   });
 
+  it('prunes expired rows and reports the counts per table', async () => {
+    const [job] = await harness.sql<{ id: string }[]>`
+      insert into background_jobs (org_id, kind, status, updated_at)
+      values (${orgId}, 'test', 'dead', '1990-01-01T00:00:00Z') returning id`;
+    const res = await app.inject({
+      method: 'POST',
+      url: '/internal/tick',
+      headers: { 'x-internal-token': TOKEN },
+    });
+    const { pruned } = res.json<{ pruned: Record<string, number> }>();
+    expect(Object.keys(pruned).sort()).toEqual([
+      'auditLogs',
+      'backgroundJobs',
+      'eventPayloads',
+      'idempotencyRecords',
+      'scenarioRuns',
+    ]);
+    expect(pruned.backgroundJobs).toBeGreaterThanOrEqual(1);
+    const left = await harness.sql`select 1 from background_jobs where id = ${job?.id ?? ''}`;
+    expect(left).toHaveLength(0);
+  });
+
   it('is not registered when no token is configured', async () => {
     const bare = createHarness();
     const bareApp = await bare.start();

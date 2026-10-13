@@ -105,6 +105,7 @@ Names only; values belong in the host's secret store, never in the repo.
 | `RUN_WORKER_IN_PROCESS`                  | opt |     | Default `true`                                    |
 | `INTERNAL_TICK_TOKEN`                    | opt |     | Enables `/internal/tick`                          |
 | `RECONCILIATION_SCHEDULE_INTERVAL_HOURS` | opt |     | Default 24; `0` turns scheduled runs off          |
+| `RETENTION_*_DAYS`                       | opt |     | See [operations.md](operations.md#data-retention) |
 | `NEXT_PUBLIC_API_URL`                    |     | yes | Public API base URL                               |
 | `CREDENTIALS_ENCRYPTION_KEY`             | yes |     | 32-byte base64; required in production            |
 | `CREDENTIALS_ENCRYPTION_KEY_VERSION`     | opt |     | Default 1, see [security.md](security.md)         |

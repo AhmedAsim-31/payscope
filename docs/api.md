@@ -152,10 +152,10 @@ All filters combine with AND and keep keyset pagination, so pass the same filter
 
 ### Machine routes
 
-| Method | Path                                | Auth               | Notes                                                                                 |
-| ------ | ----------------------------------- | ------------------ | ------------------------------------------------------------------------------------- |
-| POST   | `/webhooks/:provider/:connectionId` | Provider signature | `stripe`, `paypal`, `paddle`, `revenuecat`; 256 KiB limit                             |
-| POST   | `/internal/tick`                    | `x-internal-token` | Registered only when `INTERNAL_TICK_TOKEN` is set; also schedules reconciliation runs |
+| Method | Path                                | Auth               | Notes                                                                                                         |
+| ------ | ----------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------- |
+| POST   | `/webhooks/:provider/:connectionId` | Provider signature | `stripe`, `paypal`, `paddle`, `revenuecat`; 256 KiB limit                                                     |
+| POST   | `/internal/tick`                    | `x-internal-token` | Registered only when `INTERNAL_TICK_TOKEN` is set; also schedules reconciliation runs and prunes expired data |
 
 The connections, reconciliation, and webhook routes are registered only when `CREDENTIALS_ENCRYPTION_KEY` is set.
 

@@ -171,6 +171,21 @@ describe('repair center', () => {
     expect(busy.statusCode).toBe(409);
   });
 
+  it('refuses to reprocess an event whose payload retention pruned', async () => {
+    const t = await newTenant(harness, app);
+    const [event] = await sql<{ id: string }[]>`
+      insert into provider_events (org_id, connection_id, provider, provider_event_id, event_type,
+        occurred_at, status, signature_verified, payload, payload_pruned_at)
+      values (${t.orgId}, ${t.connectionId}, 'stripe', ${`evt_${randomUUID()}`}, 'x',
+        now(), 'processed', true, '{}'::jsonb, now()) returning id`;
+    const res = await repairCall(app, t, t.owner, 'reprocess-event', {
+      eventId: event?.id ?? '',
+      reason: REASON,
+    });
+    expect(res.statusCode).toBe(409);
+    expect(res.json<{ error: { code: string } }>().error.code).toBe('PAYLOAD_PRUNED');
+  });
+
   it('enforces the role matrix and hides other orgs', async () => {
     const t = await newTenant(harness, app);
     const other = await newTenant(harness, app);

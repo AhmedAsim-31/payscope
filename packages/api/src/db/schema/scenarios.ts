@@ -1,4 +1,5 @@
 import { index, jsonb, pgEnum, pgTable, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 import { SCENARIO_RUN_STATUSES } from '@payscope/shared/scenario-schemas';
 import { organizationsTable } from './identity';
 
@@ -22,5 +23,8 @@ export const demoScenarioRunsTable = pgTable(
   (t) => [
     unique('demo_scenario_runs_org_id_id_unique').on(t.orgId, t.id),
     index('demo_scenario_runs_org_scenario_idx').on(t.orgId, t.scenarioId, t.startedAt.desc()),
+    index('demo_scenario_runs_finished_retention_idx')
+      .on(t.startedAt)
+      .where(sql`${t.status} <> 'running'`),
   ],
 ).enableRLS();
