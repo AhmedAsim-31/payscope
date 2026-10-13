@@ -102,6 +102,18 @@ export async function listPayments(db: Db, orgId: string, q: PaymentQuery) {
 export async function getPayment(db: Db, orgId: string, paymentId: string) {
   const [row] = await selectRows(db, and(eq(p.orgId, orgId), eq(p.id, paymentId)), 1);
   if (!row) return undefined;
+  const [subscription] = await db
+    .select({ id: s.id })
+    .from(s)
+    .innerJoin(p, and(eq(p.orgId, s.orgId), eq(p.connectionId, s.connectionId)))
+    .where(
+      and(
+        eq(p.orgId, orgId),
+        eq(p.id, paymentId),
+        eq(s.providerSubscriptionId, p.providerSubscriptionId),
+      ),
+    )
+    .limit(1);
   const events = await db
     .select({
       id: providerEventsTable.id,
@@ -123,6 +135,7 @@ export async function getPayment(db: Db, orgId: string, paymentId: string) {
     .limit(RELATED_EVENT_LIMIT);
   return {
     ...toPayment(row),
+    subscriptionId: subscription?.id ?? null,
     lastEventAt: isoOrNull(row.lastEventAt),
     updatedAt: iso(row.updatedAt),
     events: events.map((e) => ({

@@ -4,6 +4,7 @@ import { apiFetch } from '@/lib/api-client';
 import type * as ApiClient from '@/lib/api-client';
 import { renderWithQuery } from '@/test/render';
 import { CustomerDetail } from './customer-detail';
+import { EntitlementDetail } from './entitlement-detail';
 import { PaymentDetail } from './payment-detail';
 import { SubscriptionDetail } from './subscription-detail';
 
@@ -20,6 +21,7 @@ const CONNECTION = '22222222-2222-4222-8222-222222222222';
 const CUSTOMER = '33333333-3333-4333-8333-333333333333';
 const SUB = '44444444-4444-4444-8444-444444444444';
 const PAYMENT = '11111111-1111-4111-8111-111111111111';
+const ENTITLEMENT = '88888888-8888-4888-8888-888888888888';
 const NOW = '2026-03-05T14:07:09.000Z';
 
 const customerRef = { id: CUSTOMER, email: 'a@example.test' };
@@ -110,7 +112,13 @@ function requested(prefix: string): URLSearchParams {
 describe('record detail related sections', () => {
   it('shows payment audit history scoped to the payment', async () => {
     respond({
-      [`/payments/${PAYMENT}`]: { ...payment, lastEventAt: null, updatedAt: NOW, events: [] },
+      [`/payments/${PAYMENT}`]: {
+        ...payment,
+        subscriptionId: null,
+        lastEventAt: null,
+        updatedAt: NOW,
+        events: [],
+      },
       '/audit': page([audit], 'next'),
     });
     renderWithQuery(<PaymentDetail orgId={ORG} paymentId={PAYMENT} />);
@@ -123,6 +131,60 @@ describe('record detail related sections', () => {
       'href',
       `/app/${ORG}/audit?targetType=payment&targetId=${PAYMENT}`,
     );
+  });
+
+  it('links the payment subscription and shows findings scoped to the payment', async () => {
+    respond({
+      [`/payments/${PAYMENT}`]: {
+        ...payment,
+        subscriptionId: SUB,
+        lastEventAt: null,
+        updatedAt: NOW,
+        events: [],
+      },
+      '/reconciliation/findings': page([
+        { ...finding, subjectType: 'payment', subjectId: PAYMENT },
+      ]),
+    });
+    renderWithQuery(<PaymentDetail orgId={ORG} paymentId={PAYMENT} />);
+    expect(await screen.findByText('Status mismatch')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'View subscription' })).toHaveAttribute(
+      'href',
+      `/app/${ORG}/subscriptions/${SUB}`,
+    );
+    const q = requested('/reconciliation/findings');
+    expect(q.get('subjectType')).toBe('payment');
+    expect(q.get('subjectId')).toBe(PAYMENT);
+  });
+
+  it('shows entitlement audit and its subscription findings', async () => {
+    respond({
+      [`/entitlements/${ENTITLEMENT}`]: {
+        id: ENTITLEMENT,
+        customer: customerRef,
+        subscriptionId: SUB,
+        entitlementKey: 'pro_access',
+        state: 'active',
+        source: 'reconciliation',
+        reconciliationStatus: null,
+        grantedAt: null,
+        expiresAt: null,
+        revokedAt: null,
+        createdAt: NOW,
+        updatedAt: NOW,
+      },
+      '/audit': page([{ ...audit, targetType: 'entitlement', targetId: ENTITLEMENT }]),
+      '/reconciliation/findings': page([finding]),
+    });
+    renderWithQuery(<EntitlementDetail orgId={ORG} entitlementId={ENTITLEMENT} />);
+    expect(await screen.findByText('Provider says refunded')).toBeInTheDocument();
+    expect(await screen.findByText('Status mismatch')).toBeInTheDocument();
+    const audits = requested('/audit');
+    expect(audits.get('targetType')).toBe('entitlement');
+    expect(audits.get('targetId')).toBe(ENTITLEMENT);
+    const findings = requested('/reconciliation/findings');
+    expect(findings.get('subjectType')).toBe('subscription');
+    expect(findings.get('subjectId')).toBe(SUB);
   });
 
   it('shows customer payments, events and audit timeline', async () => {

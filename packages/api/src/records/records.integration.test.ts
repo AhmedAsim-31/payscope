@@ -325,6 +325,21 @@ describe('related record filters', () => {
     expect(cross.body.items).toEqual([]);
   });
 
+  it('resolves the payment subscription id on the detail', async () => {
+    const linked = await get<{ subscriptionId: string | null }>(
+      t.owner,
+      t.orgId,
+      `/payments/${subPaymentId}`,
+    );
+    expect(linked.body.subscriptionId).toBe(subscriptionId);
+    const unlinked = await get<{ subscriptionId: string | null }>(
+      t.owner,
+      t.orgId,
+      `/payments/${otherPaymentId}`,
+    );
+    expect(unlinked.body.subscriptionId).toBeNull();
+  });
+
   it('filters events by object ref and by customer', async () => {
     const subEvent = await insertEvent('sub_rel');
     const payEvent = await insertEvent(`pi_${subPaymentId}`);

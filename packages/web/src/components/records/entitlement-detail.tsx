@@ -1,9 +1,21 @@
 'use client';
 
 import Link from 'next/link';
+import { auditPageSchema } from '@payscope/shared/audit-schemas';
+import { findingPageSchema } from '@payscope/shared/reconciliation-schemas';
 import { entitlementDetailSchema } from '@payscope/shared/records-schemas';
-import { BackLink, DetailField, DetailGrid, DetailSection, Timestamp } from './detail-parts';
+import { AUDIT_COLUMNS } from '@/components/audit/audit-list';
+import { findingColumns } from '@/components/reconciliation/findings-list';
+import {
+  BackLink,
+  DetailField,
+  DetailGrid,
+  DetailSection,
+  SectionEmpty,
+  Timestamp,
+} from './detail-parts';
 import { humanize, recordHref } from './format';
+import { RelatedRecords } from './related-records';
 import { StatusBadge } from './status-badge';
 import { useRecordDetail } from './use-record-detail';
 
@@ -78,6 +90,44 @@ export function EntitlementDetail({
           </DetailField>
         </DetailGrid>
       </DetailSection>
+
+      {entitlement.subscriptionId ? (
+        <RelatedRecords
+          orgId={orgId}
+          title="Subscription findings"
+          resource="reconciliation/findings"
+          listPath="findings"
+          viewAllLabel="View all findings"
+          schema={findingPageSchema}
+          params={{ subjectType: 'subscription', subjectId: entitlement.subscriptionId }}
+          columns={findingColumns(orgId)}
+          empty={{
+            title: 'No findings',
+            hint: 'Reconciliation has not flagged the subscription behind this entitlement.',
+          }}
+        />
+      ) : (
+        <DetailSection title="Subscription findings">
+          <SectionEmpty>
+            Findings are recorded against subscriptions, and this entitlement has none.
+          </SectionEmpty>
+        </DetailSection>
+      )}
+
+      <RelatedRecords
+        orgId={orgId}
+        title="Audit history"
+        resource="audit"
+        listPath="audit"
+        viewAllLabel="View all audit entries"
+        schema={auditPageSchema}
+        params={{ targetType: 'entitlement', targetId: entitlement.id }}
+        columns={AUDIT_COLUMNS}
+        empty={{
+          title: 'No audit entries yet',
+          hint: 'Audited actions on this entitlement appear here.',
+        }}
+      />
     </div>
   );
 }
