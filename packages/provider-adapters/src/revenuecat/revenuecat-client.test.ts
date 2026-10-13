@@ -79,12 +79,22 @@ describe('revenuecat client', () => {
     expect(snapshot.status).toBe('active');
   });
 
-  it('validates credentials with the sentinel subscriber', async () => {
-    const fetchMock = vi.fn(() => Promise.resolve(json(subscriber, { status: 201 })));
-    await validateRevenueCatCredentials(ctxWith(fetchMock));
-    expect((fetchMock.mock.calls[0] as unknown as [string])[0]).toBe(
-      'https://api.revenuecat.com/v1/subscribers/payscope-credential-check',
+  it('validates credentials with the offerings read, which does not create a customer', async () => {
+    const fetchMock = vi.fn(() =>
+      Promise.resolve(json({ current_offering_id: null, offerings: [] })),
     );
+    await validateRevenueCatCredentials(ctxWith(fetchMock));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe(
+      'https://api.revenuecat.com/v1/subscribers/payscope-credential-check/offerings',
+    );
+    expect(init.method).toBe('GET');
+  });
+
+  it('rejects credentials the offerings read refuses', async () => {
+    const ctx = ctxWith(() => Promise.resolve(json({ message: 'x' }, { status: 401 })));
+    expect(await categoryOf(validateRevenueCatCredentials(ctx))).toBe('provider_auth');
   });
 
   it.each([

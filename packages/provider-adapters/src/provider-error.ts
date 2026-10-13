@@ -11,6 +11,10 @@ export const PROVIDER_ERROR_CATEGORIES = [
 
 export type ProviderErrorCategory = (typeof PROVIDER_ERROR_CATEGORIES)[number];
 
+export const PROVIDER_ERROR_REASONS = ['live_mode'] as const;
+
+export type ProviderErrorReason = (typeof PROVIDER_ERROR_REASONS)[number];
+
 const RETRYABLE: readonly ProviderErrorCategory[] = ['transient', 'unavailable'];
 
 export function classifyHttpStatus(status: number): ProviderErrorCategory {
@@ -24,12 +28,12 @@ export function classifyHttpStatus(status: number): ProviderErrorCategory {
 export class ProviderError extends Error {
   readonly category: ProviderErrorCategory;
   readonly status: number | undefined;
-  readonly reason: string | undefined;
+  readonly reason: ProviderErrorReason | undefined;
 
   constructor(
     category: ProviderErrorCategory,
     message: string,
-    options: { status?: number; cause?: unknown; reason?: string } = {},
+    options: { status?: number; cause?: unknown; reason?: ProviderErrorReason } = {},
   ) {
     super(message, { cause: options.cause });
     this.name = 'ProviderError';

@@ -32,7 +32,7 @@ for (const signal of ['SIGINT', 'SIGTERM'] as const) {
       .then(
         () => process.exit(0),
         (err: unknown) => {
-          logger.error({ err: String(err) }, 'worker_shutdown_failed');
+          logger.error({ err }, 'worker_shutdown_failed');
           process.exit(1);
         },
       );

@@ -12,7 +12,7 @@ import {
 import type { AdapterRegistry } from '@payscope/provider-adapters/registry';
 import { z } from 'zod';
 import { errorHandler, notFoundHandler } from './error-handler';
-import { LOG_REDACT } from './logger';
+import { LOG_REDACT, LOG_SERIALIZERS } from './logger';
 import { healthRoutes, type ReadinessCheck } from './health-routes';
 import { apiHardeningPlugin } from './security/api-hardening';
 import { authenticatePlugin } from './auth/authenticate';
@@ -71,6 +71,7 @@ export async function buildApp(opts: BuildAppOptions = {}) {
             level: opts.logLevel ?? 'info',
             stream: opts.logStream,
             redact: LOG_REDACT,
+            serializers: LOG_SERIALIZERS,
           },
     bodyLimit: BODY_LIMIT_BYTES,
     trustProxy: opts.trustProxy ?? false,

@@ -43,14 +43,14 @@ async function readCapped(response: Response): Promise<string> {
   return Buffer.concat(chunks).toString('utf8');
 }
 
-async function getSubscriber(ctx: ProviderContext, appUserId: string): Promise<unknown> {
+async function getJson(ctx: ProviderContext, appUserId: string, suffix = ''): Promise<unknown> {
   assertUsable(ctx);
   if (!appUserId) throw new ProviderError('invalid_input', 'RevenueCat app user id is empty');
   let response: Response;
   let text: string;
   try {
     response = await ctx.fetch(
-      `${REVENUECAT_BASE_URL}/v1/subscribers/${encodeURIComponent(appUserId)}`,
+      `${REVENUECAT_BASE_URL}/v1/subscribers/${encodeURIComponent(appUserId)}${suffix}`,
       {
         method: 'GET',
         headers: { Authorization: `Bearer ${ctx.credentials.apiKey}`, Accept: 'application/json' },
@@ -59,7 +59,7 @@ async function getSubscriber(ctx: ProviderContext, appUserId: string): Promise<u
     );
     if (!response.ok) {
       await response.body?.cancel();
-      throw ProviderError.fromHttpStatus(response.status, 'RevenueCat subscriber request failed');
+      throw ProviderError.fromHttpStatus(response.status, 'RevenueCat request failed');
     }
     text = await readCapped(response);
   } catch (error) {
@@ -81,7 +81,7 @@ export async function fetchRevenueCatSubscription(
   ctx: ProviderContext,
   appUserId: string,
 ): Promise<ProviderObjectSnapshot> {
-  const parsed = SubscriberResponseSchema.safeParse(await getSubscriber(ctx, appUserId));
+  const parsed = SubscriberResponseSchema.safeParse(await getJson(ctx, appUserId));
   if (!parsed.success) {
     throw new ProviderError('permanent', 'RevenueCat returned an unexpected subscriber shape', {
       cause: parsed.error,
@@ -103,7 +103,7 @@ export async function fetchRevenueCatSubscription(
   };
 }
 
-/** GET /v1/subscribers creates the customer if missing, so the sentinel user is created once and reused. */
+/** Offerings read: unlike GET /v1/subscribers/{id}, it does not create the customer it is asked about. */
 export async function validateRevenueCatCredentials(ctx: ProviderContext): Promise<void> {
-  await getSubscriber(ctx, CREDENTIAL_CHECK_USER_ID);
+  await getJson(ctx, CREDENTIAL_CHECK_USER_ID, '/offerings');
 }

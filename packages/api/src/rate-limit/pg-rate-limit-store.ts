@@ -51,7 +51,7 @@ export function pgRateLimitStore({
     if (now - lastCleanup < cleanupIntervalMs) return;
     lastCleanup = now;
     deleteExpiredBuckets(db).catch((err: unknown) => {
-      logger.warn({ err: String(err) }, 'rate_limit_cleanup_failed');
+      logger.warn({ err }, 'rate_limit_cleanup_failed');
     });
   };
 
@@ -67,7 +67,7 @@ export function pgRateLimitStore({
           callback(null, result);
         },
         (err: unknown) => {
-          logger.warn({ err: String(err), key }, 'rate_limit_store_failed_open');
+          logger.warn({ err, key }, 'rate_limit_store_failed_open');
           callback(null, { current: 0, ttl: timeWindow });
         },
       );
