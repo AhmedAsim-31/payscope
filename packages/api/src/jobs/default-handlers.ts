@@ -6,6 +6,7 @@ import {
   RUN_RECONCILIATION_JOB_KIND,
   createRunReconciliationHandler,
 } from './handlers/run-reconciliation';
+import { RUN_SCENARIO_JOB_KIND, createRunScenarioHandler } from './handlers/run-scenario';
 import type { JobHandlers } from './worker';
 
 export function createDefaultHandlers(
@@ -15,5 +16,6 @@ export function createDefaultHandlers(
   return {
     [PROCESS_EVENT_JOB_KIND]: createProcessProviderEventHandler(adapters),
     [RUN_RECONCILIATION_JOB_KIND]: createRunReconciliationHandler(adapters, cipher),
+    [RUN_SCENARIO_JOB_KIND]: createRunScenarioHandler(adapters, cipher),
   };
 }
