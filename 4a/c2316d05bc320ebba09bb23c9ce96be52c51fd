@@ -1,0 +1,16 @@
+packages/provider-adapters/src/paypal/paypal-adapter.test.ts
+  h_78e539a96187c3 44
+packages/provider-adapters/src/paypal/paypal-adapter.ts
+  h_78e539a96187c3 18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4ac2316d05bc320ebba09bb23c9ce96be52c51fd",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
