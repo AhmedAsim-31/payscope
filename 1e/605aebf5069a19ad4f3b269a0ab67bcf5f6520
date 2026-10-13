@@ -1,0 +1,62 @@
+packages/provider-adapters/package.json
+  h_78e539a96187c3 15
+packages/provider-adapters/src/revenuecat/fixtures/billing-issue.json
+  h_78e539a96187c3 1-25
+packages/provider-adapters/src/revenuecat/fixtures/cancellation-refund.json
+  h_78e539a96187c3 1-26
+packages/provider-adapters/src/revenuecat/fixtures/cancellation-unsubscribe.json
+  h_78e539a96187c3 1-26
+packages/provider-adapters/src/revenuecat/fixtures/expiration.json
+  h_78e539a96187c3 1-26
+packages/provider-adapters/src/revenuecat/fixtures/initial-purchase.json
+  h_78e539a96187c3 1-25
+packages/provider-adapters/src/revenuecat/fixtures/non-renewing-purchase.json
+  h_78e539a96187c3 1-25
+packages/provider-adapters/src/revenuecat/fixtures/product-change.json
+  h_78e539a96187c3 1-26
+packages/provider-adapters/src/revenuecat/fixtures/production-renewal.json
+  h_78e539a96187c3 1-25
+packages/provider-adapters/src/revenuecat/fixtures/renewal.json
+  h_78e539a96187c3 1-26
+packages/provider-adapters/src/revenuecat/fixtures/subscription-paused.json
+  h_78e539a96187c3 1-25
+packages/provider-adapters/src/revenuecat/fixtures/test.json
+  h_78e539a96187c3 1-23
+packages/provider-adapters/src/revenuecat/fixtures/uncancellation.json
+  h_78e539a96187c3 1-25
+packages/provider-adapters/src/revenuecat/revenuecat-adapter.test.ts
+  h_78e539a96187c3 1-77
+packages/provider-adapters/src/revenuecat/revenuecat-adapter.ts
+  h_78e539a96187c3 1-37
+packages/provider-adapters/src/revenuecat/revenuecat-amount.test.ts
+  h_78e539a96187c3 1-28
+packages/provider-adapters/src/revenuecat/revenuecat-amount.ts
+  h_78e539a96187c3 1-11
+packages/provider-adapters/src/revenuecat/revenuecat-auth.test.ts
+  h_78e539a96187c3 1-93
+packages/provider-adapters/src/revenuecat/revenuecat-auth.ts
+  h_78e539a96187c3 1-79
+packages/provider-adapters/src/revenuecat/revenuecat-client.test.ts
+  h_78e539a96187c3 1-148
+packages/provider-adapters/src/revenuecat/revenuecat-client.ts
+  h_78e539a96187c3 1-109
+packages/provider-adapters/src/revenuecat/revenuecat-envelope.ts
+  h_78e539a96187c3 1-24
+packages/provider-adapters/src/revenuecat/revenuecat-fixtures.ts
+  h_78e539a96187c3 1-6
+packages/provider-adapters/src/revenuecat/revenuecat-normalize.test.ts
+  h_78e539a96187c3 1-98
+packages/provider-adapters/src/revenuecat/revenuecat-normalize.ts
+  h_78e539a96187c3 1-124
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1e605aebf5069a19ad4f3b269a0ab67bcf5f6520",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
