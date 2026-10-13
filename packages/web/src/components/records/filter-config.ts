@@ -1,4 +1,10 @@
 import { EVENT_STATUSES } from '@payscope/shared/events-schemas';
+import { INCIDENT_STATUSES } from '@payscope/shared/incident-schemas';
+import {
+  FINDING_SEVERITIES,
+  FINDING_STATUSES,
+  FINDING_TYPES,
+} from '@payscope/shared/reconciliation-schemas';
 import {
   ENTITLEMENT_STATES,
   PAYMENT_STATUSES,
@@ -66,6 +72,22 @@ export const EVENT_FILTERS: readonly FilterField[] = [
   },
   { name: 'from', label: 'From', kind: 'date', toParam: startOfDay },
   { name: 'to', label: 'To', kind: 'date', toParam: endExclusive },
+];
+
+export const FINDING_FILTERS: readonly FilterField[] = [
+  { name: 'status', label: 'Status', kind: 'select', options: FINDING_STATUSES },
+  { name: 'severity', label: 'Severity', kind: 'select', options: FINDING_SEVERITIES },
+  { name: 'type', label: 'Type', kind: 'select', options: FINDING_TYPES },
+];
+
+export const INCIDENT_FILTERS: readonly FilterField[] = [
+  { name: 'status', label: 'Status', kind: 'select', options: INCIDENT_STATUSES },
+];
+
+export const AUDIT_FILTERS: readonly FilterField[] = [
+  { name: 'action', label: 'Action', kind: 'text', placeholder: 'repair.correct_entitlement' },
+  { name: 'targetType', label: 'Target type', kind: 'text', placeholder: 'finding' },
+  { name: 'targetId', label: 'Target id', kind: 'text', placeholder: 'uuid' },
 ];
 
 export function toApiParams(

@@ -32,6 +32,19 @@ const TONES: Record<string, string> = {
   expired: NEUTRAL,
   duplicate: NEUTRAL,
   ignored: NEUTRAL,
+  open: WARNING,
+  reviewed: INFO,
+  investigating: INFO,
+  resolved: SUCCESS,
+  dismissed: NEUTRAL,
+  completed: SUCCESS,
+  partial: WARNING,
+  success: SUCCESS,
+  failure: DANGER,
+  critical: DANGER,
+  high: DANGER,
+  medium: WARNING,
+  low: NEUTRAL,
 };
 
 export function StatusBadge({ status, className }: { status: string; className?: string }) {

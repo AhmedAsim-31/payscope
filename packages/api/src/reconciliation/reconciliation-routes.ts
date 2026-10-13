@@ -12,6 +12,7 @@ import {
   startRunBodySchema,
   updateFindingBodySchema,
 } from '@payscope/shared/reconciliation-schemas';
+import { audited, auditContext } from '../audit/audit-log';
 import type { CredentialsCipher } from '../crypto/credentials-cipher';
 import type { Db } from '../db/client';
 import { pgErrorCode } from '../db/pg-errors';
@@ -89,35 +90,51 @@ export const reconciliationRoutes: FastifyPluginCallbackZod<Options> = (app, opt
     async (request, reply) => {
       const orgId = currentOrg(request).id;
       const { connectionId, mode } = request.body;
-      await assertRunnable(options, orgId, request.body);
-      try {
-        const run = await db.transaction(async (tx) => {
-          const [row] = await tx
-            .insert(reconciliationRunsTable)
-            .values({
+      const run = await audited(
+        db,
+        {
+          ...auditContext(request),
+          action: 'reconciliation.run_start',
+          targetType: 'reconciliation_run',
+        },
+        async (tx) => {
+          await assertRunnable(options, orgId, request.body);
+          try {
+            const [row] = await tx
+              .insert(reconciliationRunsTable)
+              .values({
+                orgId,
+                connectionId: connectionId ?? null,
+                mode,
+                scope: { connectionId: connectionId ?? null },
+                triggeredBy: currentUserId(request),
+              })
+              .returning();
+            if (!row) throw new Error('run insert returned no row');
+            await enqueueJob(tx, {
+              kind: RUN_RECONCILIATION_JOB_KIND,
+              payload: { runId: row.id },
               orgId,
-              connectionId: connectionId ?? null,
-              mode,
-              scope: { connectionId: connectionId ?? null },
-              triggeredBy: currentUserId(request),
-            })
-            .returning();
-          if (!row) throw new Error('run insert returned no row');
-          await enqueueJob(tx, {
-            kind: RUN_RECONCILIATION_JOB_KIND,
-            payload: { runId: row.id },
-            orgId,
-            idempotencyKey: `run:${row.id}`,
-          });
-          return row;
-        });
-        return reply.code(202).send(toRunDetail(run));
-      } catch (err) {
-        if (pgErrorCode(err) === UNIQUE_VIOLATION) {
-          throw new ApiHttpError(409, 'RUN_IN_PROGRESS', 'A reconciliation run is already running');
-        }
-        throw err;
-      }
+              idempotencyKey: `run:${row.id}`,
+            });
+            return {
+              value: row,
+              targetId: row.id,
+              resultingState: { mode, connectionId: connectionId ?? null },
+            };
+          } catch (err) {
+            if (pgErrorCode(err) === UNIQUE_VIOLATION) {
+              throw new ApiHttpError(
+                409,
+                'RUN_IN_PROGRESS',
+                'A reconciliation run is already running',
+              );
+            }
+            throw err;
+          }
+        },
+      );
+      return reply.code(202).send(toRunDetail(run));
     },
   );
 
@@ -188,16 +205,39 @@ export const reconciliationRoutes: FastifyPluginCallbackZod<Options> = (app, opt
     async (request) => {
       const orgId = currentOrg(request).id;
       const { findingId } = request.params;
-      const updated = await triageFinding(
+      return audited(
         db,
-        orgId,
-        findingId,
-        request.body.status,
-        request.body.note,
+        {
+          ...auditContext(request),
+          action: `finding.${request.body.status === 'reviewed' ? 'review' : 'dismiss'}`,
+          targetType: 'finding',
+          targetId: findingId,
+          reason: request.body.note,
+        },
+        async (tx) => {
+          const current = await getFinding(tx, orgId, findingId);
+          if (!current) throw notFound('Finding');
+          const updated = await triageFinding(
+            tx,
+            orgId,
+            findingId,
+            request.body.status,
+            request.body.note,
+          );
+          if (!updated) {
+            throw new ApiHttpError(
+              409,
+              'FINDING_CLOSED',
+              'Finding is already resolved or dismissed',
+            );
+          }
+          return {
+            value: toFindingDetail(updated),
+            previousState: { status: current.status },
+            resultingState: { status: updated.status },
+          };
+        },
       );
-      if (updated) return toFindingDetail(updated);
-      if (!(await getFinding(db, orgId, findingId))) throw notFound('Finding');
-      throw new ApiHttpError(409, 'FINDING_CLOSED', 'Finding is already resolved or dismissed');
     },
   );
 

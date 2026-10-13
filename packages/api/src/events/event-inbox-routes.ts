@@ -7,6 +7,7 @@ import {
   jobSummarySchema,
   retryResultSchema,
 } from '@payscope/shared/events-schemas';
+import { audited, auditContext } from '../audit/audit-log';
 import type { Db } from '../db/client';
 import { ApiHttpError } from '../http-error';
 import { currentOrg } from '../orgs/request-context';
@@ -61,7 +62,15 @@ export const eventInboxRoutes: FastifyPluginCallbackZod<Options> = (app, { db },
       schema: { params: eventParams, response: { 202: retryResultSchema } },
     },
     async (request, reply) => {
-      await retryEvent(db, currentOrg(request).id, request.params.eventId);
+      const { eventId } = request.params;
+      await audited(
+        db,
+        { ...auditContext(request), action: 'event.retry', targetType: 'event', targetId: eventId },
+        async (tx) => {
+          await retryEvent(tx, currentOrg(request).id, eventId);
+          return { value: undefined, resultingState: { status: 'pending' } };
+        },
+      );
       return reply.code(202).send({ eventId: request.params.eventId, status: 'pending' as const });
     },
   );

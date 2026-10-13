@@ -8,13 +8,16 @@ export type RuleParams = {
   connectionId: string | null;
   after: string | null;
   limit: number;
+  only?: string | null;
 };
 
 export type Candidate = { cursor: string; draft: FindingDraft };
 
 export type LocalRule = {
   phase: string;
-  find(db: Db, params: RuleParams): Promise<Candidate[]>;
+  type: (typeof FINDING_TYPES)[number];
+  subjectType: string;
+  find(db: Pick<Db, 'execute'>, params: RuleParams): Promise<Candidate[]>;
 };
 
 type Row = { cursor: string; subjectId: string; key?: string } & Record<string, unknown>;
@@ -30,11 +33,14 @@ type Spec = {
 const connFilter = (col: SQL, p: RuleParams) =>
   sql`(${p.connectionId}::uuid is null or ${col} = ${p.connectionId}::uuid)`;
 const afterFilter = (col: SQL, p: RuleParams) =>
-  sql`(${p.after}::uuid is null or ${col} > ${p.after}::uuid)`;
+  sql`(${p.after}::uuid is null or ${col} > ${p.after}::uuid)
+    and (${p.only ?? null}::uuid is null or ${col} = ${p.only ?? null}::uuid)`;
 
 function rule(spec: Spec): LocalRule {
   return {
     phase: spec.phase,
+    type: spec.type,
+    subjectType: spec.subjectType,
     async find(db, params) {
       const rows = await db.execute<Row>(spec.query(params));
       return [...rows].map(({ cursor, subjectId, key, ...evidence }) => ({

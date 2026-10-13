@@ -126,6 +126,17 @@ One finding per detected inconsistency, with `type`, `severity`, `status` (`open
 `first_seen_run_id` and `last_seen_run_id` reference runs in the same org.
 A partial unique index on `(org_id, fingerprint) where status in ('open', 'reviewed')` makes re-detection an upsert.
 
+### audit_logs
+
+Append-only record of org mutations: actor, `actor_type`, `action`, target, `reason`, `previous_state`, `resulting_state`, `outcome`, and `request_id`.
+A trigger rejects `UPDATE` and `DELETE`, except the delete cascade from removing the organization.
+
+### incidents and incident_actions
+
+`incidents` groups high and critical findings, with `finding_count` and `last_seen_at`.
+A partial unique index on `(org_id, fingerprint) where status <> 'resolved'` keeps one active incident per fingerprint.
+`incident_actions` is the acknowledge, note, and resolve timeline.
+
 ### Domain row level security
 
 `authenticated` has `SELECT` with a policy of `app.is_org_member(org_id)` on every domain table except `idempotency_records`.

@@ -2,7 +2,16 @@ import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
 import type { z } from 'zod';
 import { ApiClientError, apiFetch } from '@/lib/api-client';
 
-export type RecordResource = 'payments' | 'subscriptions' | 'customers' | 'entitlements' | 'events';
+export type RecordResource =
+  | 'payments'
+  | 'subscriptions'
+  | 'customers'
+  | 'entitlements'
+  | 'events'
+  | 'reconciliation/runs'
+  | 'reconciliation/findings'
+  | 'incidents'
+  | 'audit';
 
 export type RecordPage<T> = { items: T[]; nextCursor: string | null };
 

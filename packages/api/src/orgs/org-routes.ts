@@ -2,6 +2,7 @@ import { asc, eq } from 'drizzle-orm';
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import { ROLES } from '@payscope/shared/permissions';
+import { writeAudit } from '../audit/audit-log';
 import type { Db } from '../db/client';
 import { rethrowPgError } from '../db/pg-errors';
 import { membershipsTable, organizationsTable } from '../db/schema/identity';
@@ -63,6 +64,15 @@ export const orgRoutes: FastifyPluginCallbackZod<{ db: Db }> = (app, { db }, don
             });
           if (!org) throw new Error('organization insert returned no row');
           await tx.insert(membershipsTable).values({ orgId: org.id, userId, role: 'OWNER' });
+          await writeAudit(tx, {
+            orgId: org.id,
+            actorId: userId,
+            action: 'org.create',
+            targetType: 'organization',
+            targetId: org.id,
+            resultingState: { name: org.name, slug: org.slug },
+            requestId: request.id,
+          });
           return { ...org, role: 'OWNER' as const };
         });
         return reply.code(201).send(created);
