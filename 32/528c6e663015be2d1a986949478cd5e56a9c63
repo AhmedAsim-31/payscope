@@ -1,0 +1,41 @@
+packages/api/src/config.ts
+  s_3bfb2e09c422d0::t_97dd1a54e21a6d 6,39-44,88,127
+packages/api/src/db/schema/reconciliation.ts
+  s_3bfb2e09c422d0::t_319c217965926e 22,29,47
+packages/api/src/jobs/tick-routes.ts
+  s_3bfb2e09c422d0::t_f244d9b61f501c 3,5,8,12-16,24-27,29
+packages/api/src/reconciliation/reconciliation-repo.ts
+  s_3bfb2e09c422d0::t_2335ef7591492c 23
+packages/api/src/reconciliation/run-scheduler.integration.test.ts
+  s_3bfb2e09c422d0::t_e927ff6159123c 1-71
+packages/api/src/reconciliation/run-scheduler.ts
+  s_3bfb2e09c422d0::t_891de0921a8162 1-37
+packages/api/src/server.ts
+  s_3bfb2e09c422d0::t_98f768354493a3 30
+packages/shared/src/reconciliation-schemas.ts
+  s_3bfb2e09c422d0::t_bc8677c89f3cb9 6,39
+packages/web/src/components/reconciliation/runs-view.tsx
+  s_3bfb2e09c422d0::t_5195dbe2405af0 17
+supabase/migrations/20261013171039_reconciliation_trigger.sql
+  s_3bfb2e09c422d0::t_75bbbf82ac110b 1-2
+supabase/migrations/meta/20261013171039_snapshot.json
+  s_3bfb2e09c422d0::t_fb5c76bb8bb7fc 1-3253
+supabase/migrations/meta/_journal.json
+  s_3bfb2e09c422d0::t_6455bb66d6dfb8 123-129
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "32528c6e663015be2d1a986949478cd5e56a9c63",
+  "prompts": {},
+  "sessions": {
+    "s_3bfb2e09c422d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3c00ef3d-597c-492a-bf23-7c65c0557e13",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
