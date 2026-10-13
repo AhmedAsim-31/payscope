@@ -1,0 +1,70 @@
+packages/provider-adapters/package.json
+  h_78e539a96187c3 18
+packages/provider-adapters/src/paddle/fixtures/adjustment-created-chargeback.json
+  h_78e539a96187c3 1-27
+packages/provider-adapters/src/paddle/fixtures/adjustment-created-refund-approved.json
+  h_78e539a96187c3 1-27
+packages/provider-adapters/src/paddle/fixtures/adjustment-created-refund-pending.json
+  h_78e539a96187c3 1-27
+packages/provider-adapters/src/paddle/fixtures/adjustment-updated-refund-approved.json
+  h_78e539a96187c3 1-27
+packages/provider-adapters/src/paddle/fixtures/subscription-activated.json
+  h_78e539a96187c3 1-18
+packages/provider-adapters/src/paddle/fixtures/subscription-canceled.json
+  h_78e539a96187c3 1-19
+packages/provider-adapters/src/paddle/fixtures/subscription-created.json
+  h_78e539a96187c3 1-18
+packages/provider-adapters/src/paddle/fixtures/subscription-past-due.json
+  h_78e539a96187c3 1-18
+packages/provider-adapters/src/paddle/fixtures/subscription-paused.json
+  h_78e539a96187c3 1-18
+packages/provider-adapters/src/paddle/fixtures/subscription-resumed.json
+  h_78e539a96187c3 1-18
+packages/provider-adapters/src/paddle/fixtures/subscription-updated.json
+  h_78e539a96187c3 1-22
+packages/provider-adapters/src/paddle/fixtures/transaction-completed-recurring.json
+  h_78e539a96187c3 1-28
+packages/provider-adapters/src/paddle/fixtures/transaction-completed-subscription-first.json
+  h_78e539a96187c3 1-28
+packages/provider-adapters/src/paddle/fixtures/transaction-completed.json
+  h_78e539a96187c3 1-28
+packages/provider-adapters/src/paddle/fixtures/transaction-paid.json
+  h_78e539a96187c3 1-28
+packages/provider-adapters/src/paddle/fixtures/transaction-payment-failed.json
+  h_78e539a96187c3 1-28
+packages/provider-adapters/src/paddle/fixtures/unsupported-customer-created.json
+  h_78e539a96187c3 1-12
+packages/provider-adapters/src/paddle/paddle-adapter.test.ts
+  h_78e539a96187c3 1-70
+packages/provider-adapters/src/paddle/paddle-adapter.ts
+  h_78e539a96187c3 1-53
+packages/provider-adapters/src/paddle/paddle-amount.test.ts
+  h_78e539a96187c3 1-15
+packages/provider-adapters/src/paddle/paddle-amount.ts
+  h_78e539a96187c3 1-10
+packages/provider-adapters/src/paddle/paddle-client.test.ts
+  h_78e539a96187c3 1-154
+packages/provider-adapters/src/paddle/paddle-client.ts
+  h_78e539a96187c3 1-129
+packages/provider-adapters/src/paddle/paddle-envelope.ts
+  h_78e539a96187c3 1-11
+packages/provider-adapters/src/paddle/paddle-normalize.test.ts
+  h_78e539a96187c3 1-197
+packages/provider-adapters/src/paddle/paddle-normalize.ts
+  h_78e539a96187c3 1-200
+packages/provider-adapters/src/paddle/paddle-signature.test.ts
+  h_78e539a96187c3 1-146
+packages/provider-adapters/src/paddle/paddle-signature.ts
+  h_78e539a96187c3 1-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0cb79e9a05dc459760da8220a186f6c1aa67fd30",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
