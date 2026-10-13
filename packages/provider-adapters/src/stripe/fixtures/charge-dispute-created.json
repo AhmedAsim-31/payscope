@@ -1,0 +1,27 @@
+{
+  "id": "evt_test_4",
+  "object": "event",
+  "api_version": "2025-09-30.clover",
+  "created": 1760000004,
+  "type": "charge.dispute.created",
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "data": {
+    "object": {
+      "id": "dp_test_1Rt5kLm",
+      "object": "dispute",
+      "amount": 4999,
+      "currency": "usd",
+      "charge": "ch_test_3Qa1b2c3d4",
+      "payment_intent": "pi_test_3Qa1b2c3d4",
+      "reason": "fraudulent",
+      "status": "needs_response",
+      "created": 1759999970,
+      "livemode": false
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "id": "evt_test_7",
+  "object": "event",
+  "api_version": "2025-09-30.clover",
+  "created": 1760000007,
+  "type": "customer.subscription.updated",
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "data": {
+    "object": {
+      "id": "sub_test_1Pq9zXy",
+      "object": "subscription",
+      "customer": "cus_test_Nx81aB",
+      "status": "past_due",
+      "currency": "usd",
+      "cancel_at_period_end": false,
+      "created": 1759913600,
+      "livemode": false,
+      "items": {
+        "object": "list",
+        "data": [
+          {
+            "id": "si_test_Qw12er",
+            "object": "subscription_item",
+            "current_period_start": 1759913600,
+            "current_period_end": 1762592000,
+            "price": {
+              "id": "price_test_pro_monthly",
+              "object": "price",
+              "currency": "usd",
+              "unit_amount": 1999
+            },
+            "quantity": 1
+          }
+        ],
+        "has_more": false
+      }
+    }
+  }
+}
