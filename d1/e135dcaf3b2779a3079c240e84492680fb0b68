@@ -1,0 +1,67 @@
+README.md
+  s_3bfb2e09c422d0::t_64f5424f5fdfd2 27-35
+docs/api.md
+  s_3bfb2e09c422d0::t_3392f560171439 77-83,158-166
+packages/api/src/app.ts
+  s_3bfb2e09c422d0::t_64f99443874680 22,128-132
+packages/api/src/connections/connection-routes.ts
+  s_3bfb2e09c422d0::t_a8fb002d728d74 50,60
+packages/api/src/connections/connection-verify-route.ts
+  s_3bfb2e09c422d0::t_15b9a8ac43780a 1-123
+packages/api/src/connections/connection-verify.integration.test.ts
+  s_3bfb2e09c422d0::t_03704e2aea5cbd 1-103
+packages/api/src/connections/connection-view.ts
+  s_3bfb2e09c422d0::t_b01e518849cf18 2,6,9-10,21,24,40,59,62
+packages/api/src/reconciliation/provider-checks.ts
+  s_3bfb2e09c422d0::t_f47d9f0335f01d 11
+packages/api/src/security/tenant-isolation.integration.test.ts
+  s_3bfb2e09c422d0::t_8b68300c0fb746 43,64
+packages/e2e/tests/connections.spec.ts
+  s_3bfb2e09c422d0::t_8730498e3d5da6 1-18
+packages/e2e/tests/viewer.spec.ts
+  s_3bfb2e09c422d0::t_a3b9ecc400f99f 26-31
+packages/e2e/tests/visual.spec.ts
+  s_3bfb2e09c422d0::t_3910c1efef4721 29
+packages/web/src/app/app/[orgId]/connections/page.tsx
+  s_3bfb2e09c422d0::t_500cdcd5af0df1 1-12
+packages/web/src/components/connections/connection-card.tsx
+  s_3bfb2e09c422d0::t_f47c1a2b59f08f 1-167
+packages/web/src/components/connections/connections-view.test.tsx
+  s_3bfb2e09c422d0::t_1eb09106194fee 1-119
+packages/web/src/components/connections/connections-view.tsx
+  s_3bfb2e09c422d0::t_8fabd694dc7fb7 1-46
+packages/web/src/components/connections/create-connection-form.tsx
+  s_3bfb2e09c422d0::t_bdad1a5a1ea600 1-149
+packages/web/src/components/connections/edit-credentials-form.tsx
+  s_3bfb2e09c422d0::t_752464ae7fa59b 1-79
+packages/web/src/components/connections/use-connection-mutations.ts
+  s_3bfb2e09c422d0::t_47952c4a24c156 1-48
+packages/web/src/components/reconciliation/start-run-form.tsx
+  s_3bfb2e09c422d0::t_d2c3458fafc85c 10,18
+packages/web/src/components/records/status-badge.tsx
+  s_3bfb2e09c422d0::t_84719cccd1d640 14-16
+packages/web/src/components/shell/nav-config.ts
+  s_3bfb2e09c422d0::t_fcdaea2ad2f1a4 13,41
+packages/web/src/components/shell/sidebar-nav.test.tsx
+  s_3bfb2e09c422d0::t_e0d1c5e65f3bc9 39
+packages/web/src/lib/api-messages.ts
+  s_3bfb2e09c422d0::t_6b7f5490bdfbf5 14-17,30,43-45,55-60,79-81,84-87,98-100
+packages/web/src/lib/connection-queries.ts
+  s_3bfb2e09c422d0::t_e4c86aa2f300a7 1-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d1e135dcaf3b2779a3079c240e84492680fb0b68",
+  "prompts": {},
+  "sessions": {
+    "s_3bfb2e09c422d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3c00ef3d-597c-492a-bf23-7c65c0557e13",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
