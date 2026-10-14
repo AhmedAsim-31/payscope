@@ -1,0 +1,1 @@
+CREATE INDEX "provider_customer_mappings_org_provider_customer_idx" ON "provider_customer_mappings" USING btree ("org_id","provider_customer_id");

@@ -79,7 +79,12 @@ export const SUBSCRIPTION_FILTERS: readonly FilterField[] = [
 ];
 
 export const CUSTOMER_FILTERS: readonly FilterField[] = [
-  { name: 'email', label: 'Email starts with', kind: 'text', placeholder: 'name@example.com' },
+  {
+    name: 'q',
+    label: 'Search email or provider ID',
+    kind: 'text',
+    placeholder: 'Email or provider ID',
+  },
 ];
 
 export const ENTITLEMENT_FILTERS: readonly FilterField[] = [

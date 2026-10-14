@@ -233,10 +233,19 @@ describe('subscriptions, customers and entitlements', () => {
     expect(detail.body.entitlements.map((e) => e.id)).toEqual([entitlementId]);
   });
 
+  it('searches customers by exact provider customer id within the org only', async () => {
+    const byId = await get<Page>(a.owner, a.orgId, '/customers?q=cus_1');
+    expect(byId.body.items.map((i) => i.id)).toEqual([a.customerId]);
+    const otherOrg = await get<Page>(b.owner, b.orgId, '/customers?q=cus_1');
+    expect(otherOrg.body.items.map((i) => i.id)).toEqual([b.customerId]);
+    const partial = await get<Page>(a.owner, a.orgId, '/customers?q=cus_');
+    expect(partial.body.items).toEqual([]);
+  });
+
   it('searches customers by case-insensitive email prefix and treats wildcards literally', async () => {
-    const hit = await get<Page>(a.owner, a.orgId, '/customers?email=alice@EXA');
+    const hit = await get<Page>(a.owner, a.orgId, '/customers?q=alice@EXA');
     expect(hit.body.items.map((i) => i.id)).toEqual([a.customerId]);
-    const wildcard = await get<Page>(a.owner, a.orgId, '/customers?email=%25');
+    const wildcard = await get<Page>(a.owner, a.orgId, '/customers?q=%25');
     expect(wildcard.body.items).toEqual([]);
     const detail = await get<{
       mappings: { providerCustomerId: string; provider: string }[];

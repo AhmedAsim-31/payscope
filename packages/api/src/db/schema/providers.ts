@@ -103,5 +103,6 @@ export const providerCustomerMappingsTable = pgTable(
       t.providerCustomerId,
     ),
     index('provider_customer_mappings_customer_idx').on(t.customerId),
+    index('provider_customer_mappings_org_provider_customer_idx').on(t.orgId, t.providerCustomerId),
   ],
 ).enableRLS();
