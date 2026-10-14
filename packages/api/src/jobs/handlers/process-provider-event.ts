@@ -42,7 +42,8 @@ export function createProcessProviderEventHandler(
   cipher?: CredentialsCipher,
   fetchImpl: typeof fetch = fetch,
 ): JobHandler {
-  return async (job, { db }) => {
+  return async (job, ctx) => {
+    const { db } = ctx;
     const parsed = payloadSchema.safeParse(job.payload);
     if (!parsed.success || !job.orgId) throw new PermanentJobError('invalid_job_payload');
     const orgId = job.orgId;
@@ -72,6 +73,7 @@ export function createProcessProviderEventHandler(
       jobId: job.id,
       attemptNumber: event.attemptCount,
       startedAt,
+      correlationId: ctx.correlationId ?? null,
     };
     const eventWhere = eq(providerEventsTable.id, parsed.data.eventId);
     const stored = { id: parsed.data.eventId, orgId, connectionId: event.connectionId };
@@ -116,6 +118,7 @@ export function createProcessProviderEventHandler(
           failureCategory: failureCategoryOf(err),
           errorMessage: sanitizeError(err),
           retryable,
+          nextRetryAt: willRetry ? (ctx.nextRetryAt?.() ?? null) : null,
         });
       });
       throw err;

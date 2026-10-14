@@ -12,7 +12,12 @@ type Tenant = { orgId: string; owner: TestUser; connectionId: string };
 type EventDetail = {
   status: string;
   payload: Record<string, unknown>;
-  attempts: { attemptNumber: number; outcome: string }[];
+  attempts: {
+    attemptNumber: number;
+    outcome: string;
+    correlationId: string | null;
+    nextRetryAt: string | null;
+  }[];
   job: { status: string; maxAttempts: number; lastError: string | null } | null;
   signatureVerified: boolean;
   objectRef: string | null;
@@ -157,8 +162,9 @@ describe('event inbox', () => {
         data: { object: { receipt_email: 'alice@example.test', nested: { client_secret: 'sek' } } },
       },
     });
-    await sql`insert into event_processing_attempts (org_id, event_id, attempt_number, outcome, ended_at)
-      values (${a.orgId}, ${id}, 2, 'failed', now()), (${a.orgId}, ${id}, 1, 'failed', now())`;
+    await sql`insert into event_processing_attempts (org_id, event_id, attempt_number, outcome, ended_at, correlation_id, next_retry_at)
+      values (${a.orgId}, ${id}, 2, 'failed', now(), null, null),
+        (${a.orgId}, ${id}, 1, 'failed', now(), 'corr-1', '2026-01-01T00:00:05Z')`;
     const res = await request<EventDetail>(viewer, a.orgId, `/events/${id}`);
     expect(res.status).toBe(200);
     const raw = JSON.stringify(res.body.payload);
@@ -166,6 +172,11 @@ describe('event inbox', () => {
     expect(raw).not.toContain('sek');
     expect(raw).toContain('evt_x');
     expect(res.body.attempts.map((x) => x.attemptNumber)).toEqual([1, 2]);
+    expect(res.body.attempts[0]).toMatchObject({
+      correlationId: 'corr-1',
+      nextRetryAt: '2026-01-01T00:00:05.000Z',
+    });
+    expect(res.body.attempts[1]).toMatchObject({ correlationId: null, nextRetryAt: null });
     expect(res.body.job?.lastError).toBe('boom');
   });
 

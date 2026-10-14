@@ -18,7 +18,14 @@ export type JobLogger = {
   error(obj: object, msg?: string): void;
 };
 
-export type JobContext = { db: Db; logger: JobLogger; workerId: string };
+export type JobContext = {
+  db: Db;
+  logger: JobLogger;
+  workerId: string;
+  correlationId?: string;
+  /** Same instant the worker schedules if this run fails retryably; stable across calls. */
+  nextRetryAt?: () => Date;
+};
 export type JobHandler = (job: Job, ctx: JobContext) => Promise<void>;
 export type JobHandlers = Record<string, JobHandler>;
 
@@ -80,8 +87,18 @@ export function createWorker(opts: WorkerOptions) {
     }
   }
 
-  async function finalize(job: Job, err: unknown, started: number): Promise<void> {
-    const fields = { jobId: job.id, kind: job.kind, attempt: job.attemptCount };
+  async function finalize(
+    job: Job,
+    err: unknown,
+    started: number,
+    jobCtx: Required<JobContext>,
+  ): Promise<void> {
+    const fields = {
+      jobId: job.id,
+      kind: job.kind,
+      attempt: job.attemptCount,
+      correlationId: jobCtx.correlationId,
+    };
     const durationMs = Math.round(performance.now() - started);
     const handler = handlers[job.kind];
     let applied: boolean;
@@ -91,11 +108,10 @@ export function createWorker(opts: WorkerOptions) {
       outcome = 'succeeded';
     } else {
       const retryable = handler !== undefined && isRetryable(err);
-      const backoff = computeBackoffMs(job.attemptCount, opts.random);
       applied = await failJob(db, job.id, workerId, {
         error: sanitizeError(err),
         retryable,
-        nextAvailableAt: new Date(now().getTime() + backoff),
+        nextAvailableAt: jobCtx.nextRetryAt(),
       });
       outcome = retryable && job.attemptCount < job.maxAttempts ? 'retry_scheduled' : 'dead';
     }
@@ -105,6 +121,13 @@ export function createWorker(opts: WorkerOptions) {
 
   async function runJob(job: Job): Promise<void> {
     const started = performance.now();
+    let retryAt: Date | undefined;
+    const jobCtx: Required<JobContext> = {
+      ...ctx,
+      correlationId: randomUUID(),
+      nextRetryAt: () =>
+        (retryAt ??= new Date(now().getTime() + computeBackoffMs(job.attemptCount, opts.random))),
+    };
     try {
       const handler = handlers[job.kind];
       let err: unknown;
@@ -112,12 +135,12 @@ export function createWorker(opts: WorkerOptions) {
         err = new PermanentJobError('unsupported_job_kind');
       } else {
         try {
-          await withHeartbeat(job, () => handler(job, ctx));
+          await withHeartbeat(job, () => handler(job, jobCtx));
         } catch (thrown) {
           err = thrown ?? new Error('unknown_error');
         }
       }
-      await finalize(job, err, started);
+      await finalize(job, err, started, jobCtx);
     } catch (err) {
       logger.error({ jobId: job.id, kind: job.kind, err }, 'job_finalize_failed');
     }
