@@ -33,6 +33,7 @@ type AuditView = {
   createdAt: string;
   outcome: string;
   actorId: string | null;
+  actorEmail: string | null;
   requestId: string | null;
 };
 
@@ -257,6 +258,33 @@ describe('audit log', () => {
     expect(items.map((i) => i.action).sort()).toEqual(['c.ent', 'c.own', 'c.payment', 'c.sub']);
     expect((await audit(other, `&customerId=${customer}`)).items).toEqual([]);
     expect((await audit(t, '&customerId=nope')).res.statusCode).toBe(400);
+  });
+
+  it('returns the actor email only for members of the same org', async () => {
+    const t = await newTenant(harness, app);
+    const other = await newTenant(harness, app);
+    const row = (action: string, actorId: string | null) => ({
+      orgId: t.orgId,
+      actorId,
+      actorType: actorId ? ('user' as const) : ('system' as const),
+      action,
+      targetType: 'x',
+      outcome: 'success' as const,
+    });
+    await db
+      .insert(auditLogsTable)
+      .values([
+        row('email.member', t.owner.id),
+        row('email.outsider', other.owner.id),
+        row('email.system', null),
+      ]);
+    const { items } = await audit(t, '&q=email.');
+    const byAction = Object.fromEntries(items.map((i) => [i.action, i.actorEmail]));
+    expect(byAction).toEqual({
+      'email.member': t.owner.email,
+      'email.outsider': null,
+      'email.system': null,
+    });
   });
 
   it('hides another org and offers no write endpoint', async () => {

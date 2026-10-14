@@ -227,6 +227,7 @@ Audit list filters: `action`, `actor` (user id), `targetType`, `targetId` match 
 `from` (inclusive) and `to` (exclusive) are ISO 8601 timestamps on `createdAt`; `from` after `to` answers `400 VALIDATION_ERROR`.
 `q` is trimmed free text (1 to 200 characters) matched case-insensitively as a substring of action, target type, target id, actor id, actor type, and reason; `%` and `_` match literally.
 All filters combine with AND and keep keyset pagination, so pass the same filters alongside `cursor`.
+Each entry carries `actorEmail`, the actor's profile email when the actor is a current member of the org, else `null` (system actors, former members, and users of other orgs are never resolved).
 
 ### Machine routes
 

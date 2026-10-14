@@ -27,6 +27,7 @@ export const auditQuerySchema = z
 export const auditEntrySchema = z.object({
   id: z.uuid(),
   actorId: z.uuid().nullable(),
+  actorEmail: z.string().nullable(),
   actorType: z.enum(AUDIT_ACTOR_TYPES),
   action: z.string(),
   targetType: z.string(),

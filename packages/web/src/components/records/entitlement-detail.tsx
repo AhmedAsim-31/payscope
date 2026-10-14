@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { auditPageSchema } from '@payscope/shared/audit-schemas';
 import { findingPageSchema } from '@payscope/shared/reconciliation-schemas';
 import { entitlementDetailSchema } from '@payscope/shared/records-schemas';
-import { AUDIT_COLUMNS } from '@/components/audit/audit-list';
+import { auditColumns } from '@/components/audit/audit-list';
 import { findingColumns } from '@/components/reconciliation/findings-list';
 import {
   BackLink,
@@ -122,7 +122,7 @@ export function EntitlementDetail({
         viewAllLabel="View all audit entries"
         schema={auditPageSchema}
         params={{ targetType: 'entitlement', targetId: entitlement.id }}
-        columns={AUDIT_COLUMNS}
+        columns={auditColumns(orgId)}
         empty={{
           title: 'No audit entries yet',
           hint: 'Audited actions on this entitlement appear here.',

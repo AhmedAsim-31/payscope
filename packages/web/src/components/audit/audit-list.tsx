@@ -1,34 +1,55 @@
 'use client';
 
+import Link from 'next/link';
 import { auditPageSchema, type AuditEntry } from '@payscope/shared/audit-schemas';
 import { AUDIT_FILTERS } from '@/components/records/filter-config';
-import { formatTimestamp } from '@/components/records/format';
+import { formatTimestamp, recordHref } from '@/components/records/format';
 import type { Column } from '@/components/records/records-list';
 import { RecordsListView } from '@/components/records/records-list-view';
 import { StatusBadge } from '@/components/records/status-badge';
 
-export const AUDIT_COLUMNS: Column<AuditEntry>[] = [
+const TARGET_RESOURCES: Record<string, string> = {
+  payment: 'payments',
+  subscription: 'subscriptions',
+  customer: 'customers',
+  entitlement: 'entitlements',
+  incident: 'incidents',
+  finding: 'findings',
+  reconciliation_run: 'reconciliation',
+  event: 'events',
+};
+
+function targetHref(orgId: string, e: AuditEntry): string | null {
+  if (!e.targetId) return null;
+  if (e.targetType === 'connection') return `/app/${orgId}/connections`;
+  const resource = TARGET_RESOURCES[e.targetType];
+  return resource ? recordHref(orgId, resource, e.targetId) : null;
+}
+
+function Actor({ entry: e }: { entry: AuditEntry }) {
+  if (e.actorEmail) return <span className="text-xs break-all">{e.actorEmail}</span>;
+  if (e.actorId) return <span className="font-mono text-xs">{e.actorId.slice(0, 8)}</span>;
+  return <span className="text-muted-foreground">System</span>;
+}
+
+function Target({ orgId, entry: e }: { orgId: string; entry: AuditEntry }) {
+  const label = `${e.targetType}${e.targetId ? `:${e.targetId.slice(0, 8)}` : ''}`;
+  const href = targetHref(orgId, e);
+  return href ? (
+    <Link href={href} className="font-mono text-xs break-all underline-offset-4 hover:underline">
+      {label}
+    </Link>
+  ) : (
+    <span className="font-mono text-xs break-all">{label}</span>
+  );
+}
+
+export const auditColumns = (orgId: string): Column<AuditEntry>[] => [
   { header: 'When', cell: (e) => formatTimestamp(e.createdAt) },
   { header: 'Action', cell: (e) => <span className="font-mono text-xs">{e.action}</span> },
   { header: 'Outcome', cell: (e) => <StatusBadge status={e.outcome} /> },
-  {
-    header: 'Actor',
-    cell: (e) =>
-      e.actorId ? (
-        <span className="font-mono text-xs">{e.actorId.slice(0, 8)}</span>
-      ) : (
-        <span className="text-muted-foreground">System</span>
-      ),
-  },
-  {
-    header: 'Target',
-    cell: (e) => (
-      <span className="font-mono text-xs break-all">
-        {e.targetType}
-        {e.targetId ? `:${e.targetId.slice(0, 8)}` : ''}
-      </span>
-    ),
-  },
+  { header: 'Actor', cell: (e) => <Actor entry={e} /> },
+  { header: 'Target', cell: (e) => <Target orgId={orgId} entry={e} /> },
   {
     header: 'Reason',
     cell: (e) => e.reason ?? <span className="text-muted-foreground">None</span>,
@@ -60,7 +81,7 @@ export function AuditList({ orgId }: { orgId: string }) {
       description="Append-only record of who changed what. Entries cannot be edited or deleted."
       fields={AUDIT_FILTERS}
       schema={auditPageSchema}
-      columns={AUDIT_COLUMNS}
+      columns={auditColumns(orgId)}
       empty={{
         title: 'No audit entries yet',
         filteredTitle: 'No entries match these filters',
