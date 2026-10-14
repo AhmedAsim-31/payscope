@@ -63,7 +63,7 @@ Authenticated policies never use the IP; they key on the verified token subject 
 
 ## Overview queries
 
-`GET /api/v1/orgs/:orgId/overview` runs seven independent statements in parallel: payments grouped by currency and status, subscriptions by status, entitlements by state, events in range by status, open findings by severity, the existing jobs summary, and the latest 10 events.
+`GET /api/v1/orgs/:orgId/overview` runs eight independent statements in parallel: payments grouped by currency and status, subscriptions by status, entitlements by state, events in range by status, open findings by severity, non-resolved incidents by status, the existing jobs summary, and the latest 10 events.
 Each is one `GROUP BY` over rows of a single org, so the response cost is bounded by the number of distinct groups, not the number of rows returned.
 Sums are computed in Postgres and returned as text, then added as `BigInt` per currency in the API, so amounts above 2^53 stay exact and currencies are never summed together.
 

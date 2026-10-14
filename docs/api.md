@@ -109,6 +109,9 @@ Payment list filters: `status`, `provider`, `currency`, `connectionId`, `custome
 Subscription list items and detail include `canceledAt` and `endedAt` (ISO 8601 or `null`) as the provider reported them.
 Stripe supplies both, Paddle supplies `canceledAt`, RevenueCat supplies `endedAt` on expiration, and PayPal supplies neither.
 
+Overview `incidents` counts the org's non-resolved incidents as `{ open, investigating }`, regardless of `range`.
+`open` matches the incidents list filtered by `status=open`.
+
 Customer list `q` matches a case-insensitive email prefix (wildcards are literal) or an exact provider customer id from the org's provider customer mappings.
 
 ### Entitlement ingestion

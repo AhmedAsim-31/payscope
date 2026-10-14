@@ -1,4 +1,4 @@
-import { and, count, eq, gte, sql } from 'drizzle-orm';
+import { and, count, eq, gte, ne, sql } from 'drizzle-orm';
 import {
   ENTITLEMENT_STATES,
   PAYMENT_STATUSES,
@@ -6,6 +6,7 @@ import {
 } from '@payscope/shared/records-schemas';
 import { EVENT_STATUSES } from '@payscope/shared/events-schemas';
 import { FINDING_SEVERITIES } from '@payscope/shared/reconciliation-schemas';
+import { INCIDENT_STATUSES } from '@payscope/shared/incident-schemas';
 import {
   OVERVIEW_RANGE_DAYS,
   type CurrencyOverview,
@@ -14,6 +15,7 @@ import {
 } from '@payscope/shared/overview-schemas';
 import type { Db } from '../db/client';
 import { providerEventsTable } from '../db/schema/events';
+import { incidentsTable } from '../db/schema/operations';
 import { reconciliationFindingsTable } from '../db/schema/reconciliation';
 import {
   entitlementRecordsTable,
@@ -79,8 +81,9 @@ export async function loadOverview(db: Db, orgId: string, range: OverviewRange):
   const s = subscriptionRecordsTable;
   const n = entitlementRecordsTable;
   const f = reconciliationFindingsTable;
+  const i = incidentsTable;
 
-  const [payments, subscriptions, entitlements, events, severities, jobs, recent] =
+  const [payments, subscriptions, entitlements, events, severities, incidents, jobs, recent] =
     await Promise.all([
       paymentsByCurrency(db, orgId, since),
       countsBy(
@@ -115,6 +118,14 @@ export async function loadOverview(db: Db, orgId: string, range: OverviewRange):
           .where(and(eq(f.orgId, orgId), eq(f.status, 'open')))
           .groupBy(f.severity),
       ),
+      countsBy(
+        INCIDENT_STATUSES,
+        db
+          .select({ key: i.status, total: count() })
+          .from(i)
+          .where(and(eq(i.orgId, orgId), ne(i.status, 'resolved')))
+          .groupBy(i.status),
+      ),
       summarizeJobs(db, orgId),
       listEvents(db, orgId, { limit: RECENT_EVENT_LIMIT }),
     ]);
@@ -142,6 +153,7 @@ export async function loadOverview(db: Db, orgId: string, range: OverviewRange):
       open: Object.values(severities).reduce((sum, v) => sum + v, 0),
       bySeverity: severities,
     },
+    incidents: { open: incidents.open, investigating: incidents.investigating },
     recentEvents: recent.items,
   };
 }
