@@ -10,6 +10,7 @@ import {
 } from '../db/schema/records';
 import { reconciliationFindingsTable as f } from '../db/schema/reconciliation';
 import { ApiHttpError } from '../http-error';
+import { refreshIncidentForFindingType } from '../incidents/incident-refresh';
 import { PROCESS_EVENT_JOB_KIND } from '../webhooks/ingest-event';
 import { enqueueJob } from '../jobs/job-queue';
 import { evidenceString } from './evidence';
@@ -56,7 +57,13 @@ export async function loadOpenFinding(tx: Tx, orgId: string, findingId: string):
   return finding;
 }
 
-async function markResolved(tx: Tx, orgId: string, findingId: string, note: string) {
+async function markResolved(
+  tx: Tx,
+  orgId: string,
+  findingId: string,
+  note: string,
+  requestId: string,
+) {
   const [row] = await tx
     .update(f)
     .set({
@@ -66,9 +73,10 @@ async function markResolved(tx: Tx, orgId: string, findingId: string, note: stri
       updatedAt: sql`now()`,
     })
     .where(and(eq(f.orgId, orgId), eq(f.id, findingId), inArray(f.status, ['open', 'reviewed'])))
-    .returning({ id: f.id });
+    .returning({ type: f.type });
   if (!row)
     throw new ApiHttpError(409, 'FINDING_CLOSED', 'Finding is already resolved or dismissed');
+  await refreshIncidentForFindingType(tx, orgId, row.type, requestId);
 }
 
 export async function reprocessEvent(tx: Tx, orgId: string, eventId: string): Promise<Outcome> {
@@ -237,6 +245,7 @@ export async function correctEntitlement(
   orgId: string,
   findingId: string,
   reason: string,
+  requestId: string,
 ): Promise<Outcome> {
   const finding = await loadOpenFinding(tx, orgId, findingId);
   let done: Outcome;
@@ -250,7 +259,7 @@ export async function correctEntitlement(
       'This finding type has no entitlement correction',
     );
   }
-  await markResolved(tx, orgId, findingId, reason);
+  await markResolved(tx, orgId, findingId, reason, requestId);
   return done;
 }
 
@@ -259,6 +268,7 @@ export async function resolveFinding(
   orgId: string,
   findingId: string,
   reason: string,
+  requestId: string,
 ): Promise<Outcome> {
   const finding = await loadOpenFinding(tx, orgId, findingId);
   const check = await recheckFinding(tx, finding);
@@ -272,6 +282,6 @@ export async function resolveFinding(
   if (check.stillDetected) {
     throw new ApiHttpError(409, 'STILL_DETECTED', 'The inconsistency is still detected locally');
   }
-  await markResolved(tx, orgId, findingId, reason);
+  await markResolved(tx, orgId, findingId, reason, requestId);
   return outcome('resolve_finding', findingId, { status: finding.status }, { status: 'resolved' });
 }

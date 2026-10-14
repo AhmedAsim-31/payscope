@@ -135,3 +135,40 @@ describe('refresh on an already consistent record', () => {
     expect((await findingRow(findingId))?.status).toBe('open');
   });
 });
+
+describe('refresh keeps the status mismatch incident in step', () => {
+  const addIncident = (t: Tenant, count: number) => sql`
+    insert into incidents (org_id, category, severity, title, fingerprint, finding_count)
+    values (${t.orgId}, 'status_mismatch', 'high', 'x', 'finding_type:status_mismatch', ${count})`;
+  const incident = async (t: Tenant) => {
+    const [row] = await sql<{ status: string; count: number }[]>`
+      select status, finding_count as count from incidents where org_id = ${t.orgId}`;
+    return row;
+  };
+
+  it('auto-resolves the incident when a 200 refresh clears its last finding', async () => {
+    useFake();
+    const t = await tenant();
+    const pay = await addPayment(sql, t, { status: 'pending' });
+    behaviors.set(pay.providerId, { kind: 'ok', status: 'succeeded' });
+    await addFinding(t, 'payment', pay.id);
+    await addIncident(t, 1);
+
+    expect((await refresh(t, pay.id)).statusCode).toBe(200);
+    expect(await incident(t)).toEqual({ status: 'resolved', count: 0 });
+  });
+
+  it('recounts on a 409 refresh and stays open while other findings remain', async () => {
+    useFake();
+    const t = await tenant();
+    const pay = await addPayment(sql, t, { status: 'refunded', amount: 1000, refunded: 1000 });
+    behaviors.set(pay.providerId, { kind: 'ok', status: 'succeeded', amountMinor: 1000n });
+    const other = await addPayment(sql, t, { status: 'pending' });
+    await addFinding(t, 'payment', pay.id);
+    await addFinding(t, 'payment', other.id);
+    await addIncident(t, 2);
+
+    expect((await refresh(t, pay.id)).statusCode).toBe(409);
+    expect(await incident(t)).toEqual({ status: 'open', count: 1 });
+  });
+});

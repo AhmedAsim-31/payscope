@@ -289,5 +289,8 @@ Every precondition (finding still open, entitlement still active, subscription s
 
 When a reconciliation batch records a high or critical finding, `openIncidentsForFindings` upserts one incident per finding type, fingerprint `finding_type:<type>`.
 The partial unique index on `(org_id, fingerprint)` where status is not `resolved` deduplicates across runs; on conflict the count is recomputed from live findings and `last_seen_at` moves.
+Every other path that changes a finding's status (review, dismiss, `resolve-finding`, `correct-entitlement`, and the refresh-from-provider auto-resolve) calls `refreshIncidentForFindingType` in the same transaction.
+It recounts the active incident from open and reviewed high or critical findings in one conditional `UPDATE`, and resolves it when the count reaches zero, writing a system `resolve` timeline action and an `incident.resolve` audit row.
+Incident writers for one org and finding type serialize on a transaction-scoped advisory lock, so a recount always sees the previous writer's commit.
 Resolving an incident lets the next detection open a fresh one.
 Incident actions (`acknowledge`, `note`, `resolve`) require `findings:update` and are audited.

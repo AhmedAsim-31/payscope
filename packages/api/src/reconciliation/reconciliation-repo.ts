@@ -6,6 +6,7 @@ import {
   reconciliationFindingsTable as f,
   reconciliationRunsTable as r,
 } from '../db/schema/reconciliation';
+import { refreshIncidentForFindingType } from '../incidents/incident-refresh';
 import { cursorTsColumn, iso, isoOrNull, keysetAfter, toPage } from '../records/keyset';
 
 type FindingQuery = z.output<typeof findingQuerySchema>;
@@ -134,18 +135,22 @@ export async function getFinding(db: Pick<Db, 'select'>, orgId: string, findingI
   return row;
 }
 
+type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
+
 /** Resolved is reserved for the repair flow, so only open or reviewed findings can be triaged. */
 export async function triageFinding(
-  db: Pick<Db, 'update'>,
+  db: Tx,
   orgId: string,
   findingId: string,
   status: 'reviewed' | 'dismissed',
   note: string,
+  requestId: string,
 ) {
   const [row] = await db
     .update(f)
     .set({ status, resolutionNote: note, updatedAt: sql`now()` })
     .where(and(eq(f.orgId, orgId), eq(f.id, findingId), inArray(f.status, ['open', 'reviewed'])))
     .returning();
+  if (row) await refreshIncidentForFindingType(db, orgId, row.type, requestId);
   return row;
 }

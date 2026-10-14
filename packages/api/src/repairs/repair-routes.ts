@@ -93,7 +93,7 @@ export const repairRoutes: FastifyPluginCallbackZod<{ db: Db } & ProviderDeps> =
           body: request.body,
         },
         async (tx) => ({
-          ...(await correctEntitlement(tx, currentOrg(request).id, findingId, reason)),
+          ...(await correctEntitlement(tx, currentOrg(request).id, findingId, reason, request.id)),
           targetId: findingId,
         }),
       );
@@ -124,7 +124,7 @@ export const repairRoutes: FastifyPluginCallbackZod<{ db: Db } & ProviderDeps> =
           body: request.body,
         },
         async (tx) => ({
-          ...(await resolveFinding(tx, currentOrg(request).id, findingId, reason)),
+          ...(await resolveFinding(tx, currentOrg(request).id, findingId, reason, request.id)),
           targetId: findingId,
         }),
       );
