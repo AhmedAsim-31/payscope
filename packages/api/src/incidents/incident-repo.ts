@@ -105,7 +105,13 @@ export async function transitionIncident(
 
 export async function recordIncidentAction(
   tx: Pick<Db, 'insert'>,
-  input: { orgId: string; incidentId: string; actorId: string; action: string; note: string },
+  input: {
+    orgId: string;
+    incidentId: string;
+    actorId: string | null;
+    action: string;
+    note: string;
+  },
 ): Promise<void> {
   await tx.insert(a).values(input);
 }

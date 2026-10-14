@@ -3,13 +3,14 @@ import type { Db } from '../db/client';
 import { incidentsTable } from '../db/schema/operations';
 import { reconciliationFindingsTable as f } from '../db/schema/reconciliation';
 import type { FindingDraft } from '../reconciliation/finding-upsert';
+import { lockFindingType } from './incident-refresh';
 
 const RANK = { low: 0, medium: 1, high: 2, critical: 3 } as const;
 const INCIDENT_SEVERITIES = ['high', 'critical'] as const;
 
 /** One incident per finding type, deduplicated by the partial unique index; the count is recomputed from live findings. */
 export async function openIncidentsForFindings(
-  executor: Pick<Db, 'insert'>,
+  executor: Pick<Db, 'insert' | 'execute'>,
   orgId: string,
   runId: string,
   drafts: FindingDraft[],
@@ -20,7 +21,8 @@ export async function openIncidentsForFindings(
     const seen = worst.get(d.type);
     if (!seen || RANK[d.severity] > RANK[seen]) worst.set(d.type, d.severity);
   }
-  for (const [type, severity] of worst) {
+  for (const [type, severity] of [...worst].sort(([a], [b]) => a.localeCompare(b))) {
+    await lockFindingType(executor, orgId, type);
     const liveCount = sql<number>`(select count(*)::int from ${f}
       where ${f.orgId} = ${orgId} and ${f.type} = ${type}
         and ${f.severity} in ('high', 'critical') and ${f.status} in ('open', 'reviewed'))`;

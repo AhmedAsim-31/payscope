@@ -4,6 +4,7 @@ import { writeAudit } from '../audit/audit-log';
 import type { Db } from '../db/client';
 import { reconciliationFindingsTable as f } from '../db/schema/reconciliation';
 import { ApiHttpError } from '../http-error';
+import { refreshIncidentForFindingType } from '../incidents/incident-refresh';
 
 type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
 type SubjectType = 'payment' | 'subscription';
@@ -74,5 +75,7 @@ export async function resolveRefreshedFindings(
       resultingState: { status: 'resolved', via: 'refresh_from_provider' },
     });
   }
+  if (resolved.length > 0)
+    await refreshIncidentForFindingType(tx, actor.orgId, 'status_mismatch', actor.requestId);
   return resolved.map((row) => row.id);
 }

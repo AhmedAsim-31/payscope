@@ -224,6 +224,7 @@ export const reconciliationRoutes: FastifyPluginCallbackZod<Options> = (app, opt
             findingId,
             request.body.status,
             request.body.note,
+            request.id,
           );
           if (!updated) {
             throw new ApiHttpError(
