@@ -1,0 +1,50 @@
+docs/api.md
+  h_78e539a96187c3 28,149-162,225
+docs/database.md
+  h_78e539a96187c3 23
+packages/api/src/app.ts
+  h_78e539a96187c3 34,125
+packages/api/src/exports/csv.test.ts
+  h_78e539a96187c3 1-22
+packages/api/src/exports/csv.ts
+  h_78e539a96187c3 1-13
+packages/api/src/exports/export-routes.ts
+  h_78e539a96187c3 1-120
+packages/api/src/exports/exports.integration.test.ts
+  h_78e539a96187c3 1-163
+packages/api/src/records/payments-repo.ts
+  h_78e539a96187c3 5,71-73
+packages/api/src/records/records-routes.ts
+  h_78e539a96187c3 58
+packages/shared/src/permissions.test.ts
+  h_78e539a96187c3 19
+packages/shared/src/permissions.ts
+  h_78e539a96187c3 14,43
+packages/web/src/components/reconciliation/findings-list.tsx
+  h_78e539a96187c3 41
+packages/web/src/components/records/export-csv-button.test.tsx
+  h_78e539a96187c3 1-70
+packages/web/src/components/records/export-csv-button.tsx
+  h_78e539a96187c3 1-53
+packages/web/src/components/records/payments-list.test.tsx
+  h_78e539a96187c3 14-15
+packages/web/src/components/records/payments-list.tsx
+  h_78e539a96187c3 42
+packages/web/src/components/records/records-list-view.tsx
+  h_78e539a96187c3 8,23,45,51-59
+packages/web/src/lib/api-client.ts
+  h_78e539a96187c3 37,44,58-65,72,74,85-93
+packages/web/src/lib/api-messages.ts
+  h_78e539a96187c3 19-20,107-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2bf1377f9b3dbdee1f224d7e02b145ffaecded52",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
