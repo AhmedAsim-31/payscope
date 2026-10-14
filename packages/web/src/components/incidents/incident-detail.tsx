@@ -3,6 +3,7 @@
 import { incidentDetailSchema } from '@payscope/shared/incident-schemas';
 import { FINDING_TYPES } from '@payscope/shared/reconciliation-schemas';
 import Link from 'next/link';
+import { z } from 'zod';
 import {
   BackLink,
   DetailField,
@@ -20,8 +21,13 @@ import { IncidentActions } from './incident-actions';
 export function IncidentDetail({ orgId, incidentId }: { orgId: string; incidentId: string }) {
   const incident = useRecordDetail(orgId, 'incidents', incidentId, incidentDetailSchema);
   const org = useCurrentOrg(orgId);
-  const { findingType } = incident.related;
+  const { findingType, lastRunId } = incident.related;
   const findingsType = FINDING_TYPES.find((t) => t === findingType);
+  const runId = z.uuid().safeParse(lastRunId).data;
+  const findingsQuery = new URLSearchParams({
+    type: findingsType ?? '',
+    ...(runId ? { runId } : {}),
+  });
 
   return (
     <div className="grid gap-8">
@@ -42,7 +48,7 @@ export function IncidentDetail({ orgId, incidentId }: { orgId: string; incidentI
               {incident.findingCount}
               {findingsType ? (
                 <Link
-                  href={`/app/${orgId}/findings?type=${findingsType}`}
+                  href={`/app/${orgId}/findings?${findingsQuery}`}
                   className="underline underline-offset-4"
                 >
                   View findings
