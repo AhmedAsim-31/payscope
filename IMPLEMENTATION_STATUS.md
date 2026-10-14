@@ -1,6 +1,6 @@
 # Implementation Status
 
-Last updated 2026-10-13.
+Last updated 2026-10-14.
 
 ## Current phase
 
@@ -15,10 +15,12 @@ Real (runs the production code paths):
 
 - Webhook ingress, signature verification, replay window, and exactly-once event storage.
 - The Postgres job queue and worker: claims, leases, retries, lease recovery, and dead-lettering.
-- Event processing into payments, subscriptions, customers, and entitlements.
+- Event processing into payments, subscriptions, customers, and entitlements, including subscription `canceled_at` and `ended_at` where the provider payload carries them.
+- Processing attempts record a correlation id and, for retryable failures, the next retry time.
 - Local-rule reconciliation, findings, incidents, repairs, and the audit log.
 - Auth through Supabase Auth (JWKS), org roles, and Postgres RLS.
 - Rate limiting, input validation, and encrypted per-connection credentials.
+- CSV export of payments and findings, capped at 5,000 rows.
 
 Simulated:
 
@@ -31,6 +33,8 @@ Not verified:
 
 - The four provider adapters are written against official docs but never exercised against a live sandbox (capability `implemented_unverified`).
 - Provider-mode reconciliation is covered only by the lab's fake fetch, because no sandbox API key is configured.
+- Refresh from provider (including the entitlement recompute and the `ALREADY_CONSISTENT` finding resolution) is covered only by integration tests with a fake adapter.
+  The demo connections have no credentials, so a refresh there answers `PROVIDER_NOT_CONFIGURED`.
 
 ## Capability matrix
 
@@ -40,9 +44,14 @@ Not verified:
 | Duplicate and out-of-order event handling                     | Real      | Unique constraints and guarded transitions                           |
 | Job worker with retries, lease recovery, dead letter          | Real      | `FOR UPDATE SKIP LOCKED`                                             |
 | Payments, subscriptions, customers, entitlements screens      | Real      | Keyset pagination, filters                                           |
-| Event inbox, attempts, safe retry                             | Real      |                                                                      |
+| Event inbox, attempts, safe retry                             | Real      | Attempts carry a correlation id and next retry time                  |
+| Event detail related records and signature status             | Real      | Links to payment, subscription, customer in the same org and connection |
+| Jobs summary                                                  | Real      | Queued, Running, Retrying, Dead, oldest queued                       |
+| Customer search                                               | Real      | Email prefix or exact provider customer id                           |
+| Subscription `canceled_at` and `ended_at`                     | Real      | Stripe both, Paddle canceled only, RevenueCat ended only, PayPal none |
+| CSV export of payments and findings                           | Real      | `records:export` (OWNER, ADMIN, OPERATOR); 5,000-row cap             |
 | Per-currency overview dashboard                               | Real      | SQL aggregates, integer minor units                                  |
-| Local-rule reconciliation, findings, incidents                | Real      |                                                                      |
+| Local-rule reconciliation, findings, incidents                | Real      | Incident severity and category filters; incident-scoped findings link |
 | Repair center and append-only audit log                       | Real      | Reasoned, idempotent repairs                                         |
 | Multi-tenant orgs, roles, RLS, cross-tenant tests             | Real      | OWNER, ADMIN, OPERATOR, VIEWER                                       |
 | Rate limiting                                                 | Real      | Postgres-backed, per endpoint                                        |
@@ -51,6 +60,7 @@ Not verified:
 | Scenario lab (17 scenarios)                                   | Simulated | Real pipeline, simulation connection, fake provider fetch where noted |
 | Provider sandbox webhooks and API calls                       | Planned   | Needs sandbox credentials per provider                               |
 | Provider-mode reconciliation against a real provider          | Planned   | Code exists; untested without a sandbox key                          |
+| Refresh from provider with entitlement recompute              | Planned   | Code exists; fake-adapter tests only, no sandbox key                 |
 | Hosted demo (Vercel web, Render API, Supabase DB)             | Blocked   | PAYSCOPE-45                                                          |
 | Scheduled tick (pg_cron plus pg_net, GitHub Actions fallback) | Planned   | Config added; not applied, see docs/deployment.md                    |
 | E2E in CI                                                     | Planned   | Needs `DEMO_USER_PASSWORD` and Supabase values as GitHub secrets     |
