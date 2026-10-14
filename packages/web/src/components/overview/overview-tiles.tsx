@@ -62,6 +62,23 @@ export function JobsTile({ jobs, orgId }: { jobs: Overview['jobs']; orgId: strin
   );
 }
 
+export function IncidentsTile({
+  incidents,
+  orgId,
+}: {
+  incidents: Overview['incidents'];
+  orgId: string;
+}) {
+  return (
+    <Tile
+      title="Open incidents"
+      href={`/app/${orgId}/incidents?status=open`}
+      value={String(incidents.open)}
+      hint={`${incidents.investigating} investigating`}
+    />
+  );
+}
+
 export function FindingsTile({ findings }: { findings: Overview['findings'] }) {
   return (
     <Card>

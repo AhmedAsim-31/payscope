@@ -51,6 +51,7 @@ const base = {
   processing: { processed: 0, attempted: 0, successRate: null },
   jobs: { queued: 0, running: 0, dead: 0, oldestQueuedAgeSeconds: null },
   findings: { open: 0, bySeverity: { low: 0, medium: 0, high: 0, critical: 0 } },
+  incidents: { open: 0, investigating: 0 },
   recentEvents: [],
 };
 
@@ -112,6 +113,21 @@ describe('OverviewView', () => {
     expect(screen.getByRole('link', { name: '7d' })).toHaveAttribute('aria-current', 'true');
     expect(screen.getByRole('link', { name: '30d' })).not.toHaveAttribute('aria-current');
     expect(mockedFetch).toHaveBeenCalledWith(`/api/v1/orgs/${ORG_ID}/overview?range=7d`);
+  });
+
+  it('links the open incidents tile to the incidents list filtered to open', async () => {
+    mockedFetch.mockResolvedValue({
+      ...base,
+      incidents: { open: 3, investigating: 1 },
+      events: { ...base.events, processed: 1 },
+    });
+    renderWithQuery(<OverviewView orgId={ORG_ID} />);
+    expect(await screen.findByRole('link', { name: 'Open incidents' })).toHaveAttribute(
+      'href',
+      `/app/${ORG_ID}/incidents?status=open`,
+    );
+    expect(screen.getByText('3')).toBeInTheDocument();
+    expect(screen.getByText('1 investigating')).toBeInTheDocument();
   });
 
   it('shows no data for a null success rate', async () => {

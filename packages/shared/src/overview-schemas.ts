@@ -44,6 +44,7 @@ export const overviewSchema = z.object({
     oldestQueuedAgeSeconds: count.nullable(),
   }),
   findings: z.object({ open: count, bySeverity: countsBy(FINDING_SEVERITIES) }),
+  incidents: z.object({ open: count, investigating: count }),
   recentEvents: z.array(eventSummarySchema),
 });
 export type Overview = z.infer<typeof overviewSchema>;

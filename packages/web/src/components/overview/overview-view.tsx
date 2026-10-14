@@ -14,7 +14,7 @@ import { overviewQueryOptions } from '@/lib/overview-queries';
 import { cn } from '@/lib/utils';
 import { BarList, barItems } from './bar-list';
 import { CurrencyCard } from './currency-card';
-import { FindingsTile, JobsTile, SuccessRateTile } from './overview-tiles';
+import { FindingsTile, IncidentsTile, JobsTile, SuccessRateTile } from './overview-tiles';
 import { RecentActivity } from './recent-activity';
 
 const DEFAULT_RANGE: OverviewRange = '30d';
@@ -94,6 +94,7 @@ function OverviewData({ orgId, range }: { orgId: string; range: OverviewRange })
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <SuccessRateTile processing={data.processing} />
         <JobsTile jobs={data.jobs} orgId={orgId} />
+        <IncidentsTile incidents={data.incidents} orgId={orgId} />
         <FindingsTile findings={data.findings} />
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

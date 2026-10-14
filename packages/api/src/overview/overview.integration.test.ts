@@ -44,6 +44,11 @@ async function addPayment(
       ${amount}, ${refunded}, ${currency}, ${createdAt})`;
 }
 
+async function addIncident(t: Tenant, status: string) {
+  await sql`insert into incidents (org_id, category, severity, status, title, fingerprint)
+    values (${t.orgId}, 'status_mismatch', 'high', ${status}, 'Incident', ${randomUUID()})`;
+}
+
 function overview(t: Tenant, query = '', user = t.owner) {
   return app.inject({
     url: `/api/v1/orgs/${t.orgId}/overview${query}`,
@@ -104,6 +109,7 @@ describe('overview', () => {
     expect(body.processing).toEqual({ processed: 0, attempted: 0, successRate: null });
     expect(body.jobs).toEqual({ queued: 0, running: 0, dead: 0, oldestQueuedAgeSeconds: null });
     expect(body.findings.open).toBe(0);
+    expect(body.incidents).toEqual({ open: 0, investigating: 0 });
     expect(body.recentEvents).toEqual([]);
     expect(body.subscriptions.active).toBe(0);
   });
@@ -142,6 +148,18 @@ describe('overview', () => {
     await addPayment(a, 'succeeded', 'USD', '100');
     expect((await overview(b)).json<Overview>().payments).toEqual([]);
     expect((await overview(a, '', b.owner)).statusCode).toBe(404);
+  });
+
+  it('counts non-resolved incidents per status within the org only', async () => {
+    const a = await createTenant();
+    const b = await createTenant();
+    await addIncident(a, 'open');
+    await addIncident(a, 'open');
+    await addIncident(a, 'investigating');
+    await addIncident(a, 'resolved');
+    await addIncident(b, 'open');
+    expect((await overview(a)).json<Overview>().incidents).toEqual({ open: 2, investigating: 1 });
+    expect((await overview(b)).json<Overview>().incidents).toEqual({ open: 1, investigating: 0 });
   });
 
   it('rejects an unknown range and marks responses as non-cacheable', async () => {
