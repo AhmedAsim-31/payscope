@@ -13,6 +13,7 @@ type FilterBarProps = {
   read: (name: string) => string;
   isFiltered: boolean;
   onChange: (name: string, value: string) => void;
+  onApply: (values: Record<string, string>) => void;
   onClear: () => void;
 };
 
@@ -58,7 +59,15 @@ function SearchInput({ id, name, placeholder, value, onChange }: SearchInputProp
   );
 }
 
-export function FilterBar({ label, fields, read, isFiltered, onChange, onClear }: FilterBarProps) {
+export function FilterBar({
+  label,
+  fields,
+  read,
+  isFiltered,
+  onChange,
+  onApply,
+  onClear,
+}: FilterBarProps) {
   return (
     <form
       role="search"
@@ -67,11 +76,13 @@ export function FilterBar({ label, fields, read, isFiltered, onChange, onClear }
       onSubmit={(event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
+        const values: Record<string, string> = {};
         for (const field of fields) {
           const value = data.get(field.name);
           if ((field.kind === 'text' || field.kind === 'search') && typeof value === 'string')
-            onChange(field.name, value.trim());
+            values[field.name] = value.trim();
         }
+        onApply(values);
       }}
     >
       {fields

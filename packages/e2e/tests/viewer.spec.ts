@@ -13,7 +13,9 @@ test('viewer sees no manage controls', async ({ page }) => {
   await expect(page.getByRole('button', { name: /remove/i })).toHaveCount(0);
 
   await page.goto(`/app/${acme}/repairs`);
-  await expect(page.getByText('Your role can view repairs but not run them.')).toBeVisible();
+  await expect(
+    page.getByText('Your role can view repairs but not run them.', { exact: true }),
+  ).toHaveCount(3);
 
   await page.goto(`/app/${acme}/scenarios`);
   await expect(page.getByRole('heading', { name: 'Scenario lab' })).toBeVisible();

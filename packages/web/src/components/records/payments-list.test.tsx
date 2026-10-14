@@ -89,6 +89,18 @@ describe('PaymentsList', () => {
     expect(replace).toHaveBeenCalledWith('/app/org/payments?minAmount=250');
   });
 
+  it('applies every typed text filter in one navigation', async () => {
+    mockedFetch.mockResolvedValue({ items: [], nextCursor: null });
+    renderWithQuery(<PaymentsList orgId={ORG_ID} />);
+    await screen.findByText('No payments yet');
+    await userEvent.type(screen.getByLabelText('Currency'), 'eur');
+    await userEvent.type(screen.getByLabelText('Min amount (minor units)'), '250');
+    replace.mockClear();
+    await userEvent.click(screen.getByRole('button', { name: 'Apply' }));
+    expect(replace).toHaveBeenCalledTimes(1);
+    expect(replace).toHaveBeenCalledWith('/app/org/payments?currency=eur&minAmount=250');
+  });
+
   it('writes a changed filter to the URL', async () => {
     mockedFetch.mockResolvedValue({ items: [], nextCursor: null });
     renderWithQuery(<PaymentsList orgId={ORG_ID} />);

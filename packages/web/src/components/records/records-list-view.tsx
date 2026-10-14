@@ -63,6 +63,7 @@ export function RecordsListView<T extends { id: string }>({
         read={filters.read}
         isFiltered={filters.isFiltered}
         onChange={filters.setFilter}
+        onApply={filters.setFilters}
         onClear={filters.clearFilters}
       />
       <Suspense fallback={<ListSkeleton />}>
