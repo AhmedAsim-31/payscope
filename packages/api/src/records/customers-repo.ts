@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike } from 'drizzle-orm';
+import { and, desc, eq, exists, ilike, or } from 'drizzle-orm';
 import type { z } from 'zod';
 import type { customerQuerySchema } from '@payscope/shared/records-schemas';
 import type { Db } from '../db/client';
@@ -48,7 +48,19 @@ function toCustomer(row: CustomerRow) {
 export async function listCustomers(db: Db, orgId: string, q: CustomerQuery) {
   const where = and(
     eq(c.orgId, orgId),
-    q.email === undefined ? undefined : ilike(c.email, `${escapeLike(q.email)}%`),
+    q.q === undefined
+      ? undefined
+      : or(
+          ilike(c.email, `${escapeLike(q.q)}%`),
+          exists(
+            db
+              .select({ one: m.id })
+              .from(m)
+              .where(
+                and(eq(m.orgId, orgId), eq(m.providerCustomerId, q.q), eq(m.customerId, c.id)),
+              ),
+          ),
+        ),
     keysetAfter(c.createdAt, c.id, q.cursor),
   );
   const rows = await db

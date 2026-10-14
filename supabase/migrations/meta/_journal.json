@@ -162,6 +162,13 @@
       "when": 1791935467815,
       "tag": "20261013235107_findings_run_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1791948613597,
+      "tag": "20261014033013_provider_customer_id_search_index",
+      "breakpoints": true
     }
   ]
 }

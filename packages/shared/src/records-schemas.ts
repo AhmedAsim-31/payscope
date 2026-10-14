@@ -188,7 +188,7 @@ export const subscriptionQuerySchema = pageQuerySchema.extend({
 });
 
 export const customerQuerySchema = pageQuerySchema.extend({
-  email: z.string().trim().min(1).max(100).optional(),
+  q: z.string().trim().min(1).max(100).optional(),
 });
 
 export const entitlementQuerySchema = pageQuerySchema.extend({

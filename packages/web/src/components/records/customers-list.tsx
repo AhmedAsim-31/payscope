@@ -38,7 +38,7 @@ export function CustomersList({ orgId }: { orgId: string }) {
       columns={customerColumns(orgId)}
       empty={{
         title: 'No customers yet',
-        filteredTitle: 'No customers match this email prefix',
+        filteredTitle: 'No customers match this email or provider ID',
         hint: 'Customers appear here once a connected provider delivers webhook events that mention them, or when seed data is loaded.',
       }}
     />
