@@ -53,6 +53,9 @@ describe('retries', () => {
     await worker.drainOnce();
     expect((await eventRow(sql, stored.eventId))?.status).toBe('failed');
     expect(await payments(sql, seed)).toHaveLength(0);
+    const [scheduled] = await sql<
+      { available_at: string }[]
+    >`select available_at from background_jobs where id = ${stored.jobId}`;
     await makeAvailable(sql, stored.jobId);
     await worker.drainOnce();
     expect((await eventRow(sql, stored.eventId))?.status).toBe('processed');
@@ -61,6 +64,13 @@ describe('retries', () => {
       { attempt_number: 2, outcome: 'succeeded' },
     ]);
     expect((await payments(sql, seed))[0]?.status).toBe('succeeded');
+    const [first, second] = await attemptRows(sql, stored.eventId);
+    expect(first?.next_retry_at).not.toBeNull();
+    expect(new Date(first?.next_retry_at ?? 0)).toEqual(new Date(scheduled?.available_at ?? 1));
+    expect(second?.next_retry_at).toBeNull();
+    expect(first?.correlation_id).toMatch(/^[0-9a-f-]{36}$/);
+    expect(second?.correlation_id).toMatch(/^[0-9a-f-]{36}$/);
+    expect(first?.correlation_id).not.toBe(second?.correlation_id);
   });
 
   it('moves the event to needs_attention when the last attempt fails', async () => {
@@ -91,5 +101,8 @@ describe('retries', () => {
       { status: string }[]
     >`select status from background_jobs where id = ${stored.jobId}`;
     expect(job?.status).toBe('dead');
+    const [attempt] = await attemptRows(sql, stored.eventId);
+    expect(attempt?.next_retry_at).toBeNull();
+    expect(attempt?.correlation_id).not.toBeNull();
   });
 });

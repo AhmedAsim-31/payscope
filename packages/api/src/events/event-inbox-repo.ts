@@ -143,6 +143,8 @@ export async function getEvent(db: Db, orgId: string, eventId: string) {
       failureCategory: eventProcessingAttemptsTable.failureCategory,
       errorMessage: eventProcessingAttemptsTable.errorMessage,
       retryable: eventProcessingAttemptsTable.retryable,
+      nextRetryAt: eventProcessingAttemptsTable.nextRetryAt,
+      correlationId: eventProcessingAttemptsTable.correlationId,
     })
     .from(eventProcessingAttemptsTable)
     .where(
@@ -181,6 +183,7 @@ export async function getEvent(db: Db, orgId: string, eventId: string) {
       ...a,
       startedAt: iso(a.startedAt),
       endedAt: isoOrNull(a.endedAt),
+      nextRetryAt: isoOrNull(a.nextRetryAt),
       durationMs: a.endedAt ? a.endedAt.getTime() - a.startedAt.getTime() : null,
     })),
     job: job ? { ...job, availableAt: iso(job.availableAt) } : null,

@@ -76,8 +76,10 @@ export function attemptRows(sql: postgres.Sql, eventId: string) {
       outcome: string | null;
       failure_category: string | null;
       error_message: string | null;
+      correlation_id: string | null;
+      next_retry_at: string | null;
     }[]
-  >`select attempt_number, outcome, failure_category, error_message
+  >`select attempt_number, outcome, failure_category, error_message, correlation_id, next_retry_at
     from event_processing_attempts where event_id = ${eventId} order by attempt_number`;
 }
 

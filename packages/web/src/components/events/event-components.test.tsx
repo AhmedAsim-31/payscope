@@ -6,6 +6,7 @@ import { StatusBadge } from '@/components/records/status-badge';
 import { ApiClientError, apiFetch } from '@/lib/api-client';
 import type * as ApiClient from '@/lib/api-client';
 import { renderWithQuery } from '@/test/render';
+import { AttemptsTimeline } from './attempts-timeline';
 import { PayloadViewer } from './payload-viewer';
 import { RetryEventButton } from './retry-event-button';
 
@@ -80,5 +81,33 @@ describe('event status badges', () => {
   ])('shows %s as text', (status, text) => {
     renderWithQuery(<StatusBadge status={status} />);
     expect(screen.getByText(text)).toBeInTheDocument();
+  });
+});
+
+describe('AttemptsTimeline', () => {
+  const attempt = {
+    id: '00000000-0000-4000-8000-000000000001',
+    attemptNumber: 1,
+    startedAt: '2026-01-01T00:00:00.000Z',
+    endedAt: '2026-01-01T00:00:01.000Z',
+    durationMs: 1000,
+    outcome: 'failed' as const,
+    failureCategory: 'transient' as const,
+    errorMessage: 'provider hiccup',
+    retryable: true,
+    correlationId: 'corr-123',
+    nextRetryAt: '2026-01-01T00:00:06.000Z',
+  };
+
+  it('shows the correlation id and next retry time', () => {
+    renderWithQuery(<AttemptsTimeline attempts={[attempt]} />);
+    expect(screen.getByText('corr-123')).toBeInTheDocument();
+    expect(screen.getByText(/Next retry/)).toBeInTheDocument();
+    expect(document.querySelector('time[datetime="2026-01-01T00:00:06.000Z"]')).not.toBeNull();
+  });
+
+  it('omits the next retry line when none is scheduled', () => {
+    renderWithQuery(<AttemptsTimeline attempts={[{ ...attempt, nextRetryAt: null }]} />);
+    expect(screen.queryByText(/Next retry/)).toBeNull();
   });
 });

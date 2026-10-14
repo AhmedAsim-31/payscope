@@ -54,6 +54,8 @@ export const eventAttemptSchema = z.object({
   failureCategory: z.enum(FAILURE_CATEGORIES).nullable(),
   errorMessage: z.string().nullable(),
   retryable: z.boolean().nullable(),
+  nextRetryAt: nullableDate,
+  correlationId: z.string().nullable(),
 });
 export type EventAttempt = z.infer<typeof eventAttemptSchema>;
 

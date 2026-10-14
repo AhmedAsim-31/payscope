@@ -37,8 +37,18 @@ export function AttemptsTimeline({ attempts }: { attempts: EventAttempt[] }) {
             Started <Timestamp value={attempt.startedAt} />
             {attempt.durationMs === null ? '' : `, took ${formatDuration(attempt.durationMs)}`}
           </p>
+          {attempt.nextRetryAt ? (
+            <p className="text-muted-foreground text-xs">
+              Next retry <Timestamp value={attempt.nextRetryAt} />
+            </p>
+          ) : null}
           {attempt.errorMessage ? (
             <p className="font-mono text-xs break-words">{attempt.errorMessage}</p>
+          ) : null}
+          {attempt.correlationId ? (
+            <p className="text-muted-foreground text-xs">
+              Correlation ID <span className="font-mono break-all">{attempt.correlationId}</span>
+            </p>
           ) : null}
         </li>
       ))}

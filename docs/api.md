@@ -139,6 +139,10 @@ Event detail adds `signatureVerified`, `objectRef`, and `related: { paymentId, s
 Each related id is resolved from `objectRef` within the event's org and connection only, and is `null` when nothing matches.
 A payment event also resolves the payment's subscription and customer, and a subscription event its customer.
 
+Each attempt carries `correlationId` and `nextRetryAt`.
+`correlationId` is a UUID the worker generates per job run, and it matches the `correlationId` on that run's `job_finished` log line.
+`nextRetryAt` is the time the queue made the job available again after a retryable failure, and `null` when no retry was scheduled.
+
 ### Reconciliation
 
 | Method | Path                                                       | Permission           | Notes                                            |
