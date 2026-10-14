@@ -12,7 +12,12 @@ import {
   type ObjectKind,
 } from '../reconciliation/provider-checks';
 import { outcome, type Outcome } from './repair-actions';
-import { resolveRefreshedFindings, type RefreshActor } from './resolve-refreshed-findings';
+import { deriveFromSubscription } from '../events/derived-entitlements';
+import {
+  AlreadyConsistentError,
+  resolveRefreshedFindings,
+  type RefreshActor,
+} from './resolve-refreshed-findings';
 
 type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
 type PaymentStatus = typeof pay.$inferSelect.status;
@@ -166,7 +171,7 @@ export async function planPaymentRefresh(
   const amountMinor = res.amountMinor ?? row.amountMinor;
   const currency = res.currency ?? row.currency;
   if (status === row.status && amountMinor === row.amountMinor && currency === row.currency) {
-    throw new ApiHttpError(409, 'ALREADY_CONSISTENT', 'The payment already matches the provider');
+    throw new AlreadyConsistentError('payment', paymentId, statusAgrees(status, res.status));
   }
   if (amountMinor < row.amountRefundedMinor) {
     throw new ApiHttpError(
@@ -207,10 +212,10 @@ export async function planSubscriptionRefresh(
   const status = PROVIDER_SUBSCRIPTION_STATUS[normalize(res.status)];
   if (!status) throw unmapped(res.status);
   if (status === row.status) {
-    throw new ApiHttpError(
-      409,
-      'ALREADY_CONSISTENT',
-      'The subscription already matches the provider',
+    throw new AlreadyConsistentError(
+      'subscription',
+      subscriptionId,
+      statusAgrees(status, res.status),
     );
   }
   return {
@@ -263,11 +268,18 @@ export async function applyRefresh(
       `The ${plan.kind} changed while the provider was being read`,
     );
   }
+  const derived =
+    plan.kind === 'subscription'
+      ? await deriveFromSubscription(tx, actor.orgId, plan.targetId, new Date())
+      : undefined;
   const resolvedFindingIds = plan.matchesProvider
     ? await resolveRefreshedFindings(tx, actor, plan.kind, plan.targetId)
     : [];
   return outcome('refresh_from_provider', plan.targetId, plan.previousState, {
     ...plan.resultingState,
+    ...(typeof derived === 'object' && derived.changed
+      ? { entitlements: { state: derived.state, keys: derived.keys } }
+      : {}),
     resolvedFindingIds,
   });
 }

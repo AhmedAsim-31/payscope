@@ -7,6 +7,7 @@ import { createHarness, type TestUser } from '../test/identity-harness';
 import { REASON, repairCall, type Tenant } from '../test/ops-harness';
 import {
   addCustomer,
+  addEntitlement,
   addPayment,
   addSubscription,
   createFakeAdapter,
@@ -400,5 +401,144 @@ describe('refresh resolves the originating finding', () => {
     expect(res.statusCode).toBe(200);
     expect((await findingRow(dismissed))?.status).toBe('dismissed');
     expect((await findingRow(unrelated))?.status).toBe('open');
+  });
+});
+
+describe('refresh on an already consistent record', () => {
+  const subscriptionWith = async (t: Tenant, local: string, remote: string) => {
+    const id = await addSubscription(sql, t, await addCustomer(sql, t), local);
+    behaviors.set((await subscriptionRow(id))?.providerId ?? '', { kind: 'ok', status: remote });
+    return id;
+  };
+
+  it('resolves open status mismatches on a payment and still answers 409', async () => {
+    useFake();
+    const t = await tenant();
+    const pay = await addPayment(sql, t, { status: 'refunded', amount: 1000, refunded: 1000 });
+    behaviors.set(pay.providerId, { kind: 'ok', status: 'succeeded', amountMinor: 1000n });
+    const findingId = await addFinding(t, 'payment', pay.id);
+
+    const res = await refresh(t, pay.id);
+    expect(res.statusCode).toBe(409);
+    expect(res.json()).toMatchObject({
+      error: { code: 'ALREADY_CONSISTENT', details: { resolvedFindingIds: [findingId] } },
+    });
+    expect(await findingRow(findingId)).toEqual({ status: 'resolved', note: REASON });
+    expect(await findingAudits(t, findingId)).toEqual([
+      expect.objectContaining({
+        previous: { status: 'open' },
+        resulting: { status: 'resolved', via: 'refresh_from_provider' },
+      }),
+    ]);
+  });
+
+  it('resolves reviewed status mismatches on a subscription', async () => {
+    useFake();
+    const t = await tenant();
+    const subId = await subscriptionWith(t, 'active', 'active');
+    const findingId = await addFinding(t, 'subscription', subId, 'reviewed');
+
+    const res = await refreshSub(t, subId);
+    expect(res.statusCode).toBe(409);
+    expect(errorCode(res)).toBe('ALREADY_CONSISTENT');
+    expect((await findingRow(findingId))?.status).toBe('resolved');
+    expect(await findingAudits(t, findingId)).toHaveLength(1);
+  });
+
+  it('leaves the finding open when the local status only maps to the provider spelling', async () => {
+    useFake();
+    const t = await tenant();
+    const subId = await subscriptionWith(t, 'past_due', 'unpaid');
+    const findingId = await addFinding(t, 'subscription', subId);
+
+    const res = await refreshSub(t, subId);
+    expect(res.statusCode).toBe(409);
+    expect((await findingRow(findingId))?.status).toBe('open');
+  });
+});
+
+describe('refresh recomputes subscription entitlements', () => {
+  async function subscription(
+    t: Tenant,
+    status: string,
+    opts: { periodEnd?: string; mapped?: boolean } = {},
+  ) {
+    const customerId = await addCustomer(sql, t);
+    const id = await addSubscription(sql, t, customerId, status, opts.periodEnd ?? null);
+    if (opts.mapped !== false) {
+      await sql`update provider_connections set entitlement_map = '{"gold":["pro"]}'::jsonb
+        where id = ${t.connectionId}`;
+      await sql`update subscription_records set plan_ref = 'gold' where id = ${id}`;
+    }
+    return { id, customerId, providerId: (await subscriptionRow(id))?.providerId ?? '' };
+  }
+
+  const entitlementRow = async (customerId: string) => {
+    const [row] = await sql<{ state: string; subscriptionId: string | null }[]>`
+      select state, subscription_id as "subscriptionId" from entitlement_records
+      where customer_id = ${customerId} and entitlement_key = 'pro'`;
+    return row;
+  };
+
+  it('expires the linked entitlement when the provider reports the subscription expired', async () => {
+    useFake();
+    const t = await tenant();
+    const sub = await subscription(t, 'active');
+    await addEntitlement(sql, t, sub.customerId, 'active', sub.id);
+    behaviors.set(sub.providerId, { kind: 'ok', status: 'expired' });
+
+    const res = await refreshSub(t, sub.id);
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toMatchObject({
+      resultingState: { status: 'expired', entitlements: { state: 'expired', keys: ['pro'] } },
+    });
+    expect(await entitlementRow(sub.customerId)).toEqual({
+      state: 'expired',
+      subscriptionId: sub.id,
+    });
+    expect((await audits(t))[0]).toMatchObject({
+      outcome: 'success',
+      resulting: { entitlements: { state: 'expired', keys: ['pro'] } },
+    });
+  });
+
+  it('grants the entitlement when a past-due subscription is active at the provider', async () => {
+    useFake();
+    const t = await tenant();
+    const sub = await subscription(t, 'past_due');
+    behaviors.set(sub.providerId, { kind: 'ok', status: 'active' });
+
+    const res = await refreshSub(t, sub.id);
+    expect(res.statusCode).toBe(200);
+    expect(await entitlementRow(sub.customerId)).toEqual({
+      state: 'active',
+      subscriptionId: sub.id,
+    });
+  });
+
+  it('keeps access through the paid period when the provider reports a cancellation', async () => {
+    useFake();
+    const t = await tenant();
+    const periodEnd = new Date(Date.now() + 86_400_000).toISOString();
+    const sub = await subscription(t, 'active', { periodEnd });
+    await addEntitlement(sql, t, sub.customerId, 'active', sub.id);
+    behaviors.set(sub.providerId, { kind: 'ok', status: 'canceled' });
+
+    const res = await refreshSub(t, sub.id);
+    expect(res.statusCode).toBe(200);
+    expect((await entitlementRow(sub.customerId))?.state).toBe('active');
+  });
+
+  it('records no entitlement change when the plan is unmapped', async () => {
+    useFake();
+    const t = await tenant();
+    const sub = await subscription(t, 'active', { mapped: false });
+    behaviors.set(sub.providerId, { kind: 'ok', status: 'expired' });
+
+    const res = await refreshSub(t, sub.id);
+    expect(res.statusCode).toBe(200);
+    expect(res.json<{ resultingState: object }>().resultingState).not.toHaveProperty(
+      'entitlements',
+    );
   });
 });

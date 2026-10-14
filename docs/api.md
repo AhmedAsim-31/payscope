@@ -185,6 +185,8 @@ None of them write to a provider.
 `refresh-from-provider` takes `{ paymentId, reason }` or `{ subscriptionId, reason }`, never both.
 It reads the object from the provider and overwrites the local status (and, for a payment, amount and currency).
 When the result matches the provider, open or reviewed `status_mismatch` findings on that record are resolved and their ids are returned in `resultingState.resolvedFindingIds`.
+This also happens when the record already matches: the request still answers `409 ALREADY_CONSISTENT`, and the resolved ids are in `error.details.resolvedFindingIds`.
+A subscription refresh re-derives its entitlements from the connection's plan map, the same way webhook ingestion does; when that changes them, `resultingState.entitlements` holds the new `state` and `keys`.
 Errors: `404 NOT_FOUND`, `409 CONNECTION_NOT_VERIFIED`, `409 PROVIDER_NOT_CONFIGURED`, `422 PROVIDER_FETCH_UNSUPPORTED` when the adapter cannot fetch that kind (RevenueCat payments), `409 PROVIDER_OBJECT_NOT_FOUND`, `502 PROVIDER_UNAVAILABLE`, `502 PROVIDER_FETCH_FAILED`, `422 PROVIDER_STATUS_UNMAPPED`, `409 ALREADY_CONSISTENT`, `409 REFUND_EXCEEDS_AMOUNT`, and `409 CONCURRENT_UPDATE` when the record changed while the provider was being read.
 
 Reusing a key with a different body answers `422 IDEMPOTENCY_KEY_REUSED`; see [architecture.md](architecture.md#repair-center).
