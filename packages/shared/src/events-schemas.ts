@@ -96,6 +96,7 @@ export const jobSummarySchema = z.object({
     failed: z.number().int(),
     dead: z.number().int(),
   }),
+  retrying: z.number().int(),
   oldestQueuedAgeSeconds: z.number().int().nullable(),
 });
 export type JobSummary = z.infer<typeof jobSummarySchema>;

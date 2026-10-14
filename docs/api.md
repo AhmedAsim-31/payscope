@@ -126,8 +126,11 @@ Each applied or ignored write is audited as `entitlement.ingest`; reusing a key 
 | ------ | ----------------------------- | ------------- | ------------------------------------------------- |
 | GET    | `{org}/events`                | `events:read` | Event inbox                                       |
 | GET    | `{org}/events/:eventId`       | `events:read` | Redacted payload, attempts, job                   |
-| GET    | `{org}/jobs/summary`          | `events:read` | Job counts by status                              |
+| GET    | `{org}/jobs/summary`          | `events:read` | Job counts by status, plus `retrying`             |
 | POST   | `{org}/events/:eventId/retry` | `jobs:retry`  | Sets the event back to `pending` and re-queues it |
+
+The jobs summary `retrying` count is the queued jobs that already used at least one attempt.
+The worker never sets job status `failed`, so `counts.failed` stays 0.
 
 Event list filters: `status`, `provider`, `connectionId`, `normalizedType`, and `objectRef` (the provider object id) match exactly, and `from` and `to` bound the timestamp.
 `customerId` matches events whose object is a payment, subscription, or provider customer mapping of that customer on the same connection.

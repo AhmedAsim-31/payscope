@@ -40,7 +40,7 @@ export function JobsSummary({ orgId }: { orgId: string }) {
     queryFn: async () =>
       jobSummarySchema.parse(await apiFetch(`/api/v1/orgs/${orgId}/jobs/summary`)),
   });
-  const { counts, oldestQueuedAgeSeconds } = data;
+  const { counts, retrying, oldestQueuedAgeSeconds } = data;
   const total = Object.values(counts).reduce((sum, n) => sum + n, 0);
 
   return (
@@ -61,10 +61,10 @@ export function JobsSummary({ orgId }: { orgId: string }) {
         <StatCard title="Queued" value={String(counts.queued)} hint="Waiting for the worker" />
         <StatCard title="Running" value={String(counts.running)} hint="Being processed now" />
         <StatCard
-          title="Failed"
-          value={String(counts.failed)}
-          hint="Stopped, can be retried"
-          link={{ href: `/app/${orgId}/events?status=failed`, label: 'View failed events' }}
+          title="Retrying"
+          value={String(retrying)}
+          hint="Queued again after a failed attempt"
+          link={{ href: `/app/${orgId}/events?status=failed`, label: 'View events awaiting retry' }}
         />
         <StatCard
           title="Dead"
