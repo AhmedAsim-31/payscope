@@ -1,0 +1,50 @@
+docs/api.md
+  h_78e539a96187c3 109-111
+docs/database.md
+  h_78e539a96187c3 82
+packages/api/src/db/schema/records.ts
+  h_78e539a96187c3 123-124
+packages/api/src/events/apply-subscriptions.integration.test.ts
+  h_78e539a96187c3 6,19,91-106
+packages/api/src/events/subscriptions.ts
+  h_78e539a96187c3 47-59,67,71,109
+packages/api/src/records/records.integration.test.ts
+  h_78e539a96187c3 212-214,223-227,240
+packages/api/src/records/subscriptions-repo.ts
+  h_78e539a96187c3 24-25,67-68
+packages/provider-adapters/src/paddle/paddle-normalize.test.ts
+  h_78e539a96187c3 219-227
+packages/provider-adapters/src/paddle/paddle-normalize.ts
+  h_78e539a96187c3 36,153
+packages/provider-adapters/src/revenuecat/revenuecat-normalize.test.ts
+  h_78e539a96187c3 99-107
+packages/provider-adapters/src/revenuecat/revenuecat-normalize.ts
+  h_78e539a96187c3 102-104
+packages/provider-adapters/src/stripe/stripe-normalize.test.ts
+  h_78e539a96187c3 195-204
+packages/provider-adapters/src/stripe/stripe-normalize.ts
+  h_78e539a96187c3 54-55,166-167
+packages/shared/src/records-schemas.ts
+  h_78e539a96187c3 92-93
+packages/web/src/components/records/record-detail-related.test.tsx
+  h_78e539a96187c3 89-90,222-223,237-239
+packages/web/src/components/records/subscription-detail.tsx
+  h_78e539a96187c3 65-70
+supabase/migrations/20261014033758_subscription_cancel_end_timestamps.sql
+  h_78e539a96187c3 1-2
+supabase/migrations/meta/20261014033758_snapshot.json
+  h_78e539a96187c3 1-3578
+supabase/migrations/meta/_journal.json
+  h_78e539a96187c3 172-178
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1c5fecf0563fd96ff21191c2294da118c8719b9a",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
