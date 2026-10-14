@@ -54,4 +54,51 @@ describe('AuditList', () => {
     await waitFor(() => expect(replace).toHaveBeenCalledWith('/app/org/audit?q=refund'));
     expect(replace).toHaveBeenCalledTimes(1);
   });
+
+  it('shows the actor email and links each target to its detail page', async () => {
+    const id = '11111111-1111-4111-8111-111111111111';
+    const entry = (action: string, targetType: string, actorEmail: string | null = null) => ({
+      id: crypto.randomUUID(),
+      actorId: actorEmail ? id : null,
+      actorEmail,
+      actorType: actorEmail ? 'user' : 'system',
+      action,
+      targetType,
+      targetId: id,
+      reason: null,
+      previousState: null,
+      resultingState: null,
+      outcome: 'success',
+      requestId: null,
+      createdAt: '2026-03-01T00:00:00.000Z',
+    });
+    const targets: [string, string][] = [
+      ['payment', `/app/${ORG_ID}/payments/${id}`],
+      ['subscription', `/app/${ORG_ID}/subscriptions/${id}`],
+      ['customer', `/app/${ORG_ID}/customers/${id}`],
+      ['entitlement', `/app/${ORG_ID}/entitlements/${id}`],
+      ['incident', `/app/${ORG_ID}/incidents/${id}`],
+      ['finding', `/app/${ORG_ID}/findings/${id}`],
+      ['reconciliation_run', `/app/${ORG_ID}/reconciliation/${id}`],
+      ['event', `/app/${ORG_ID}/events/${id}`],
+      ['connection', `/app/${ORG_ID}/connections`],
+    ];
+    mockedFetch.mockResolvedValue({
+      items: [
+        entry('member.add', 'member', 'ops@example.test'),
+        entry('member.remove', 'member', null),
+        ...targets.map(([type]) => entry(`touch.${type}`, type)),
+      ],
+      nextCursor: null,
+    });
+    renderWithQuery(<AuditList orgId={ORG_ID} />);
+    expect(await screen.findByText('ops@example.test')).toBeInTheDocument();
+    expect(screen.getAllByText('System')).toHaveLength(targets.length + 1);
+    for (const [type, href] of targets) {
+      const link = screen.getByRole('link', { name: `${type}:11111111` });
+      expect(link).toHaveAttribute('href', href);
+    }
+    expect(screen.queryByRole('link', { name: 'member:11111111' })).toBeNull();
+    expect(screen.getAllByText('member:11111111')).toHaveLength(2);
+  });
 });

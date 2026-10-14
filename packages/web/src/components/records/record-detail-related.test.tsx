@@ -65,6 +65,7 @@ const finding = {
 const audit = {
   id: '77777777-7777-4777-8777-777777777777',
   actorId: null,
+  actorEmail: null,
   actorType: 'system',
   action: 'refresh_from_provider',
   targetType: 'payment',

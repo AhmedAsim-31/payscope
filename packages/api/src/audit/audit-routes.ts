@@ -3,6 +3,7 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import { auditPageSchema, auditQuerySchema } from '@payscope/shared/audit-schemas';
 import type { Db } from '../db/client';
+import { membershipsTable, profilesTable } from '../db/schema/identity';
 import { auditLogsTable as t } from '../db/schema/operations';
 import {
   entitlementRecordsTable,
@@ -75,8 +76,18 @@ export const auditRoutes: FastifyPluginCallbackZod<{ db: Db }> = (app, { db }, d
       const q = request.query;
       const orgId = currentOrg(request).id;
       const rows = await db
-        .select({ entry: t, cursorTs: cursorTsColumn(t.createdAt) })
+        .select({
+          entry: t,
+          actorEmail: profilesTable.email,
+          cursorTs: cursorTsColumn(t.createdAt),
+        })
         .from(t)
+        // Only a current member of this org resolves to an email; other orgs' users stay null.
+        .leftJoin(
+          membershipsTable,
+          and(eq(membershipsTable.orgId, t.orgId), eq(membershipsTable.userId, t.actorId)),
+        )
+        .leftJoin(profilesTable, eq(profilesTable.id, membershipsTable.userId))
         .where(
           and(
             eq(t.orgId, orgId),
@@ -96,9 +107,10 @@ export const auditRoutes: FastifyPluginCallbackZod<{ db: Db }> = (app, { db }, d
       return toPage(
         rows.map((x) => ({ ...x, id: x.entry.id })),
         q.limit,
-        ({ entry: e }) => ({
+        ({ entry: e, actorEmail }) => ({
           id: e.id,
           actorId: e.actorId,
+          actorEmail,
           actorType: e.actorType,
           action: e.action,
           targetType: e.targetType,

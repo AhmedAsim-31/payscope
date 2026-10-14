@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { auditPageSchema } from '@payscope/shared/audit-schemas';
 import { eventPageSchema } from '@payscope/shared/events-schemas';
 import { customerDetailSchema, paymentPageSchema } from '@payscope/shared/records-schemas';
-import { AUDIT_COLUMNS } from '@/components/audit/audit-list';
+import { auditColumns } from '@/components/audit/audit-list';
 import { eventColumns } from '@/components/events/events-list';
 import {
   BackLink,
@@ -136,7 +136,7 @@ export function CustomerDetail({ orgId, customerId }: { orgId: string; customerI
         viewAllLabel="View all audit entries"
         schema={auditPageSchema}
         params={{ customerId: customer.id }}
-        columns={AUDIT_COLUMNS}
+        columns={auditColumns(orgId)}
         empty={{
           title: 'No audit entries yet',
           hint: 'Audited actions on this customer, its payments, subscriptions and entitlements appear here.',
