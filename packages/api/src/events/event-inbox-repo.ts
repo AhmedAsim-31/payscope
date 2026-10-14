@@ -141,6 +141,9 @@ export async function summarizeJobs(db: Db, orgId: string) {
     .select({
       status: backgroundJobsTable.status,
       total: count(),
+      retried: sql<number>`count(*) filter (where ${backgroundJobsTable.attemptCount} > 0)`.mapWith(
+        Number,
+      ),
       oldestAvailableAt: min(backgroundJobsTable.availableAt),
     })
     .from(backgroundJobsTable)
@@ -148,9 +151,10 @@ export async function summarizeJobs(db: Db, orgId: string) {
     .groupBy(backgroundJobsTable.status);
   const counts = { queued: 0, running: 0, succeeded: 0, failed: 0, dead: 0 };
   for (const row of rows) counts[row.status] = row.total;
-  const oldest = rows.find((row) => row.status === 'queued')?.oldestAvailableAt;
+  const queued = rows.find((row) => row.status === 'queued');
+  const oldest = queued?.oldestAvailableAt;
   const oldestQueuedAgeSeconds = oldest
     ? Math.max(0, Math.floor((Date.now() - oldest.getTime()) / 1000))
     : null;
-  return { counts, oldestQueuedAgeSeconds };
+  return { counts, retrying: queued?.retried ?? 0, oldestQueuedAgeSeconds };
 }

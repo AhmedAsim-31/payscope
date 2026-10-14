@@ -174,6 +174,20 @@ describe('jobs summary', () => {
     expect(res.body.counts).toMatchObject({ queued: 1, dead: 1, running: 0 });
     expect(res.body.oldestQueuedAgeSeconds).toBeGreaterThanOrEqual(90);
   });
+
+  it('counts queued jobs that already failed an attempt as retrying', async () => {
+    const t = await createTenant();
+    await insertEvent(t, { jobStatus: 'queued', status: 'failed' });
+    await sql`insert into background_jobs (org_id, kind, payload, status, attempt_count)
+      values (${t.orgId}, 'process_provider_event', '{}'::jsonb, 'queued', 0)`;
+    const res = await request<{ counts: Record<string, number>; retrying: number }>(
+      t.owner,
+      t.orgId,
+      '/jobs/summary',
+    );
+    expect(res.body.counts.queued).toBe(2);
+    expect(res.body.retrying).toBe(1);
+  });
 });
 
 describe('retry', () => {

@@ -14,13 +14,16 @@ const mockedFetch = vi.mocked(apiFetch);
 const ORG = '7b0f5a3e-4f64-4a6c-9a53-0f3d5a1c2b10';
 
 describe('JobsSummary retry links', () => {
-  it('links the failed and dead cards to the matching events', async () => {
+  it('links the retrying and dead cards to the matching events', async () => {
     mockedFetch.mockResolvedValue({
-      counts: { queued: 0, running: 0, succeeded: 4, failed: 1, dead: 2 },
+      counts: { queued: 3, running: 0, succeeded: 4, failed: 0, dead: 2 },
+      retrying: 1,
       oldestQueuedAgeSeconds: null,
     });
     renderWithQuery(<JobsSummary orgId={ORG} />);
-    expect(await screen.findByRole('link', { name: 'View failed events' })).toHaveAttribute(
+    expect(await screen.findByText('Retrying')).toBeInTheDocument();
+    expect(screen.queryByText('Failed')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'View events awaiting retry' })).toHaveAttribute(
       'href',
       `/app/${ORG}/events?status=failed`,
     );

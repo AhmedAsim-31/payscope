@@ -176,6 +176,7 @@ Every processing try writes one attempt row with `failure_category` taken from t
 Other errors count as `transient`.
 A retryable failure sets the event to `failed` and the job returns to `queued` with backoff.
 A non-retryable failure, or a retryable one on the job's last attempt, sets the event to `needs_attention` and the job to `dead`.
+The job status `failed` is never written; the Jobs page counts a queued job with `attempt_count > 0` as retrying.
 Unsupported event types are `ignored` with `unsupported_event`.
 
 ## Provider connection secrets
