@@ -1,0 +1,24 @@
+docs/api.md
+  h_78e539a96187c3 138-141
+packages/api/src/events/event-inbox-repo.ts
+  h_78e539a96187c3 27-73,126,134-135,179
+packages/api/src/events/event-inbox.integration.test.ts
+  h_78e539a96187c3 17-19,22-45,86,91,94,172-231
+packages/shared/src/events-schemas.ts
+  h_78e539a96187c3 69-75,79-80
+packages/web/src/components/events/event-detail.test.tsx
+  h_78e539a96187c3 1-78
+packages/web/src/components/events/event-detail.tsx
+  h_78e539a96187c3 3-8,17,49-75,97-110,126-129
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1fc4a9b5fed7c6e8d587055eb3dae7ae2f0119b0",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
