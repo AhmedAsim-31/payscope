@@ -8,9 +8,9 @@ test('reconcile, find the missing entitlement, repair it with a reason', async (
   const { acme } = orgIds();
 
   await page.goto(`/app/${acme}/customers`);
-  await page.getByLabel('Email starts with').fill('maya.patel@example.com');
+  await page.getByLabel('Search email or provider ID').fill('maya.patel@example.com');
   await page.getByRole('button', { name: 'Apply' }).click();
-  await expect(page).toHaveURL(/email=maya/);
+  await expect(page).toHaveURL(/q=maya/);
   const customerLink = page.getByRole('row').getByRole('link', { name: 'maya.patel@example.com' });
   await expect(customerLink).toBeVisible();
   const customerId = (await customerLink.getAttribute('href'))?.split('/').pop() ?? '';

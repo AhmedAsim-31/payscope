@@ -19,11 +19,17 @@ export function useUrlFilters(fields: readonly FilterField[]) {
     router.replace(query ? `${pathname}?${query}` : pathname);
   }
 
-  function setFilter(name: string, value: string) {
+  function setFilters(values: Record<string, string>) {
     const next = new URLSearchParams(searchParams.toString());
-    if (value) next.set(name, value);
-    else next.delete(name);
+    for (const [name, value] of Object.entries(values)) {
+      if (value) next.set(name, value);
+      else next.delete(name);
+    }
     navigate(next);
+  }
+
+  function setFilter(name: string, value: string) {
+    setFilters({ [name]: value });
   }
 
   function clearFilters() {
@@ -37,6 +43,7 @@ export function useUrlFilters(fields: readonly FilterField[]) {
     read: (name: string) => searchParams.get(name) ?? '',
     isFiltered: fields.some((field) => searchParams.has(field.name)),
     setFilter,
+    setFilters,
     clearFilters,
   };
 }
