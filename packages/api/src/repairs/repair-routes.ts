@@ -20,6 +20,7 @@ import {
   planSubscriptionRefresh,
   type ProviderDeps,
 } from './refresh-from-provider';
+import { AlreadyConsistentError, settleAlreadyConsistent } from './resolve-refreshed-findings';
 
 const orgParams = z.object({ orgId: z.uuid() });
 
@@ -144,12 +145,14 @@ export const repairRoutes: FastifyPluginCallbackZod<{ db: Db } & ProviderDeps> =
     async (request) => {
       const { body } = request;
       const ctx = context(request);
+      const actor = { ...ctx, reason: body.reason };
       const [targetType, targetId, plan] =
         'paymentId' in body
           ? (['payment', body.paymentId, planPaymentRefresh] as const)
           : (['subscription', body.subscriptionId, planSubscriptionRefresh] as const);
       // The provider read happens outside the transaction; the write re-checks the version it saw.
       const planned = await plan(db, providers, ctx.orgId, targetId).catch((err: unknown) => {
+        if (err instanceof AlreadyConsistentError) return settleAlreadyConsistent(db, actor, err);
         if (err instanceof ApiHttpError) return err;
         throw err;
       });
@@ -165,7 +168,7 @@ export const repairRoutes: FastifyPluginCallbackZod<{ db: Db } & ProviderDeps> =
         },
         async (tx) => {
           if (planned instanceof ApiHttpError) throw planned;
-          return applyRefresh(tx, { ...ctx, reason: body.reason }, planned);
+          return applyRefresh(tx, actor, planned);
         },
       );
     },
