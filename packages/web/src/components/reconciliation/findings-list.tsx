@@ -38,6 +38,7 @@ export function FindingsList({ orgId }: { orgId: string }) {
       fields={FINDING_FILTERS}
       schema={findingPageSchema}
       columns={findingColumns(orgId)}
+      exportable
       empty={{
         title: 'No findings yet',
         filteredTitle: 'No findings match these filters',

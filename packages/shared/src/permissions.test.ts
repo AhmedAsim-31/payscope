@@ -16,6 +16,7 @@ const OPERATE: Action[] = [
   'repairs:execute',
   'scenarios:run',
   'entitlements:ingest',
+  'records:export',
 ];
 const ADMIN_ONLY: Action[] = ['org:update', 'members:manage', 'connections:manage'];
 const OWNER_ONLY: Action[] = ['org:delete', 'ownership:transfer'];

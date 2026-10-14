@@ -34,14 +34,14 @@ async function toError(response: Response): Promise<ApiClientError> {
   return new ApiClientError(response.status, code, message, requestId);
 }
 
-export function createApiFetch(deps: ApiFetchDeps) {
+export function createApiRequest(deps: ApiFetchDeps) {
   const send = async (path: string, init: RequestInit | undefined, token: string | null) => {
     const headers = new Headers(init?.headers);
     if (token) headers.set('authorization', `Bearer ${token}`);
     return deps.fetch(`${deps.baseUrl}${path}`, { ...init, headers });
   };
 
-  return async function apiFetch(path: string, init?: RequestInit): Promise<unknown> {
+  return async function apiRequest(path: string, init?: RequestInit): Promise<Response> {
     let response = await send(path, init, await deps.getAccessToken());
 
     if (response.status === 401) {
@@ -55,15 +55,23 @@ export function createApiFetch(deps: ApiFetchDeps) {
     }
 
     if (!response.ok) throw await toError(response);
+    return response;
+  };
+}
+
+export function createApiFetch(deps: ApiFetchDeps) {
+  const apiRequest = createApiRequest(deps);
+  return async function apiFetch(path: string, init?: RequestInit): Promise<unknown> {
+    const response = await apiRequest(path, init);
     if (response.status === 204) return undefined;
     return response.json();
   };
 }
 
 /** For client components only; built per call so env and the browser session are read lazily. */
-export function apiFetch(path: string, init?: RequestInit): Promise<unknown> {
+function browserDeps(): ApiFetchDeps {
   const supabase = createClient();
-  return createApiFetch({
+  return {
     baseUrl: getPublicEnv().NEXT_PUBLIC_API_URL,
     fetch: (input, requestInit) => fetch(input, requestInit),
     getAccessToken: async () =>
@@ -74,5 +82,13 @@ export function apiFetch(path: string, init?: RequestInit): Promise<unknown> {
       await supabase.auth.signOut();
       window.location.assign('/login');
     },
-  })(path, init);
+  };
+}
+
+export function apiFetch(path: string, init?: RequestInit): Promise<unknown> {
+  return createApiFetch(browserDeps())(path, init);
+}
+
+export async function apiFetchBlob(path: string): Promise<Blob> {
+  return (await createApiRequest(browserDeps())(path)).blob();
 }

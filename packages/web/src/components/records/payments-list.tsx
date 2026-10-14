@@ -39,6 +39,7 @@ export function PaymentsList({ orgId }: { orgId: string }) {
       fields={PAYMENT_FILTERS}
       schema={paymentPageSchema}
       columns={paymentColumns(orgId)}
+      exportable
       empty={{
         title: 'No payments yet',
         filteredTitle: 'No payments match these filters',

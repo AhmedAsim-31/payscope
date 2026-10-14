@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 import type { z } from 'zod';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { RecordPage, RecordResource } from '@/lib/records-queries';
+import { ExportCsvButton } from './export-csv-button';
 import { FilterBar } from './filter-bar';
 import type { FilterField } from './filter-config';
 import { RecordsList, type Column, type EmptyCopy } from './records-list';
@@ -19,6 +20,7 @@ type RecordsListViewProps<T extends { id: string }> = {
   schema: z.ZodType<RecordPage<T>>;
   columns: readonly Column<T>[];
   empty: EmptyCopy;
+  exportable?: boolean;
 };
 
 function ListSkeleton() {
@@ -40,12 +42,21 @@ export function RecordsListView<T extends { id: string }>({
   schema,
   columns,
   empty,
+  exportable = false,
 }: RecordsListViewProps<T>) {
   const filters = useUrlFilters(fields);
 
   return (
     <div className="grid gap-6">
-      <PageHeader title={title} description={description} />
+      <PageHeader
+        title={title}
+        description={description}
+        actions={
+          exportable ? (
+            <ExportCsvButton orgId={orgId} resource={resource} params={filters.apiParams} />
+          ) : null
+        }
+      />
       <FilterBar
         label={`Filter ${title.toLowerCase()}`}
         fields={fields}

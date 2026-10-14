@@ -16,7 +16,8 @@ export type ErrorContext =
   | 'create-connection'
   | 'update-connection'
   | 'verify-connection'
-  | 'remove-credential';
+  | 'remove-credential'
+  | 'export-csv';
 
 const CONFLICT_MESSAGES: Record<string, string> = {
   SCENARIO_RUNNING: 'A scenario is already running. Wait for it to finish.',
@@ -102,6 +103,9 @@ export function describeError(error: unknown, context: ErrorContext): string {
   }
   if (error.status === 429 && CONNECTION_CONTEXTS.includes(context)) {
     return 'Too many credential changes or tests. Wait a minute and try again.';
+  }
+  if (error.status === 429 && context === 'export-csv') {
+    return 'Too many searches or exports. Wait a minute and try again.';
   }
   if (error.status === 429) return 'Too many scenario runs. Wait a few minutes and try again.';
   if (error.status === 403) return error.message || 'You do not have permission to do that.';

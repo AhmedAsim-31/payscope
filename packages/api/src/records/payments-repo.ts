@@ -2,6 +2,7 @@ import { and, desc, eq, exists, gte, lt, lte, type SQL } from 'drizzle-orm';
 import type { z } from 'zod';
 import type { paymentQuerySchema } from '@payscope/shared/records-schemas';
 import type { Db } from '../db/client';
+import { ApiHttpError } from '../http-error';
 import { providerEventsTable } from '../db/schema/events';
 import { customersTable, providerConnectionsTable } from '../db/schema/providers';
 import { paymentRecordsTable as p, subscriptionRecordsTable as s } from '../db/schema/records';
@@ -67,6 +68,9 @@ function toPayment(row: PaymentRow) {
 }
 
 export async function listPayments(db: Db, orgId: string, q: PaymentQuery) {
+  if (q.minAmount !== undefined && q.maxAmount !== undefined && q.minAmount > q.maxAmount) {
+    throw new ApiHttpError(422, 'INVALID_AMOUNT_RANGE', 'minAmount must not exceed maxAmount');
+  }
   const where = and(
     eq(p.orgId, orgId),
     q.status === undefined ? undefined : eq(p.status, q.status),

@@ -31,6 +31,7 @@ import { DEFAULT_RETENTION_POLICY, type RetentionPolicy } from './retention/rete
 import type { Worker } from './jobs/worker';
 import { identityRoutes } from './orgs/identity-routes';
 import { eventInboxRoutes } from './events/event-inbox-routes';
+import { exportRoutes } from './exports/export-routes';
 import { overviewRoutes } from './overview/overview-routes';
 import { recordsRoutes } from './records/records-routes';
 import { reconciliationRoutes } from './reconciliation/reconciliation-routes';
@@ -121,6 +122,7 @@ export async function buildApp(opts: BuildAppOptions = {}) {
     await app.register(meRoutes, { prefix: '/api/v1' });
     if (opts.db) await app.register(identityRoutes, { db: opts.db });
     if (opts.db) await app.register(recordsRoutes, { db: opts.db });
+    if (opts.db) await app.register(exportRoutes, { db: opts.db });
     if (opts.db) await app.register(eventInboxRoutes, { db: opts.db });
     if (opts.db) await app.register(overviewRoutes, { db: opts.db });
     if (opts.db) await app.register(auditRoutes, { db: opts.db });

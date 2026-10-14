@@ -25,6 +25,7 @@ Not a member, or a malformed id, answers `404 NOT_FOUND`; a member without the p
 | ---------------------------------------------------------------------------------------------------------------- | ---------------------- |
 | read permissions                                                                                                 | all roles              |
 | `jobs:retry`, `reconciliation:run`, `findings:update`, `repairs:execute`, `scenarios:run`, `entitlements:ingest` | OWNER, ADMIN, OPERATOR |
+| `records:export`                                                                                                 | OWNER, ADMIN, OPERATOR |
 | `members:manage`, `connections:manage`, `org:update`                                                             | OWNER, ADMIN           |
 | `org:delete`, `ownership:transfer`                                                                               | OWNER                  |
 
@@ -145,6 +146,20 @@ Finding list filters: `type`, `status`, `severity`, `subjectType`, and `subjectI
 
 Each run carries `trigger`: `manual` for runs started through this API, `scheduled` for runs the internal tick starts (see [operations.md](operations.md#scheduled-reconciliation)).
 
+### CSV export
+
+| Method | Path                                   | Permission       |
+| ------ | -------------------------------------- | ---------------- |
+| GET    | `{org}/payments/export`                | `records:export` |
+| GET    | `{org}/reconciliation/findings/export` | `records:export` |
+
+Each takes the same filters as its list endpoint, without `cursor` and `limit`, and answers `text/csv` as an attachment, newest first.
+Exports are capped at 5,000 rows; `x-export-truncated: true` means more rows matched, so narrow the filters.
+Amounts are integer minor units (`amount_minor`, `amount_refunded_minor`) next to a `currency` column, never decimals.
+Cells that start with `=`, `+`, `-`, `@`, tab, or carriage return are prefixed with `'` so spreadsheets do not evaluate them.
+VIEWER can read lists but cannot export, because an export moves bulk tenant data off the console.
+Exports are reads and are not written to the audit log; the audit log covers mutations.
+
 ### Incidents
 
 | Method | Path                                             | Permission        | Notes                               |
@@ -207,6 +222,7 @@ Counters are stored in Postgres (`rate_limit_buckets`), so they hold across rest
 | Reconciliation run start                              | `reconciliationRun`, in addition                     | 5 per 10 minutes per org           |
 | Scenario run and reset                                | `scenarioRun`, in addition                           | 20 per 10 minutes per org          |
 | Repair actions                                        | `repairAction`, in addition                          | 30 per 10 minutes per user and org |
+| List, search, and CSV export routes                   | `search`, in addition                                | 60 per minute per user             |
 | Webhooks                                              | `webhookIngress`                                     | 600 per minute per connection      |
 | `/internal/tick`                                      | `internalTick`                                       | 30 per minute per IP               |
 
