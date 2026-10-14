@@ -1,0 +1,32 @@
+docs/api.md
+  h_78e539a96187c3 230
+packages/api/src/audit/audit-routes.ts
+  h_78e539a96187c3 6,79-83,85-90,110,113
+packages/api/src/audit/audit.integration.test.ts
+  h_78e539a96187c3 36,263-289
+packages/shared/src/audit-schemas.ts
+  h_78e539a96187c3 30
+packages/web/src/components/audit/audit-list.test.tsx
+  h_78e539a96187c3 57-103
+packages/web/src/components/audit/audit-list.tsx
+  h_78e539a96187c3 3,6,11-47,51-52,84
+packages/web/src/components/records/customer-detail.tsx
+  h_78e539a96187c3 7,139
+packages/web/src/components/records/entitlement-detail.tsx
+  h_78e539a96187c3 7,125
+packages/web/src/components/records/payment-detail.tsx
+  h_78e539a96187c3 15,136
+packages/web/src/components/records/record-detail-related.test.tsx
+  h_78e539a96187c3 68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "83238eebcfc9bf1856300958df90313ebe521c9a",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
