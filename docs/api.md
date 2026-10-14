@@ -135,6 +135,10 @@ The worker never sets job status `failed`, so `counts.failed` stays 0.
 Event list filters: `status`, `provider`, `connectionId`, `normalizedType`, and `objectRef` (the provider object id) match exactly, and `from` and `to` bound the timestamp.
 `customerId` matches events whose object is a payment, subscription, or provider customer mapping of that customer on the same connection.
 
+Event detail adds `signatureVerified`, `objectRef`, and `related: { paymentId, subscriptionId, customerId }`.
+Each related id is resolved from `objectRef` within the event's org and connection only, and is `null` when nothing matches.
+A payment event also resolves the payment's subscription and customer, and a subscription event its customer.
+
 ### Reconciliation
 
 | Method | Path                                                       | Permission           | Notes                                            |

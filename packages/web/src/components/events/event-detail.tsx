@@ -1,6 +1,11 @@
 'use client';
 
-import { eventDetailSchema, type EventJob } from '@payscope/shared/events-schemas';
+import Link from 'next/link';
+import {
+  eventDetailSchema,
+  type EventJob,
+  type EventRelated,
+} from '@payscope/shared/events-schemas';
 import {
   BackLink,
   DetailField,
@@ -9,7 +14,7 @@ import {
   SectionEmpty,
   Timestamp,
 } from '@/components/records/detail-parts';
-import { humanize } from '@/components/records/format';
+import { humanize, recordHref } from '@/components/records/format';
 import { StatusBadge } from '@/components/records/status-badge';
 import { useRecordDetail } from '@/components/records/use-record-detail';
 import { useCurrentOrg } from '@/hooks/use-current-org';
@@ -41,6 +46,33 @@ function JobPanel({ job }: { job: EventJob | null }) {
   );
 }
 
+const RELATED_LINKS = [
+  { key: 'paymentId', label: 'Payment', resource: 'payments' },
+  { key: 'subscriptionId', label: 'Subscription', resource: 'subscriptions' },
+  { key: 'customerId', label: 'Customer', resource: 'customers' },
+] as const;
+
+function RelatedPanel({ orgId, related }: { orgId: string; related: EventRelated }) {
+  return (
+    <DetailGrid>
+      {RELATED_LINKS.map(({ key, label, resource }) => {
+        const id = related[key];
+        return (
+          <DetailField key={key} label={label}>
+            {id ? (
+              <Link href={recordHref(orgId, resource, id)} className="underline underline-offset-4">
+                View {label.toLowerCase()}
+              </Link>
+            ) : (
+              <span className="text-muted-foreground">None</span>
+            )}
+          </DetailField>
+        );
+      })}
+    </DetailGrid>
+  );
+}
+
 export function EventDetail({ orgId, eventId }: { orgId: string; eventId: string }) {
   const event = useRecordDetail(orgId, 'events', eventId, eventDetailSchema);
   const org = useCurrentOrg(orgId);
@@ -62,6 +94,20 @@ export function EventDetail({ orgId, eventId }: { orgId: string; eventId: string
           <DetailField label="Type">
             <span className="font-mono text-xs">{event.eventType}</span>
           </DetailField>
+          <DetailField label="Object">
+            {event.objectRef ? (
+              <span className="font-mono text-xs">{event.objectRef}</span>
+            ) : (
+              <span className="text-muted-foreground">None</span>
+            )}
+          </DetailField>
+          <DetailField label="Signature">
+            {event.signatureVerified ? (
+              'Verified'
+            ) : (
+              <span className="text-destructive">Unverified</span>
+            )}
+          </DetailField>
           <DetailField label="Normalized type">
             {event.normalizedType ?? <span className="text-muted-foreground">Not set</span>}
           </DetailField>
@@ -75,6 +121,10 @@ export function EventDetail({ orgId, eventId }: { orgId: string; eventId: string
             <Timestamp value={event.processedAt} />
           </DetailField>
         </DetailGrid>
+      </DetailSection>
+
+      <DetailSection title="Related">
+        <RelatedPanel orgId={orgId} related={event.related} />
       </DetailSection>
 
       <DetailSection title="Processing attempts">
