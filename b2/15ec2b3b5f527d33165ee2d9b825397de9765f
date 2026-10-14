@@ -1,0 +1,34 @@
+docs/architecture.md
+  h_78e539a96187c3 292-294
+packages/api/src/incidents/incident-open.ts
+  h_78e539a96187c3 6,13,24-25
+packages/api/src/incidents/incident-refresh.integration.test.ts
+  h_78e539a96187c3 1-124
+packages/api/src/incidents/incident-refresh.ts
+  h_78e539a96187c3 1-73
+packages/api/src/incidents/incident-repo.ts
+  h_78e539a96187c3 108-114
+packages/api/src/reconciliation/reconciliation-repo.ts
+  h_78e539a96187c3 9,138-139,142,147,154
+packages/api/src/reconciliation/reconciliation-routes.ts
+  h_78e539a96187c3 227
+packages/api/src/repairs/refresh-findings.integration.test.ts
+  h_78e539a96187c3 138-174
+packages/api/src/repairs/repair-actions.ts
+  h_78e539a96187c3 13,60-66,76,79,248,262,271,285
+packages/api/src/repairs/repair-routes.ts
+  h_78e539a96187c3 96,127
+packages/api/src/repairs/resolve-refreshed-findings.ts
+  h_78e539a96187c3 7,78-79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b215ec2b3b5f527d33165ee2d9b825397de9765f",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
