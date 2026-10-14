@@ -51,6 +51,8 @@ const SubscriptionSchema = z.object({
   customer: Customer,
   currency: z.string().length(3).nullish(),
   cancel_at_period_end: z.boolean().nullish(),
+  canceled_at: z.number().int().nullish(),
+  ended_at: z.number().int().nullish(),
   items: z
     .object({
       data: z.array(
@@ -161,6 +163,8 @@ function mapSubscription(envelope: Envelope, type: NormalizedEventType): Mapped 
     metadata: {
       currentPeriodEnd: periodEnds.length > 0 ? Math.max(...periodEnds) : null,
       cancelAtPeriodEnd: sub.cancel_at_period_end ?? false,
+      canceledAt: sub.canceled_at ? new Date(sub.canceled_at * 1000).toISOString() : null,
+      endedAt: sub.ended_at ? new Date(sub.ended_at * 1000).toISOString() : null,
       planId: sub.items?.data[0]?.price?.id ?? null,
     },
   };

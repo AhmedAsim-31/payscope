@@ -3,6 +3,7 @@ import { paddleAdapter } from '@payscope/provider-adapters/paddle/paddle-adapter
 import { paypalAdapter } from '@payscope/provider-adapters/paypal/paypal-adapter';
 import { loadPayPalFixture } from '@payscope/provider-adapters/paypal/paypal-fixtures';
 import { revenueCatAdapter } from '@payscope/provider-adapters/revenuecat/revenuecat-adapter';
+import { stripeAdapter } from '@payscope/provider-adapters/stripe/stripe-adapter';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { ProviderAdapter } from '@payscope/provider-adapters/adapter';
 import { createDb } from '../db/client';
@@ -15,6 +16,7 @@ import {
   seedConnection,
   silent,
   storeEvent,
+  stripe,
   payments,
   type Seed,
 } from '../test/event-harness';
@@ -85,6 +87,22 @@ describe('subscriptions and entitlements', () => {
       select state from entitlement_records where org_id = ${seed.orgId}`;
     expect(row?.state).toBe('expired');
     expect((await eventRow(sql, late.eventId))?.status).toBe('ignored');
+  });
+  it('stores Stripe canceled_at and ended_at and keeps them against a stale update', async () => {
+    const seed = await seedConnection(sql, 'stripe');
+    const times = async () => {
+      const [row] = await sql<{ canceled_at: string | null; ended_at: string | null }[]>`
+        select canceled_at, ended_at from subscription_records where connection_id = ${seed.connectionId}`;
+      const iso = (v: string | null | undefined) => (v ? new Date(v).toISOString() : null);
+      return { canceledAt: iso(row?.canceled_at), endedAt: iso(row?.ended_at) };
+    };
+    await run(seed, stripeAdapter, stripe('customer-subscription-created', 1760000006));
+    expect(await times()).toEqual({ canceledAt: null, endedAt: null });
+    await run(seed, stripeAdapter, stripe('customer-subscription-deleted', 1760000009));
+    const ended = new Date(1760000009 * 1000).toISOString();
+    expect(await times()).toEqual({ canceledAt: ended, endedAt: ended });
+    await run(seed, stripeAdapter, stripe('customer-subscription-updated', 1760000007));
+    expect(await times()).toEqual({ canceledAt: ended, endedAt: ended });
   });
 });
 

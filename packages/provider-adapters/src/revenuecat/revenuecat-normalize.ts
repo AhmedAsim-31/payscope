@@ -99,6 +99,9 @@ export function normalizeRevenueCatEvent(payload: unknown): NormalizedEvent {
     else if (mapping === REFUND && amountMinor < 0n) amountMinor = -amountMinor;
   }
   if (event.expiration_at_ms != null) metadata['expirationAtMs'] = event.expiration_at_ms;
+  if (event.type === 'EXPIRATION' && event.expiration_at_ms != null) {
+    metadata['endedAt'] = new Date(event.expiration_at_ms).toISOString();
+  }
   for (const key of ['store', 'product_id', 'period_type', 'cancel_reason', 'expiration_reason']) {
     const value = event[key];
     if (typeof value === 'string') metadata[key] = value;

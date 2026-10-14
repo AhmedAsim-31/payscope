@@ -21,6 +21,8 @@ const columns = {
   currentPeriodStart: s.currentPeriodStart,
   currentPeriodEnd: s.currentPeriodEnd,
   cancelAtPeriodEnd: s.cancelAtPeriodEnd,
+  canceledAt: s.canceledAt,
+  endedAt: s.endedAt,
   customerId: customersTable.id,
   customerEmail: customersTable.email,
   lastEventAt: s.lastEventAt,
@@ -62,6 +64,8 @@ export function toSubscription(row: SubscriptionRow) {
     currentPeriodStart: isoOrNull(row.currentPeriodStart),
     currentPeriodEnd: isoOrNull(row.currentPeriodEnd),
     cancelAtPeriodEnd: row.cancelAtPeriodEnd,
+    canceledAt: isoOrNull(row.canceledAt),
+    endedAt: isoOrNull(row.endedAt),
     customer: { id: row.customerId, email: row.customerEmail },
     createdAt: iso(row.createdAt),
   };

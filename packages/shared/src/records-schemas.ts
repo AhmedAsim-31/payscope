@@ -89,6 +89,8 @@ export const subscriptionSchema = z.object({
   currentPeriodStart: nullableDate,
   currentPeriodEnd: nullableDate,
   cancelAtPeriodEnd: z.boolean(),
+  canceledAt: nullableDate,
+  endedAt: nullableDate,
   customer: customerRefSchema,
   createdAt: isoDate,
 });

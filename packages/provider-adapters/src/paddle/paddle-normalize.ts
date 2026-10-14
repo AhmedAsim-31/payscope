@@ -33,6 +33,7 @@ const SubscriptionSchema = z.looseObject({
   customer_id: z.string().min(1).nullish(),
   currency_code: z.string().min(1).nullish(),
   current_billing_period: z.looseObject({ ends_at: z.string().min(1) }).nullish(),
+  canceled_at: z.iso.datetime({ offset: true }).nullish(),
   items: z
     .array(z.looseObject({ price: z.looseObject({ id: z.string().min(1) }).nullish() }))
     .nullish(),
@@ -149,6 +150,7 @@ function subscriptionBody(
       ...(sub.current_billing_period
         ? { currentPeriodEnd: sub.current_billing_period.ends_at }
         : {}),
+      ...(sub.canceled_at ? { canceledAt: new Date(sub.canceled_at).toISOString() } : {}),
       ...(sub.items?.[0]?.price ? { planId: sub.items[0].price.id } : {}),
     },
   };

@@ -86,6 +86,8 @@ const subscription = {
   currentPeriodStart: null,
   currentPeriodEnd: null,
   cancelAtPeriodEnd: false,
+  canceledAt: null,
+  endedAt: null,
   createdAt: NOW,
 };
 
@@ -217,6 +219,8 @@ describe('record detail related sections', () => {
     respond({
       [`/subscriptions/${SUB}`]: {
         ...subscription,
+        canceledAt: '2026-10-01T10:00:00.000Z',
+        endedAt: '2026-11-01T10:00:00.000Z',
         customer: customerRef,
         lastEventAt: null,
         updatedAt: NOW,
@@ -230,6 +234,9 @@ describe('record detail related sections', () => {
     expect(await screen.findByText('pi_related')).toBeInTheDocument();
     expect(await screen.findByText('invoice.paid')).toBeInTheDocument();
     expect(await screen.findByText('Status mismatch')).toBeInTheDocument();
+    const field = (label: string) => screen.getByText(label).parentElement?.querySelector('time');
+    expect(field('Canceled')).toHaveAttribute('dateTime', '2026-10-01T10:00:00.000Z');
+    expect(field('Ended')).toHaveAttribute('dateTime', '2026-11-01T10:00:00.000Z');
     expect(requested('/payments').get('subscriptionId')).toBe(SUB);
     const events = requested('/events');
     expect(events.get('connectionId')).toBe(CONNECTION);
