@@ -1,0 +1,32 @@
+docs/api.md
+  h_78e539a96187c3 109-110
+packages/api/src/db/schema/providers.ts
+  h_78e539a96187c3 106
+packages/api/src/records/customers-repo.ts
+  h_78e539a96187c3 1,51-63
+packages/api/src/records/records.integration.test.ts
+  h_78e539a96187c3 236-244,246,248
+packages/shared/src/records-schemas.ts
+  h_78e539a96187c3 191
+packages/web/src/components/records/customers-list.tsx
+  h_78e539a96187c3 41
+packages/web/src/components/records/filter-config.ts
+  h_78e539a96187c3 82-87
+supabase/migrations/20261014033013_provider_customer_id_search_index.sql
+  h_78e539a96187c3 1
+supabase/migrations/meta/20261014033013_snapshot.json
+  h_78e539a96187c3 1-3566
+supabase/migrations/meta/_journal.json
+  h_78e539a96187c3 165-171
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0f5c26c2b6f700ad1c677b5fea105c724f075847",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
