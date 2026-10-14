@@ -34,12 +34,15 @@ Page: Overview for Acme Streaming (demo), the landing page after sign-in.
 3. Point out the two clocks: "Provider time (created at the provider)" and "Received time (first seen by PayScope)".
 4. Scroll to "Related provider events": the Stripe event that created this payment, with its processing status.
 5. Click an event to open it.
-   Show "Processing attempts", the "Job" section, and the stored "Payload".
+   In "Details", point at "Object" (the provider object the event refers to) and "Signature".
+   Seed events are written through the verified-ingest path, so they show Verified.
+6. Show "Related": links back to this payment, its subscription, and its customer, resolved only within the same org and connection.
+7. Show "Processing attempts", the "Job" section, and the stored "Payload".
    The event was persisted before the webhook was acknowledged and processed by the worker afterwards.
 
 ## 1:15 The inconsistency (30 seconds)
 
-1. Go back to the payment and click the customer link (maya.patel@example.com).
+1. Click the customer link in "Related" (maya.patel@example.com).
 2. On the customer page, "Subscriptions" shows an active subscription on `price_demo_pro`.
 3. "Entitlements" is empty.
    She paid and is subscribed, but has no `pro` access.
@@ -55,6 +58,8 @@ Page: Overview for Acme Streaming (demo), the landing page after sign-in.
    Expect `entitlement_missing_or_stale` findings (Maya and others) and `expired_externally_active_locally` findings (for example Noah Kim, whose subscription expired while `pro` stayed active).
 5. Optional: click Incidents.
    The run opened one incident per high-severity finding type.
+   Severity and Category filters narrow the list.
+   Open an incident and click "View findings": the list is filtered to that incident's finding type and its latest run, not every finding of that type in the org.
 
 ## 2:30 Inspect and repair (60 seconds)
 
@@ -85,7 +90,18 @@ Page: Overview for Acme Streaming (demo), the landing page after sign-in.
 ## Optional extras
 
 - Retry a failed event: Events, filter Status to "Needs attention", open one, click "Retry processing".
+  Attempts made by the worker show a correlation ID, and a retryable failure also shows "Next retry".
+  Seeded attempts were not run by the worker, so they carry no correlation ID.
   Sign in as `demo-viewer@example.com` to show that a viewer gets no retry button.
+- Jobs: the cards are Queued, Running, Retrying, Dead, and Oldest queued.
+  Retrying counts queued jobs that already failed at least once; Dead counts jobs out of attempts.
+- Export: on Payments or Findings, click "Export CSV".
+  The file uses the current filters, stores amounts as integer minor units with the currency, and stops at 5,000 rows.
+  Owners, admins, and operators can export; a viewer does not see the button.
+- Customer search: on Customers, type an email prefix (for example `maya`) or an exact provider customer id.
+  A partial provider id does not match.
+- Subscription detail shows "Canceled" and "Ended" when the provider reported them.
+  Stripe sends both, Paddle sends only the cancellation time, RevenueCat sends only the end time on expiration, and PayPal sends neither.
 - Tenant isolation: switch the org selector to Globex Apps (demo); none of the Acme rows appear.
 - Dark mode and mobile: the app follows the OS color scheme and works at 375 pixels wide.
 
@@ -93,5 +109,8 @@ Page: Overview for Acme Streaming (demo), the landing page after sign-in.
 
 - All connections are simulation mode; no live or sandbox provider credentials are configured.
 - Seed events are built from adapter fixtures and run through the real ingest and processing code.
+  They skip the HTTP signature check, which is why they show Verified.
+- "Refresh from provider" needs provider credentials, which the demo connections do not have, so it answers `PROVIDER_NOT_CONFIGURED`.
+  Its provider path, including the entitlement recompute and resolving findings on `ALREADY_CONSISTENT`, is covered only by integration tests with a fake adapter.
 - The provider API failure and mismatch scenarios use a fake provider fetch that exists only inside the lab.
 - Nothing is hosted; this runs on a local Postgres and the owner's Supabase Auth project.
