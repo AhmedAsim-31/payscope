@@ -41,7 +41,7 @@ export function IncidentsList({ orgId }: { orgId: string }) {
       columns={columns(orgId)}
       empty={{
         title: 'No incidents',
-        filteredTitle: 'No incidents match this filter',
+        filteredTitle: 'No incidents match these filters',
         hint: 'An incident opens automatically when a reconciliation run finds a high or critical inconsistency.',
       }}
     />

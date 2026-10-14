@@ -178,6 +178,9 @@ Exports are reads and are not written to the audit log; the audit log covers mut
 | GET    | `{org}/incidents`, `{org}/incidents/:incidentId` | `records:read`    |                                     |
 | POST   | `{org}/incidents/:incidentId/actions`            | `findings:update` | `acknowledge`, `note`, or `resolve` |
 
+Incident list filters: `status`, `severity`, and `category` match exactly.
+`severity` takes a finding severity and `category` takes a finding type, because each incident groups the findings of one type.
+
 ### Repairs
 
 All need `repairs:execute`, an `Idempotency-Key` header, and a `reason` of 10 to 500 characters.
