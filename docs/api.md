@@ -55,14 +55,14 @@ Rate-limited requests answer `429 RATE_LIMITED` with `retry-after` and `x-rateli
 
 ### Health and identity
 
-| Method | Path           | Permission    | Notes                           |
-| ------ | -------------- | ------------- | ------------------------------- |
-| GET    | `/health`      | none          | Liveness                        |
-| GET    | `/ready`       | none          | Database check, `503` if down   |
-| GET    | `/api/v1/me`   | authenticated | Current user                    |
-| GET    | `/api/v1/orgs` | authenticated | Orgs the caller belongs to      |
-| POST   | `/api/v1/orgs` | authenticated | Creates an org, caller is OWNER |
-| GET    | `{org}`        | `org:read`    |                                 |
+| Method | Path           | Permission    | Notes                                                        |
+| ------ | -------------- | ------------- | ------------------------------------------------------------ |
+| GET    | `/health`      | none          | Liveness                                                     |
+| GET    | `/ready`       | none          | Database and in-process worker checks, `503` if either fails |
+| GET    | `/api/v1/me`   | authenticated | Current user                                                 |
+| GET    | `/api/v1/orgs` | authenticated | Orgs the caller belongs to                                   |
+| POST   | `/api/v1/orgs` | authenticated | Creates an org, caller is OWNER                              |
+| GET    | `{org}`        | `org:read`    |                                                              |
 
 ### Members
 

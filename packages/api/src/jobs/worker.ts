@@ -55,11 +55,17 @@ export function createWorker(opts: WorkerOptions) {
   const recoverEveryPolls = opts.recoverEveryPolls ?? 30;
   const now = opts.now ?? (() => new Date());
   const ctx: JobContext = { db, logger, workerId };
+  const livenessMaxAgeMs = Math.max(5 * pollIntervalMs, leaseSeconds * 1000);
 
   const inFlight = new Set<Promise<unknown>>();
   let loop: Promise<void> | undefined;
   let stopping = false;
   let wake: (() => void) | undefined;
+  let lastBeatMs = 0;
+
+  function beat(): void {
+    lastBeatMs = now().getTime();
+  }
 
   function track<T>(promise: Promise<T>): Promise<T> {
     inFlight.add(promise);
@@ -73,7 +79,8 @@ export function createWorker(opts: WorkerOptions) {
       () => {
         extendLease(db, job.id, workerId, leaseSeconds).then(
           (held) => {
-            if (!held) logger.warn({ jobId: job.id, kind: job.kind }, 'job_lease_lost');
+            if (held) beat();
+            else logger.warn({ jobId: job.id, kind: job.kind }, 'job_lease_lost');
           },
           (err: unknown) => logger.error({ jobId: job.id, err }, 'job_heartbeat_failed'),
         );
@@ -174,6 +181,7 @@ export function createWorker(opts: WorkerOptions) {
   async function run(): Promise<void> {
     let polls = 0;
     while (!stopping) {
+      beat();
       try {
         if (polls % recoverEveryPolls === 0) {
           const recovered = await recover();
@@ -209,5 +217,13 @@ export function createWorker(opts: WorkerOptions) {
     loop = undefined;
   }
 
-  return { workerId, start, stop, drainOnce, recover };
+  function checkLiveness(): Promise<void> {
+    if (!loop) return Promise.reject(new Error('worker_not_running'));
+    if (now().getTime() - lastBeatMs > livenessMaxAgeMs) {
+      return Promise.reject(new Error('worker_heartbeat_stale'));
+    }
+    return Promise.resolve();
+  }
+
+  return { workerId, start, stop, drainOnce, recover, checkLiveness };
 }
