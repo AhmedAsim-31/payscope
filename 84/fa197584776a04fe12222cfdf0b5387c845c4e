@@ -1,0 +1,22 @@
+docs/api.md
+  h_78e539a96187c3 58-65
+docs/deployment.md
+  h_78e539a96187c3 135-137
+packages/api/src/jobs/worker.integration.test.ts
+  h_78e539a96187c3 163-215
+packages/api/src/jobs/worker.ts
+  h_78e539a96187c3 58,64-68,82-83,184,220-228
+packages/api/src/server.ts
+  h_78e539a96187c3 44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "84fa197584776a04fe12222cfdf0b5387c845c4e",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
