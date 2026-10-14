@@ -1,0 +1,20 @@
+docs/api.md
+  h_78e539a96187c3 188-189
+packages/api/src/incidents/incidents.integration.test.ts
+  h_78e539a96187c3 104-135
+packages/web/src/components/incidents/incident-detail.test.tsx
+  h_78e539a96187c3 18,46-55
+packages/web/src/components/incidents/incident-detail.tsx
+  h_78e539a96187c3 6,24,26-30,51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d4a63dda77a1601eaa75f30fb083664502ee6e0f",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
