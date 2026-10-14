@@ -66,9 +66,18 @@ export const eventJobSchema = z.object({
 });
 export type EventJob = z.infer<typeof eventJobSchema>;
 
+export const eventRelatedSchema = z.object({
+  paymentId: z.uuid().nullable(),
+  subscriptionId: z.uuid().nullable(),
+  customerId: z.uuid().nullable(),
+});
+export type EventRelated = z.infer<typeof eventRelatedSchema>;
+
 export const eventDetailSchema = eventSummarySchema.extend({
   processedAt: nullableDate,
   signatureVerified: z.boolean(),
+  objectRef: z.string().nullable(),
+  related: eventRelatedSchema,
   payload: z.unknown(),
   attempts: z.array(eventAttemptSchema),
   job: eventJobSchema.nullable(),

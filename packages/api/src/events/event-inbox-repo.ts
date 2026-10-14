@@ -24,6 +24,53 @@ function refersToCustomer(orgId: string, customerId: string) {
   )`;
 }
 
+/** Resolves the event's object to local records on the same org and connection only. */
+async function resolveRelated(
+  db: Db,
+  orgId: string,
+  connectionId: string,
+  objectRef: string | null,
+) {
+  if (!objectRef) return { paymentId: null, subscriptionId: null, customerId: null };
+  const [payment] = await db
+    .select({ id: p.id, customerId: p.customerId, subscriptionRef: p.providerSubscriptionId })
+    .from(p)
+    .where(
+      and(eq(p.orgId, orgId), eq(p.connectionId, connectionId), eq(p.providerPaymentId, objectRef)),
+    )
+    .limit(1);
+  const subscriptionRef = payment ? payment.subscriptionRef : objectRef;
+  const [subscription] = subscriptionRef
+    ? await db
+        .select({ id: s.id, customerId: s.customerId })
+        .from(s)
+        .where(
+          and(
+            eq(s.orgId, orgId),
+            eq(s.connectionId, connectionId),
+            eq(s.providerSubscriptionId, subscriptionRef),
+          ),
+        )
+        .limit(1)
+    : [];
+  const [mapping] = await db
+    .select({ customerId: m.customerId })
+    .from(m)
+    .where(
+      and(
+        eq(m.orgId, orgId),
+        eq(m.connectionId, connectionId),
+        eq(m.providerCustomerId, objectRef),
+      ),
+    )
+    .limit(1);
+  return {
+    paymentId: payment?.id ?? null,
+    subscriptionId: subscription?.id ?? null,
+    customerId: mapping?.customerId ?? payment?.customerId ?? subscription?.customerId ?? null,
+  };
+}
+
 const summaryColumns = {
   id: e.id,
   provider: e.provider,
@@ -76,12 +123,15 @@ export async function getEvent(db: Db, orgId: string, eventId: string) {
       ...summaryColumns,
       processedAt: e.processedAt,
       signatureVerified: e.signatureVerified,
+      objectRef: e.objectRef,
       payload: e.payload,
     })
     .from(e)
     .where(and(eq(e.orgId, orgId), eq(e.id, eventId)))
     .limit(1);
   if (!row) return undefined;
+
+  const related = await resolveRelated(db, orgId, row.connectionId, row.objectRef);
 
   const attempts = await db
     .select({
@@ -126,6 +176,7 @@ export async function getEvent(db: Db, orgId: string, eventId: string) {
     receivedAt: iso(row.receivedAt),
     processedAt: isoOrNull(row.processedAt),
     payload: redactPayload(row.payload),
+    related,
     attempts: attempts.map((a) => ({
       ...a,
       startedAt: iso(a.startedAt),

@@ -14,7 +14,34 @@ type EventDetail = {
   payload: Record<string, unknown>;
   attempts: { attemptNumber: number; outcome: string }[];
   job: { status: string; maxAttempts: number; lastError: string | null } | null;
+  signatureVerified: boolean;
+  objectRef: string | null;
+  related: { paymentId: string | null; subscriptionId: string | null; customerId: string | null };
 };
+
+type Linked = { paymentId: string; subscriptionId: string; customerId: string; ids: Ids };
+type Ids = { payment: string; subscription: string; customer: string };
+
+async function seedLinked(t: Tenant, ids?: Ids): Promise<Linked> {
+  const suffix = randomUUID();
+  const refs = ids ?? {
+    payment: `pi_${suffix}`,
+    subscription: `sub_${suffix}`,
+    customer: `cus_${suffix}`,
+  };
+  const customerId = randomUUID();
+  const subscriptionId = randomUUID();
+  const paymentId = randomUUID();
+  await sql`insert into customers (id, org_id) values (${customerId}, ${t.orgId})`;
+  await sql`insert into provider_customer_mappings (org_id, connection_id, customer_id, provider_customer_id)
+    values (${t.orgId}, ${t.connectionId}, ${customerId}, ${refs.customer})`;
+  await sql`insert into subscription_records (id, org_id, connection_id, customer_id, provider_subscription_id, status)
+    values (${subscriptionId}, ${t.orgId}, ${t.connectionId}, ${customerId}, ${refs.subscription}, 'active')`;
+  await sql`insert into payment_records
+      (id, org_id, connection_id, customer_id, provider_payment_id, provider_subscription_id, status, amount_minor, amount_refunded_minor, currency)
+    values (${paymentId}, ${t.orgId}, ${t.connectionId}, ${customerId}, ${refs.payment}, ${refs.subscription}, 'succeeded', 1000, 0, 'USD')`;
+  return { paymentId, subscriptionId, customerId, ids: refs };
+}
 
 let a: Tenant;
 let b: Tenant;
@@ -56,14 +83,15 @@ async function insertEvent(
     normalizedType?: string;
     payload?: unknown;
     jobStatus?: string | null;
+    objectRef?: string;
   } = {},
 ): Promise<string> {
   const id = randomUUID();
   await sql`insert into provider_events
-    (id, org_id, connection_id, provider, provider_event_id, event_type, normalized_type, occurred_at, received_at, status, signature_verified, payload)
+    (id, org_id, connection_id, provider, provider_event_id, event_type, normalized_type, occurred_at, received_at, status, signature_verified, payload, object_ref)
     values (${id}, ${t.orgId}, ${t.connectionId}, 'stripe', ${`evt_${id}`}, 'payment_intent.succeeded',
       ${over.normalizedType ?? 'payment.succeeded'}, now(), ${over.receivedAt ?? '2026-01-01T00:00:00.000000Z'},
-      ${over.status ?? 'processed'}, true, ${JSON.stringify(over.payload ?? {})}::jsonb)`;
+      ${over.status ?? 'processed'}, true, ${JSON.stringify(over.payload ?? {})}::jsonb, ${over.objectRef ?? null})`;
   if (over.jobStatus !== null) {
     await sql`insert into background_jobs (org_id, kind, payload, status, attempt_count, max_attempts, available_at, last_error, idempotency_key)
       values (${t.orgId}, 'process_provider_event', ${JSON.stringify({ eventId: id })}::jsonb, ${over.jobStatus ?? 'succeeded'},
@@ -139,6 +167,66 @@ describe('event inbox', () => {
     expect(raw).toContain('evt_x');
     expect(res.body.attempts.map((x) => x.attemptNumber)).toEqual([1, 2]);
     expect(res.body.job?.lastError).toBe('boom');
+  });
+
+  it('exposes the signature flag and object ref, with no related records when unresolved', async () => {
+    const id = await insertEvent(a, { objectRef: 'pi_unknown' });
+    const res = await request<EventDetail>(viewer, a.orgId, `/events/${id}`);
+    expect(res.body.signatureVerified).toBe(true);
+    expect(res.body.objectRef).toBe('pi_unknown');
+    expect(res.body.related).toEqual({ paymentId: null, subscriptionId: null, customerId: null });
+  });
+
+  it('resolves a payment event to its payment, subscription and customer', async () => {
+    const linked = await seedLinked(a);
+    const id = await insertEvent(a, { objectRef: linked.ids.payment });
+    const res = await request<EventDetail>(viewer, a.orgId, `/events/${id}`);
+    expect(res.body.related).toEqual({
+      paymentId: linked.paymentId,
+      subscriptionId: linked.subscriptionId,
+      customerId: linked.customerId,
+    });
+  });
+
+  it('resolves subscription and customer events', async () => {
+    const linked = await seedLinked(a);
+    const sub = await insertEvent(a, { objectRef: linked.ids.subscription });
+    const subRes = await request<EventDetail>(viewer, a.orgId, `/events/${sub}`);
+    expect(subRes.body.related).toEqual({
+      paymentId: null,
+      subscriptionId: linked.subscriptionId,
+      customerId: linked.customerId,
+    });
+    const cus = await insertEvent(a, { objectRef: linked.ids.customer });
+    const cusRes = await request<EventDetail>(viewer, a.orgId, `/events/${cus}`);
+    expect(cusRes.body.related).toEqual({
+      paymentId: null,
+      subscriptionId: null,
+      customerId: linked.customerId,
+    });
+  });
+
+  it('never resolves records from another org or another connection', async () => {
+    const other = await seedLinked(b);
+    const sibling: Tenant = { ...a, connectionId: randomUUID() };
+    await sql`insert into provider_connections (id, org_id, provider, mode, status, display_name, external_account_id)
+      values (${sibling.connectionId}, ${a.orgId}, 'stripe', 'sandbox', 'active', 'Stripe 2', ${`acct_${randomUUID()}`})`;
+    const suffix = randomUUID();
+    await seedLinked(sibling, {
+      payment: `pi_${suffix}`,
+      subscription: `sub_${suffix}`,
+      customer: `cus_${suffix}`,
+    });
+    for (const ref of [
+      ...Object.values(other.ids),
+      `pi_${suffix}`,
+      `sub_${suffix}`,
+      `cus_${suffix}`,
+    ]) {
+      const id = await insertEvent(a, { objectRef: ref });
+      const res = await request<EventDetail>(a.owner, a.orgId, `/events/${id}`);
+      expect(res.body.related).toEqual({ paymentId: null, subscriptionId: null, customerId: null });
+    }
   });
 
   it('isolates organizations', async () => {
