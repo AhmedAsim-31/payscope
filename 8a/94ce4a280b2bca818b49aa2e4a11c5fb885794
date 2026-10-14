@@ -1,0 +1,32 @@
+docs/api.md
+  h_78e539a96187c3 142-145
+packages/api/src/events/apply-retries.integration.test.ts
+  h_78e539a96187c3 56-58,67-73,104-106
+packages/api/src/events/event-inbox-repo.ts
+  h_78e539a96187c3 146-147,186
+packages/api/src/events/event-inbox.integration.test.ts
+  h_78e539a96187c3 15-20,165-167,175-179
+packages/api/src/jobs/handlers/process-provider-event.ts
+  h_78e539a96187c3 45-46,76,121
+packages/api/src/jobs/worker.ts
+  h_78e539a96187c3 21-28,90-101,114,124-130,138,143
+packages/api/src/test/event-harness.ts
+  h_78e539a96187c3 79-80,82
+packages/shared/src/events-schemas.ts
+  h_78e539a96187c3 57-58
+packages/web/src/components/events/attempts-timeline.tsx
+  h_78e539a96187c3 40-44,48-52
+packages/web/src/components/events/event-components.test.tsx
+  h_78e539a96187c3 9,86-113
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8a94ce4a280b2bca818b49aa2e4a11c5fb885794",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
