@@ -1,0 +1,16 @@
+IMPLEMENTATION_STATUS.md
+  h_78e539a96187c3 21-23,49,56,58-59,62
+docs/demo-script.md
+  h_78e539a96187c3 28-29,64,75-77,83-85,113-114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f56eb1f2c11a272c9efe473d549ea08f461f4d55",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
