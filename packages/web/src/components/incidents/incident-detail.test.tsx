@@ -15,6 +15,7 @@ vi.mock('next/navigation', () => ({ notFound: vi.fn() }));
 const mockedFetch = vi.mocked(apiFetch);
 const ORG = '7b0f5a3e-4f64-4a6c-9a53-0f3d5a1c2b10';
 const INCIDENT = '11111111-1111-4111-8111-111111111111';
+const RUN = '22222222-2222-4222-8222-222222222222';
 const NOW = '2026-03-05T14:07:09.000Z';
 
 function renderIncident(related: Record<string, unknown>) {
@@ -42,8 +43,16 @@ function renderIncident(related: Record<string, unknown>) {
 }
 
 describe('IncidentDetail findings link', () => {
-  it('links the finding count to findings of the incident type', async () => {
-    renderIncident({ findingType: 'status_mismatch', lastRunId: INCIDENT });
+  it('links the finding count to the findings of this incident run', async () => {
+    renderIncident({ findingType: 'status_mismatch', lastRunId: RUN });
+    expect(await screen.findByRole('link', { name: 'View findings' })).toHaveAttribute(
+      'href',
+      `/app/${ORG}/findings?type=status_mismatch&runId=${RUN}`,
+    );
+  });
+
+  it('falls back to the type filter when the incident has no run id', async () => {
+    renderIncident({ findingType: 'status_mismatch', lastRunId: 'not-a-uuid' });
     expect(await screen.findByRole('link', { name: 'View findings' })).toHaveAttribute(
       'href',
       `/app/${ORG}/findings?type=status_mismatch`,

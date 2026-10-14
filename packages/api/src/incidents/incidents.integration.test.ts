@@ -101,6 +101,38 @@ describe('incidents', () => {
     expect((await list('severity=nope')).statusCode).toBe(400);
   });
 
+  it('returns related run and type that scope the findings list to this incident', async () => {
+    const t = await newTenant(harness, app);
+    const other = await newTenant(harness, app);
+    await addStaleEntitlement(t);
+    await runLocalRecon(harness, app, t);
+    await addStaleEntitlement(t);
+    await runLocalRecon(harness, app, t);
+    const [run] = await sql<{ id: string }[]>`
+      select id from reconciliation_runs where org_id = ${t.orgId} order by started_at desc limit 1`;
+    const id = (await incidents(t))[0]?.id ?? '';
+    const detail = await app.inject({
+      url: `/api/v1/orgs/${t.orgId}/incidents/${id}`,
+      headers: t.owner.headers,
+    });
+    const body = detail.json<{ findingCount: number; related: Record<string, string> }>();
+    expect(body.related).toEqual({
+      findingType: 'expired_externally_active_locally',
+      lastRunId: run?.id,
+    });
+    const params = `type=${body.related.findingType}&runId=${body.related.lastRunId}`;
+    const findings = await app.inject({
+      url: `/api/v1/orgs/${t.orgId}/reconciliation/findings?${params}`,
+      headers: t.owner.headers,
+    });
+    expect(findings.json<{ items: unknown[] }>().items).toHaveLength(body.findingCount);
+    const foreign = await app.inject({
+      url: `/api/v1/orgs/${other.orgId}/reconciliation/findings?${params}`,
+      headers: other.owner.headers,
+    });
+    expect(foreign.json<{ items: unknown[] }>().items).toHaveLength(0);
+  });
+
   it('lets a viewer read but not act, and hides other orgs', async () => {
     const t = await newTenant(harness, app);
     const other = await newTenant(harness, app);

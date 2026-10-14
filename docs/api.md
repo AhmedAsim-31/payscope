@@ -185,6 +185,8 @@ Exports are reads and are not written to the audit log; the audit log covers mut
 
 Incident list filters: `status`, `severity`, and `category` match exactly.
 `severity` takes a finding severity and `category` takes a finding type, because each incident groups the findings of one type.
+Incident detail adds `related: { findingType, lastRunId }`, the finding type and the latest run that saw it.
+Passing them as the findings list `type` and `runId` filters lists the findings behind this incident, within the same org.
 
 ### Repairs
 
