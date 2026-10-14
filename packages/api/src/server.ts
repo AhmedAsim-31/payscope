@@ -41,6 +41,7 @@ const app = await buildApp({
         await sql`select 1`;
       },
     },
+    ...(config.runWorkerInProcess ? [{ name: 'worker', check: worker.checkLiveness }] : []),
   ],
   db,
   credentialsCipher,

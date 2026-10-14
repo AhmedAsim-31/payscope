@@ -132,5 +132,7 @@ Also read by code: `NODE_ENV`, `SEED_ALLOW_REMOTE`, `DEMO_USER_PASSWORD` (E2E on
 
 - `Invalid environment configuration: <NAMES>` at startup lists the variables that failed validation; values are never printed.
 - `CREDENTIALS_ENCRYPTION_KEY not set; connections API and webhook ingress disabled` means those routes return 404.
-- `/ready` answers 503 when the database is unreachable.
+- `/ready` answers 503 when the database is unreachable (`checks.database: "fail"`).
+- `/ready` also answers 503 with `checks.worker: "fail"` when the in-process worker is not running or its poll loop has not beaten within max(5 poll intervals, the job lease length), 60 seconds by default.
+  The check is skipped when `RUN_WORKER_IN_PROCESS=false`.
 - First request after idle takes about a minute on Render Free.

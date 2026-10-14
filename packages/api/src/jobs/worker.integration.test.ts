@@ -160,3 +160,56 @@ describe('start and stop', () => {
     expect((await jobRow(sql, id)).status).toBe('succeeded');
   });
 });
+
+describe('liveness', () => {
+  function clockedWorker(handler: JobHandler, kind = uniqueKind()) {
+    let nowMs = Date.parse('2026-01-01T00:00:00Z');
+    const worker = workerFor(kind, handler, {
+      pollIntervalMs: 20,
+      leaseSeconds: 600,
+      now: () => new Date(nowMs),
+    });
+    return { worker, kind, advance: (ms: number) => (nowMs += ms) };
+  }
+
+  it('fails before the worker starts', async () => {
+    const { worker } = clockedWorker(() => Promise.resolve());
+    await expect(worker.checkLiveness()).rejects.toThrow('worker_not_running');
+  });
+
+  it('passes while the poll loop keeps beating, even with no jobs', async () => {
+    const { worker, advance } = clockedWorker(() => Promise.resolve());
+    worker.start();
+    advance(700_000);
+    await new Promise((r) => setTimeout(r, 100));
+    await expect(worker.checkLiveness()).resolves.toBeUndefined();
+    await worker.stop();
+  });
+
+  it('fails once the loop is stuck past the threshold', async () => {
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let started = false;
+    const { worker, kind, advance } = clockedWorker(async () => {
+      started = true;
+      await gate;
+    });
+    await insertJobs(sql, kind, 1);
+    worker.start();
+    await expect.poll(() => started, { timeout: 5000 }).toBe(true);
+    await expect(worker.checkLiveness()).resolves.toBeUndefined();
+    advance(600_001);
+    await expect(worker.checkLiveness()).rejects.toThrow('worker_heartbeat_stale');
+    release();
+    await worker.stop();
+  });
+
+  it('fails after the worker stops', async () => {
+    const { worker } = clockedWorker(() => Promise.resolve());
+    worker.start();
+    await worker.stop();
+    await expect(worker.checkLiveness()).rejects.toThrow('worker_not_running');
+  });
+});
