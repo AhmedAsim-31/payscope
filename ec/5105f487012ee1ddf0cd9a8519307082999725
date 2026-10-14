@@ -1,0 +1,24 @@
+packages/e2e/tests/recovery.spec.ts
+  h_78e539a96187c3 11,13
+packages/e2e/tests/viewer.spec.ts
+  h_78e539a96187c3 16-18
+packages/web/src/components/records/filter-bar.tsx
+  h_78e539a96187c3 16,62-70,79,83,85
+packages/web/src/components/records/payments-list.test.tsx
+  h_78e539a96187c3 92-103
+packages/web/src/components/records/records-list-view.tsx
+  h_78e539a96187c3 66
+packages/web/src/components/records/use-url-filters.ts
+  h_78e539a96187c3 22,24-27,31-34,46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ec5105f487012ee1ddf0cd9a8519307082999725",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
