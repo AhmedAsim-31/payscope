@@ -25,7 +25,8 @@ Page: Overview for Acme Streaming (demo), the landing page after sign-in.
 - Payments are grouped per currency (EUR, GBP, JPY, USD) and never summed across currencies; money is stored as integer minor units.
 - Processing success rate shows 3 events that failed, and the Jobs card shows 3 dead jobs.
   Those are seeded on purpose.
-- Open findings is 0 because no reconciliation has run yet.
+- Open findings and Open incidents are 0 because no reconciliation has run yet.
+  The Open incidents tile links to the incidents list filtered to open, so the number matches the list.
 
 ## 0:30 The payment (45 seconds)
 
@@ -60,6 +61,7 @@ Page: Overview for Acme Streaming (demo), the landing page after sign-in.
    The run opened one incident per high-severity finding type.
    Severity and Category filters narrow the list.
    Open an incident and click "View findings": the list is filtered to that incident's finding type and its latest run, not every finding of that type in the org.
+   Back on Overview, the Open incidents tile now counts these incidents.
 
 ## 2:30 Inspect and repair (60 seconds)
 
@@ -70,12 +72,17 @@ Page: Overview for Acme Streaming (demo), the landing page after sign-in.
 4. Type a reason, for example "Active pro subscription with a succeeded payment", and confirm.
 5. The finding now shows Resolved and the button is gone.
    The repair is idempotent: repeating it does not create a second entitlement.
+6. Optional: open the entitlement incident.
+   Its finding count dropped by one in the same transaction as the repair.
+   It stays open while other high or critical findings of that type remain, and auto-resolves, with a system timeline entry and audit row, once the last one is resolved or dismissed.
 
 ## 3:30 Confirm and audit (30 seconds)
 
 1. Open Maya's customer page again: "Entitlements" now lists an active `pro` entitlement.
 2. Click Audit, enter `repair.correct_entitlement` in Action, and click Apply.
-   The row shows who did it, when, and the reason.
+   The row shows the actor's email, when, and the reason.
+   The target links to the finding's detail page.
+   System actions show "System".
    The audit log is append-only.
 
 ## 4:00 Scenario lab (60 seconds)
@@ -103,6 +110,8 @@ Page: Overview for Acme Streaming (demo), the landing page after sign-in.
 - Subscription detail shows "Canceled" and "Ended" when the provider reported them.
   Stripe sends both, Paddle sends only the cancellation time, RevenueCat sends only the end time on expiration, and PayPal sends neither.
 - Tenant isolation: switch the org selector to Globex Apps (demo); none of the Acme rows appear.
+- Filters: on Payments, type a currency and a minimum amount, then click Apply once; both filters apply together.
+- Readiness: `GET /ready` on the API includes a `worker` check when `RUN_WORKER_IN_PROCESS=true`, and returns 503 if the worker heartbeat is older than 60 seconds with defaults.
 - Dark mode and mobile: the app follows the OS color scheme and works at 375 pixels wide.
 
 ## What to say is simulated

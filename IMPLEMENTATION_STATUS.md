@@ -18,6 +18,9 @@ Real (runs the production code paths):
 - Event processing into payments, subscriptions, customers, and entitlements, including subscription `canceled_at` and `ended_at` where the provider payload carries them.
 - Processing attempts record a correlation id and, for retryable failures, the next retry time.
 - Local-rule reconciliation, findings, incidents, repairs, and the audit log.
+- Incidents recount on every finding status change (review, dismiss, resolve, correct entitlement, refresh from provider) and auto-resolve when no open or reviewed high or critical findings remain.
+- The audit log shows the actor's email when the actor is a current member of the same org, and links targets to their detail pages.
+- `/ready` fails with 503 when the in-process worker's heartbeat is stale (60 seconds with defaults), but only when `RUN_WORKER_IN_PROCESS=true`.
 - Auth through Supabase Auth (JWKS), org roles, and Postgres RLS.
 - Rate limiting, input validation, and encrypted per-connection credentials.
 - CSV export of payments and findings, capped at 5,000 rows.
@@ -43,18 +46,20 @@ Not verified:
 | Webhook ingress with raw-body signature checks                | Real      | Stripe, PayPal, Paddle, RevenueCat                                   |
 | Duplicate and out-of-order event handling                     | Real      | Unique constraints and guarded transitions                           |
 | Job worker with retries, lease recovery, dead letter          | Real      | `FOR UPDATE SKIP LOCKED`                                             |
-| Payments, subscriptions, customers, entitlements screens      | Real      | Keyset pagination, filters                                           |
+| Payments, subscriptions, customers, entitlements screens      | Real      | Keyset pagination; filter bar Apply commits every text field at once |
 | Event inbox, attempts, safe retry                             | Real      | Attempts carry a correlation id and next retry time                  |
 | Event detail related records and signature status             | Real      | Links to payment, subscription, customer in the same org and connection |
 | Jobs summary                                                  | Real      | Queued, Running, Retrying, Dead, oldest queued                       |
 | Customer search                                               | Real      | Email prefix or exact provider customer id                           |
 | Subscription `canceled_at` and `ended_at`                     | Real      | Stripe both, Paddle canceled only, RevenueCat ended only, PayPal none |
 | CSV export of payments and findings                           | Real      | `records:export` (OWNER, ADMIN, OPERATOR); 5,000-row cap             |
-| Per-currency overview dashboard                               | Real      | SQL aggregates, integer minor units                                  |
+| Per-currency overview dashboard                               | Real      | SQL aggregates, integer minor units; Open incidents tile             |
 | Local-rule reconciliation, findings, incidents                | Real      | Incident severity and category filters; incident-scoped findings link |
-| Repair center and append-only audit log                       | Real      | Reasoned, idempotent repairs                                         |
+| Incident recount and auto-resolve on finding status change    | Real      | Same transaction; advisory lock per org and finding type             |
+| Repair center and append-only audit log                       | Real      | Reasoned, idempotent repairs; actor email and target links           |
 | Multi-tenant orgs, roles, RLS, cross-tenant tests             | Real      | OWNER, ADMIN, OPERATOR, VIEWER                                       |
 | Rate limiting                                                 | Real      | Postgres-backed, per endpoint                                        |
+| `/ready` worker liveness check                                | Real      | Only with `RUN_WORKER_IN_PROCESS=true`; 60s default threshold        |
 | Credential encryption and key rotation                        | Real      | See [docs/security.md](docs/security.md)                             |
 | Demo seed and one-command reset                               | Simulated | Fictional data, real processing; `pnpm demo:reset`                   |
 | Scenario lab (17 scenarios)                                   | Simulated | Real pipeline, simulation connection, fake provider fetch where noted |
