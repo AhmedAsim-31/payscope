@@ -114,6 +114,8 @@ export const FINDING_FILTERS: readonly FilterField[] = [
 
 export const INCIDENT_FILTERS: readonly FilterField[] = [
   { name: 'status', label: 'Status', kind: 'select', options: INCIDENT_STATUSES },
+  { name: 'severity', label: 'Severity', kind: 'select', options: FINDING_SEVERITIES },
+  { name: 'category', label: 'Category', kind: 'select', options: FINDING_TYPES },
 ];
 
 export const AUDIT_FILTERS: readonly FilterField[] = [

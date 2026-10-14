@@ -30,6 +30,8 @@ export async function listIncidents(db: Db, orgId: string, q: Query) {
       and(
         eq(i.orgId, orgId),
         q.status === undefined ? undefined : eq(i.status, q.status),
+        q.severity === undefined ? undefined : eq(i.severity, q.severity),
+        q.category === undefined ? undefined : eq(i.category, q.category),
         keysetAfter(i.openedAt, i.id, q.cursor),
       ),
     )

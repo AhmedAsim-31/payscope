@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { FINDING_SEVERITIES } from './reconciliation-schemas';
+import { FINDING_SEVERITIES, FINDING_TYPES } from './reconciliation-schemas';
 import { DEFAULT_PAGE_LIMIT, MAX_PAGE_LIMIT } from './records-schemas';
 
 export const INCIDENT_STATUSES = ['open', 'investigating', 'resolved'] as const;
@@ -11,6 +11,8 @@ export const incidentQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_LIMIT).default(DEFAULT_PAGE_LIMIT),
   cursor: z.string().max(512).optional(),
   status: z.enum(INCIDENT_STATUSES).optional(),
+  severity: z.enum(FINDING_SEVERITIES).optional(),
+  category: z.enum(FINDING_TYPES).optional(),
 });
 
 export const incidentSchema = z.object({

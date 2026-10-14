@@ -77,6 +77,30 @@ describe('incidents', () => {
     expect(await incidents(t)).toHaveLength(2);
   });
 
+  it('filters the list by severity and category', async () => {
+    const t = await newTenant(harness, app);
+    await sql`
+      insert into incidents (org_id, category, severity, title, fingerprint) values
+        (${t.orgId}, 'status_mismatch', 'high', 'a', 'f:a'),
+        (${t.orgId}, 'status_mismatch', 'critical', 'b', 'f:b'),
+        (${t.orgId}, 'refund_inconsistent', 'critical', 'c', 'f:c')`;
+    const list = (query: string) =>
+      app.inject({
+        url: `/api/v1/orgs/${t.orgId}/incidents?${query}`,
+        headers: t.owner.headers,
+      });
+    const titles = async (query: string) =>
+      (await list(query))
+        .json<{ items: { title: string }[] }>()
+        .items.map((x) => x.title)
+        .sort();
+    expect(await titles('severity=critical')).toEqual(['b', 'c']);
+    expect(await titles('category=status_mismatch')).toEqual(['a', 'b']);
+    expect(await titles('severity=critical&category=status_mismatch')).toEqual(['b']);
+    expect((await list('category=nope')).statusCode).toBe(400);
+    expect((await list('severity=nope')).statusCode).toBe(400);
+  });
+
   it('lets a viewer read but not act, and hides other orgs', async () => {
     const t = await newTenant(harness, app);
     const other = await newTenant(harness, app);
