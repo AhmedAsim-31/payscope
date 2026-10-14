@@ -96,4 +96,13 @@ describe('normalizeRevenueCatEvent', () => {
     const event = normalizeRevenueCatEvent(loadRevenueCatFixture('cancellation-refund'));
     expect(event.amountMinor).toBe(999n);
   });
+
+  it('maps an EXPIRATION expiration_at_ms to endedAt and carries no canceledAt', () => {
+    const expired = normalizeRevenueCatEvent(loadRevenueCatFixture('expiration'));
+    expect(expired.metadata).toMatchObject({ endedAt: new Date(1760000300000).toISOString() });
+    expect(expired.metadata).not.toHaveProperty('canceledAt');
+    const canceled = normalizeRevenueCatEvent(loadRevenueCatFixture('cancellation-unsubscribe'));
+    expect(canceled.metadata).not.toHaveProperty('endedAt');
+    expect(canceled.metadata).not.toHaveProperty('canceledAt');
+  });
 });

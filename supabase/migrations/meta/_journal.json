@@ -169,6 +169,13 @@
       "when": 1791948613597,
       "tag": "20261014033013_provider_customer_id_search_index",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1791949078979,
+      "tag": "20261014033758_subscription_cancel_end_timestamps",
+      "breakpoints": true
     }
   ]
 }

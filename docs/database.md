@@ -79,6 +79,7 @@ Checks require `amount_minor >= 0` and `0 <= amount_refunded_minor <= amount_min
 
 One row per provider subscription, unique on `(connection_id, provider_subscription_id)`.
 It requires a customer and carries the same `last_event_at` and `version` guards as payments.
+Nullable `canceled_at` and `ended_at` hold the provider's cancellation and end times; an event that does not carry a time leaves the stored value unchanged.
 `(org_id, created_at desc)` serves the list and `(org_id, status)` serves status filters.
 
 ### entitlement_records

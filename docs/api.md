@@ -106,6 +106,9 @@ Payment list filters: `status`, `provider`, `currency`, `connectionId`, `custome
 `minAmount` and `maxAmount` are inclusive bounds on `amountMinor`, as digit strings; `minAmount` above `maxAmount` answers `422 INVALID_AMOUNT_RANGE`.
 `from` (inclusive) and `to` (exclusive) are ISO 8601 timestamps on `createdAt`.
 
+Subscription list items and detail include `canceledAt` and `endedAt` (ISO 8601 or `null`) as the provider reported them.
+Stripe supplies both, Paddle supplies `canceledAt`, RevenueCat supplies `endedAt` on expiration, and PayPal supplies neither.
+
 Customer list `q` matches a case-insensitive email prefix (wildcards are literal) or an exact provider customer id from the org's provider customer mappings.
 
 ### Entitlement ingestion

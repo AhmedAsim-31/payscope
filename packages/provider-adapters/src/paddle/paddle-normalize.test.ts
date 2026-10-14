@@ -216,4 +216,13 @@ describe('normalizePaddleEvent', () => {
     noId['data'] = { status: 'completed' };
     expect(() => normalizePaddleEvent(noId)).toThrow(ProviderError);
   });
+
+  it('maps canceled_at and leaves ended time absent', () => {
+    const event = normalizePaddleEvent(load('subscription-canceled'));
+    expect(event.metadata).toMatchObject({ canceledAt: '2026-11-01T10:00:00.000Z' });
+    expect(event.metadata).not.toHaveProperty('endedAt');
+    expect(normalizePaddleEvent(load('subscription-created')).metadata).not.toHaveProperty(
+      'canceledAt',
+    );
+  });
 });

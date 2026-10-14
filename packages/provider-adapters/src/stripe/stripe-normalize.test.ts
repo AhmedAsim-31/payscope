@@ -192,4 +192,14 @@ describe('normalizeStripeEvent', () => {
       }
     }
   });
+
+  it('normalizes canceled_at and ended_at epoch seconds to ISO strings', () => {
+    const ended = normalizeStripeEvent(loadStripeFixture('customer-subscription-deleted'));
+    expect(ended.metadata).toMatchObject({
+      canceledAt: new Date(1760000009 * 1000).toISOString(),
+      endedAt: new Date(1760000009 * 1000).toISOString(),
+    });
+    const active = normalizeStripeEvent(loadStripeFixture('customer-subscription-created'));
+    expect(active.metadata).toMatchObject({ canceledAt: null, endedAt: null });
+  });
 });

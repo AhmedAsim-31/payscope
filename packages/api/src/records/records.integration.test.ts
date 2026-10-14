@@ -209,8 +209,9 @@ describe('subscriptions, customers and entitlements', () => {
     subscriptionId = randomUUID();
     entitlementId = randomUUID();
     await sql`insert into subscription_records
-      (id, org_id, connection_id, customer_id, provider_subscription_id, status, plan_ref)
-      values (${subscriptionId}, ${a.orgId}, ${a.connectionId}, ${a.customerId}, 'sub_1', 'past_due', 'pro')`;
+      (id, org_id, connection_id, customer_id, provider_subscription_id, status, plan_ref, canceled_at, ended_at)
+      values (${subscriptionId}, ${a.orgId}, ${a.connectionId}, ${a.customerId}, 'sub_1', 'past_due', 'pro',
+        '2026-10-01T10:00:00Z', '2026-11-01T10:00:00Z')`;
     await sql`insert into entitlement_records
       (id, org_id, customer_id, subscription_id, entitlement_key, state, source)
       values (${entitlementId}, ${a.orgId}, ${a.customerId}, ${subscriptionId}, 'pro_access', 'inconsistent', 'reconciliation')`;
@@ -219,6 +220,11 @@ describe('subscriptions, customers and entitlements', () => {
   it('lists and filters subscriptions, with entitlements on the detail', async () => {
     const hit = await get<Page>(a.owner, a.orgId, '/subscriptions?status=past_due&provider=stripe');
     expect(hit.body.items.map((i) => i.id)).toEqual([subscriptionId]);
+    const lifecycle = {
+      canceledAt: '2026-10-01T10:00:00.000Z',
+      endedAt: '2026-11-01T10:00:00.000Z',
+    };
+    expect(hit.body.items[0]).toMatchObject(lifecycle);
     const byCustomer = await get<Page>(
       a.owner,
       a.orgId,
@@ -231,6 +237,7 @@ describe('subscriptions, customers and entitlements', () => {
       `/subscriptions/${subscriptionId}`,
     );
     expect(detail.body.entitlements.map((e) => e.id)).toEqual([entitlementId]);
+    expect(detail.body).toMatchObject(lifecycle);
   });
 
   it('searches customers by exact provider customer id within the org only', async () => {

@@ -62,6 +62,12 @@ export function SubscriptionDetail({
           <DetailField label="Cancels at period end">
             {sub.cancelAtPeriodEnd ? 'Yes' : 'No'}
           </DetailField>
+          <DetailField label="Canceled">
+            <Timestamp value={sub.canceledAt} />
+          </DetailField>
+          <DetailField label="Ended">
+            <Timestamp value={sub.endedAt} />
+          </DetailField>
           <DetailField label="First seen by PayScope">
             <Timestamp value={sub.createdAt} />
           </DetailField>

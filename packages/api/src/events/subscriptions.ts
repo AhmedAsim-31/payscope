@@ -44,6 +44,19 @@ function planRefOf(event: NormalizedEvent): string | null {
   return typeof plan === 'string' ? plan : null;
 }
 
+type LifecycleTimes = Partial<Record<'canceledAt' | 'endedAt', Date | null>>;
+
+/** Only keys the adapter emitted are written, so providers that omit a time never clear it. */
+function lifecycleTimesOf(event: NormalizedEvent): LifecycleTimes {
+  const times: LifecycleTimes = {};
+  for (const key of ['canceledAt', 'endedAt'] as const) {
+    if (!event.metadata || !(key in event.metadata)) continue;
+    const value = event.metadata[key];
+    times[key] = typeof value === 'string' ? new Date(value) : null;
+  }
+  return times;
+}
+
 /** Returns the subscription row id when the write applied, undefined when the event is stale. */
 export async function applySubscription(ctx: ApplyContext): Promise<string | undefined> {
   const { tx, orgId, connectionId, event } = ctx;
@@ -51,9 +64,11 @@ export async function applySubscription(ctx: ApplyContext): Promise<string | und
   const planRef = planRefOf(event);
   const status = statusOf(event);
   const cancelAtPeriodEnd = cancelAtPeriodEndOf(event);
+  const lifecycleTimes = lifecycleTimesOf(event);
   const set = {
     status,
     cancelAtPeriodEnd,
+    ...lifecycleTimes,
     ...(periodEnd ? { currentPeriodEnd: periodEnd } : {}),
     ...(planRef ? { planRef } : {}),
     lastEventAt: event.occurredAt,
@@ -91,6 +106,7 @@ export async function applySubscription(ctx: ApplyContext): Promise<string | und
       planRef,
       currentPeriodEnd: periodEnd,
       cancelAtPeriodEnd,
+      ...lifecycleTimes,
       lastEventAt: event.occurredAt,
     })
     .onConflictDoUpdate({
