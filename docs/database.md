@@ -20,6 +20,7 @@ The matrix lives in `packages/shared/src/permissions.ts` and is queried with `ca
 | -------------------------------------------------------------------------------------------------- | ----- | ----- | -------- | ------ |
 | Read: `org:read`, `members:read`, `connections:read`, `records:read`, `events:read`, `audit:read`  | yes   | yes   | yes      | yes    |
 | Operate: `jobs:retry`, `reconciliation:run`, `findings:update`, `repairs:execute`, `scenarios:run` | yes   | yes   | yes      | no     |
+| Export: `records:export`                                                                           | yes   | yes   | yes      | no     |
 | Manage: `org:update`, `members:manage`, `connections:manage`                                       | yes   | yes   | no       | no     |
 | Owner only: `org:delete`, `ownership:transfer`                                                     | yes   | no    | no       | no     |
 

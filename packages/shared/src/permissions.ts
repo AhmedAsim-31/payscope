@@ -11,6 +11,7 @@ export const ACTIONS = [
   'connections:read',
   'connections:manage',
   'records:read',
+  'records:export',
   'events:read',
   'jobs:retry',
   'reconciliation:run',
@@ -39,6 +40,7 @@ const OPERATOR_ACTIONS: readonly Action[] = [
   'repairs:execute',
   'scenarios:run',
   'entitlements:ingest',
+  'records:export',
 ];
 
 const PERMISSIONS: Record<Role, ReadonlySet<Action>> = {

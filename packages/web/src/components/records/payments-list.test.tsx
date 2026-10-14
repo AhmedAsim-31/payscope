@@ -11,6 +11,8 @@ vi.mock('@/lib/api-client', async (importOriginal) => ({
   apiFetch: vi.fn(),
 }));
 
+vi.mock('@/hooks/use-current-org', () => ({ useCurrentOrg: () => ({ role: 'OWNER' }) }));
+
 const replace = vi.fn();
 let search = '';
 vi.mock('next/navigation', () => ({
