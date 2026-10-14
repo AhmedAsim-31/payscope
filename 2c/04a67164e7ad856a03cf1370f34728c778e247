@@ -1,0 +1,26 @@
+docs/api.md
+  h_78e539a96187c3 188-189
+docs/architecture.md
+  h_78e539a96187c3 276-281
+packages/api/src/events/derived-entitlements.ts
+  h_78e539a96187c3 5,9,18-21,23-24,35-36,40-43,51,53-68
+packages/api/src/repairs/refresh-from-provider.integration.test.ts
+  h_78e539a96187c3 10,406-544
+packages/api/src/repairs/refresh-from-provider.ts
+  h_78e539a96187c3 15-20,174,215-218,271-274,280-282
+packages/api/src/repairs/repair-routes.ts
+  h_78e539a96187c3 23,148,155,171
+packages/api/src/repairs/resolve-refreshed-findings.ts
+  h_78e539a96187c3 6,9,12-35,40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2c04a67164e7ad856a03cf1370f34728c778e247",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
