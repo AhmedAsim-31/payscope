@@ -44,15 +44,22 @@ describe('loadConfig', () => {
       ...BASE,
       API_PORT: '8080',
       CORS_ORIGIN: 'https://a.test, https://b.test',
-      TRUST_PROXY: 'true',
+      TRUST_PROXY: '1',
       LOG_LEVEL: 'debug',
     });
     expect(config).toMatchObject({
       port: 8080,
       corsOrigins: ['https://a.test', 'https://b.test'],
-      trustProxy: true,
+      trustProxy: 1,
       logLevel: 'debug',
     });
+  });
+
+  it('takes TRUST_PROXY as a hop count and rejects trust-everything', () => {
+    expect(loadConfig({ ...BASE, TRUST_PROXY: 'false' }).trustProxy).toBe(false);
+    for (const bad of ['true', '0', '-1', '1.5', 'yes']) {
+      expect(() => loadConfig({ ...BASE, TRUST_PROXY: bad })).toThrow(/TRUST_PROXY/);
+    }
   });
 
   it('rejects a bad API_PORT and names the key without the value', () => {

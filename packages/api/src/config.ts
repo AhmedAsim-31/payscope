@@ -52,9 +52,10 @@ const envSchema = z
     RETENTION_SCENARIO_RUN_DAYS: retentionDays(R.scenarioRunDays),
     RETENTION_AUDIT_LOG_DAYS: retentionDays(R.auditLogDays),
     TRUST_PROXY: z
-      .enum(['true', 'false'])
+      .string()
+      .regex(/^(false|[1-9]\d?)$/, 'must be "false" or a proxy hop count from 1 to 99')
       .default('false')
-      .transform((v) => v === 'true'),
+      .transform((v) => (v === 'false' ? false : Number(v))),
   })
   .refine((env) => env.NODE_ENV !== 'production' || env.CORS_ORIGIN !== undefined, {
     path: ['CORS_ORIGIN'],
@@ -82,7 +83,7 @@ export type Config = {
   host: string;
   corsOrigins: string[];
   logLevel: 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace' | 'silent';
-  trustProxy: boolean;
+  trustProxy: false | number;
   supabaseUrl: string;
   jwksUrl: string;
   jwtIssuer: string;

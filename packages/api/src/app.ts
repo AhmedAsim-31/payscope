@@ -47,7 +47,7 @@ export type BuildAppOptions = {
   logger?: false;
   logLevel?: string;
   logStream?: { write: (msg: string) => void };
-  trustProxy?: boolean;
+  trustProxy?: boolean | number;
   hsts?: boolean;
   readinessChecks?: ReadinessCheck[];
   tokenVerifier?: TokenVerifier;
@@ -68,6 +68,12 @@ function genReqId(req: { headers: Record<string, string | string[] | undefined> 
   return incoming.success ? incoming.data : randomUUID();
 }
 
+// Fastify's numeric trustProxy fails closed in this version, so express the hop count as a function.
+function trustProxyOption(trust: boolean | number | undefined) {
+  if (typeof trust !== 'number') return trust ?? false;
+  return (_addr: string, hop: number) => hop < trust;
+}
+
 export async function buildApp(opts: BuildAppOptions = {}) {
   const app = Fastify({
     logger:
@@ -80,7 +86,7 @@ export async function buildApp(opts: BuildAppOptions = {}) {
             serializers: LOG_SERIALIZERS,
           },
     bodyLimit: BODY_LIMIT_BYTES,
-    trustProxy: opts.trustProxy ?? false,
+    trustProxy: trustProxyOption(opts.trustProxy),
     requestIdHeader: false,
     genReqId,
   });

@@ -228,13 +228,23 @@ describe('ip and connection limits', () => {
   it('keys by the forwarded client address when the proxy is trusted', async () => {
     const app = await startWith(
       { internalTick: { max: 1, windowSec: 60 } },
-      { worker: worker(), internalTickToken: 'tick-token-0123456789', trustProxy: true },
+      { worker: worker(), internalTickToken: 'tick-token-0123456789', trustProxy: 1 },
     );
     const proxy = randomIp();
     const [a, b] = [randomIp(), randomIp()];
     expect(await tick(app, proxy, a)).toBe(401);
     expect(await tick(app, proxy, b)).toBe(401);
     expect(await tick(app, proxy, a)).toBe(429);
+  });
+
+  it('ignores client-prepended X-Forwarded-For entries beyond the trusted hop count', async () => {
+    const app = await startWith(
+      { internalTick: { max: 1, windowSec: 60 } },
+      { worker: worker(), internalTickToken: 'tick-token-0123456789', trustProxy: 1 },
+    );
+    const [proxy, client] = [randomIp(), randomIp()];
+    expect(await tick(app, proxy, `${randomIp()}, ${client}`)).toBe(401);
+    expect(await tick(app, proxy, `${randomIp()}, ${client}`)).toBe(429);
   });
 
   const postWebhook = (
