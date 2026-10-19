@@ -1,0 +1,16 @@
+packages/api/src/logger.test.ts
+  h_78e539a96187c3 6,54-65
+packages/api/src/logger.ts
+  h_78e539a96187c3 54-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "19812b94edb2c16f0de50b36fcd305c415b47e02",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
