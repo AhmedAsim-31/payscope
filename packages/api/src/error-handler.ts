@@ -39,7 +39,10 @@ export function errorHandler(error: FastifyError, request: FastifyRequest, reply
   }
   const status = error.statusCode ?? 500;
   if (status < 500) {
-    return send(reply, status, { code: codeForStatus(status), message: error.message });
+    return send(reply, status, {
+      code: codeForStatus(status),
+      message: STATUS_CODES[status] ?? 'Client error',
+    });
   }
   request.log.error({ err: error }, 'request failed');
   return send(reply, status, { code: 'INTERNAL_ERROR', message: 'Internal server error' });

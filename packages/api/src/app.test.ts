@@ -105,12 +105,29 @@ describe('errors', () => {
     expect(res.body).not.toContain('at ');
   });
 
-  it('4xx errors keep their message', async () => {
+  it('framework 4xx errors use a fixed message, not the raw error text', async () => {
     await build();
-    app.get('/test-conflict', (_req, reply) => reply.conflict('already exists'));
-    const res = await app.inject('/test-conflict');
-    expect(res.statusCode).toBe(409);
-    expect(apiErrorSchema.parse(res.json()).error.message).toBe('already exists');
+    app.post('/test-json', () => ({ ok: true }));
+    const res = await app.inject({
+      method: 'POST',
+      url: '/test-json',
+      headers: { 'content-type': 'application/json' },
+      payload: '{"email": "jane@example.com"',
+    });
+    expect(res.statusCode).toBe(400);
+    expect(apiErrorSchema.parse(res.json()).error).toMatchObject({
+      code: 'BAD_REQUEST',
+      message: 'Bad Request',
+    });
+    expect(res.body).not.toContain('example.com');
+    const unsupported = await app.inject({
+      method: 'POST',
+      url: '/test-json',
+      headers: { 'content-type': 'text/x-weird' },
+      payload: 'x',
+    });
+    expect(unsupported.statusCode).toBe(415);
+    expect(apiErrorSchema.parse(unsupported.json()).error.message).toBe('Unsupported Media Type');
   });
 
   it('body over 1 MiB returns 413', async () => {
