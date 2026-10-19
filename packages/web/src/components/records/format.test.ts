@@ -32,6 +32,12 @@ describe('humanize', () => {
   it('turns enum values into sentence case', () => {
     expect(humanize('partially_refunded')).toBe('Partially refunded');
   });
+
+  it('uses brand display names for provider ids', () => {
+    expect(humanize('revenuecat')).toBe('RevenueCat');
+    expect(humanize('paypal')).toBe('PayPal');
+    expect(humanize('stripe')).toBe('Stripe');
+  });
 });
 
 describe('formatDuration and formatAge', () => {
