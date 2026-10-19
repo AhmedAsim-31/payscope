@@ -51,7 +51,17 @@ function serializeError(err: unknown, depth = 0): SerializedError {
   return out;
 }
 
-export const LOG_SERIALIZERS = { err: (err: unknown) => serializeError(err) };
+type LoggedRequest = { method?: string; url?: string; ip?: string };
+
+// Query strings carry customer search terms and export filters.
+function serializeReq(req: LoggedRequest) {
+  return { method: req.method, url: req.url?.split('?')[0], remoteAddress: req.ip };
+}
+
+export const LOG_SERIALIZERS = {
+  err: (err: unknown) => serializeError(err),
+  req: serializeReq,
+};
 
 export function createLogger(level: string) {
   return pino({ level, redact: LOG_REDACT, serializers: LOG_SERIALIZERS });
