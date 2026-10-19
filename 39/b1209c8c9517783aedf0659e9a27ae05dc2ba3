@@ -1,0 +1,21 @@
+packages/api/src/config.test.ts
+  s_399d9740cf7ca4::t_8b726cb4ff8a25 47,53,58-64
+packages/api/src/rate-limit/rate-limit.integration.test.ts
+  s_399d9740cf7ca4::t_4595c655eef6bd 231,240-249
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "39b1209c8c9517783aedf0659e9a27ae05dc2ba3",
+  "prompts": {},
+  "sessions": {
+    "s_399d9740cf7ca4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d2b583dc-2a54-42c4-a45e-cafdc78c8e64",
+        "model": "unknown"
+      },
+      "human_author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
