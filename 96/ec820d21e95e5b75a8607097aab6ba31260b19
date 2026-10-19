@@ -1,0 +1,28 @@
+packages/provider-adapters/src/paddle/paddle-client.test.ts
+  h_78e539a96187c3 49
+packages/provider-adapters/src/paddle/paddle-client.ts
+  h_78e539a96187c3 62
+packages/provider-adapters/src/paypal/paypal-client.test.ts
+  h_78e539a96187c3 73-74
+packages/provider-adapters/src/paypal/paypal-client.ts
+  h_78e539a96187c3 52
+packages/provider-adapters/src/revenuecat/revenuecat-client.test.ts
+  h_78e539a96187c3 52
+packages/provider-adapters/src/revenuecat/revenuecat-client.ts
+  h_78e539a96187c3 58
+packages/provider-adapters/src/stripe/stripe-client.test.ts
+  h_78e539a96187c3 53
+packages/provider-adapters/src/stripe/stripe-client.ts
+  h_78e539a96187c3 88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "96ec820d21e95e5b75a8607097aab6ba31260b19",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
