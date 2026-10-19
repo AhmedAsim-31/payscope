@@ -1,0 +1,18 @@
+packages/web/src/components/shell/app-header.tsx
+  h_78e539a96187c3 11-29,31-33
+packages/web/src/components/shell/org-switcher.test.tsx
+  h_78e539a96187c3 1-26
+packages/web/src/components/shell/org-switcher.tsx
+  h_78e539a96187c3 27-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ff0443850104cdcae3d59fae3a56ba2ef35602d3",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
