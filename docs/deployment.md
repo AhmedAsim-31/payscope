@@ -39,7 +39,7 @@ It validates against Render's published Blueprint schema; it has not been applie
   It runs from source through tsx; the build does not include the migration CLI.
   It runs from a workstation, because Render's pre-deploy command is not available on the Free plan.
 - Set `NODE_ENV=production`, which makes `CORS_ORIGIN` and `CREDENTIALS_ENCRYPTION_KEY` required and turns on HSTS.
-- Set `TRUST_PROXY=true` so rate limits key on the real client IP behind Render's proxy.
+- Set `TRUST_PROXY=1` (one trusted hop) so rate limits key on the real client IP behind Render's proxy.
 - Never run `db:seed` against production; the seed refuses `NODE_ENV=production` and remote hosts unless `SEED_ALLOW_REMOTE=true`.
 
 ## Web on Vercel
@@ -101,7 +101,7 @@ Names only; values belong in the host's secret store, never in the repo.
 | `API_PORT`, `API_HOST`                   | opt |     | Defaults 3001 and 0.0.0.0                         |
 | `CORS_ORIGIN`                            | yes |     | Comma-separated; required in production           |
 | `LOG_LEVEL`                              | opt |     | Default `info`                                    |
-| `TRUST_PROXY`                            | opt |     | `true` behind a proxy                             |
+| `TRUST_PROXY`                            | opt |     | `false`, or proxy hop count (Render: `1`)         |
 | `RUN_WORKER_IN_PROCESS`                  | opt |     | Default `true`                                    |
 | `INTERNAL_TICK_TOKEN`                    | opt |     | Enables `/internal/tick`                          |
 | `RECONCILIATION_SCHEDULE_INTERVAL_HOURS` | opt |     | Default 24; `0` turns scheduled runs off          |

@@ -57,8 +57,9 @@ The cost is a temporary loss of abuse protection while the database is unreachab
 ### Trusted proxy rules
 
 The client IP used for IP-keyed policies is `request.ip`, which Fastify derives from the socket address.
-`X-Forwarded-For` is honoured only when `TRUST_PROXY=true`; with `TRUST_PROXY=false` (the default) a spoofed header cannot change the bucket.
-Set `TRUST_PROXY=true` only when the API sits behind a proxy that overwrites `X-Forwarded-For`, otherwise clients can mint unlimited buckets.
+`X-Forwarded-For` is honoured only when `TRUST_PROXY` is a hop count; with `TRUST_PROXY=false` (the default) a spoofed header cannot change the bucket.
+Set `TRUST_PROXY=<n>` to the number of proxies in front of the API (Render: `1`); Fastify then takes the address n hops from the right, so entries a client prepends are ignored.
+`TRUST_PROXY=true` (trust every hop) is rejected.
 IPv6 addresses are normalised to their /64 prefix so a client cannot rotate addresses within its subnet.
 Authenticated policies never use the IP; they key on the verified token subject and, where relevant, the organization resolved from membership.
 
