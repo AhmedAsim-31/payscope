@@ -29,6 +29,11 @@ describe('health and readiness', () => {
     expect(Object.keys(doc.paths)).toEqual(expect.arrayContaining(['/health', '/ready']));
   });
 
+  it('does not serve /openapi.json when serveOpenApi is false', async () => {
+    await build({ serveOpenApi: false });
+    expect((await app.inject('/openapi.json')).statusCode).toBe(404);
+  });
+
   it('GET /health returns ok', async () => {
     await build();
     const res = await app.inject('/health');
