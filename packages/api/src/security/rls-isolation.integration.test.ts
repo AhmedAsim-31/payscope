@@ -115,4 +115,16 @@ describe('row level security', () => {
         and has_column_privilege('authenticated', 'public.provider_connections', column_name, 'SELECT')`;
     expect(granted).toEqual([]);
   });
+
+  it('does not let authenticated select raw payload or state columns', async () => {
+    const rows = await sql<{ table_name: string; column_name: string }[]>`
+      select table_name, column_name from information_schema.columns
+      where table_schema = 'public'
+        and (table_name, column_name) in (
+          ('provider_events', 'payload'), ('background_jobs', 'payload'),
+          ('background_jobs', 'last_error'), ('audit_logs', 'previous_state'),
+          ('audit_logs', 'resulting_state'))
+        and has_column_privilege('authenticated', format('public.%I', table_name), column_name, 'SELECT')`;
+    expect(rows).toEqual([]);
+  });
 });
