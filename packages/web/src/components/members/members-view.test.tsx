@@ -119,11 +119,9 @@ describe('MembersView permission gating', () => {
     renderWithQuery(<MembersView orgId={ORG_ID} />);
 
     expect(
-      screen.queryByRole('button', { name: 'Transfer ownership to owner@example.com' }),
+      screen.queryByRole('button', { name: 'Make owner owner@example.com' }),
     ).not.toBeInTheDocument();
-    await user.click(
-      await screen.findByRole('button', { name: 'Transfer ownership to viewer@example.com' }),
-    );
+    await user.click(await screen.findByRole('button', { name: 'Make owner viewer@example.com' }));
     const dialog = await screen.findByRole('dialog');
     expect(dialog).toHaveTextContent('viewer@example.com will become the owner');
     expect(mockedFetch).not.toHaveBeenCalledWith(

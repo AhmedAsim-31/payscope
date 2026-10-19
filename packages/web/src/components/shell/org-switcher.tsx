@@ -25,7 +25,7 @@ export function OrgSwitcher({ orgId }: { orgId: string }) {
         <Button
           variant="outline"
           className="min-w-0 max-w-56 flex-1 justify-between sm:flex-none"
-          aria-label={`Switch organization${current ? ` (current: ${current.name})` : ''}`}
+          aria-label={current ? `${current.name}, Switch organization` : 'Switch organization'}
           title={current?.name}
         >
           <span className="truncate">{current?.name ?? 'Select organization'}</span>
