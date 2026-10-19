@@ -4,16 +4,16 @@ import { formatAge, formatDuration, formatMoney, formatTimestamp, humanize } fro
 describe('formatMoney', () => {
   it('formats a bigint string beyond 2^53 exactly', () => {
     expect(formatMoney({ amountMinor: '9007199254740993123', currency: 'USD' })).toBe(
-      '90071992547409931.23 USD',
+      '90,071,992,547,409,931.23 USD',
     );
   });
 
   it('respects zero-decimal currencies', () => {
-    expect(formatMoney({ amountMinor: '1234', currency: 'JPY' })).toBe('1234 JPY');
+    expect(formatMoney({ amountMinor: '1234', currency: 'JPY' })).toBe('1,234 JPY');
   });
 
   it('respects three-decimal currencies', () => {
-    expect(formatMoney({ amountMinor: '1234567', currency: 'BHD' })).toBe('1234.567 BHD');
+    expect(formatMoney({ amountMinor: '1234567', currency: 'BHD' })).toBe('1,234.567 BHD');
     expect(formatMoney({ amountMinor: '5', currency: 'BHD' })).toBe('0.005 BHD');
   });
 

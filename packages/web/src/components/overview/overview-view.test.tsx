@@ -89,7 +89,7 @@ describe('OverviewView', () => {
     });
     renderWithQuery(<OverviewView orgId={ORG_ID} />);
     const usd = await screen.findByLabelText('USD payments');
-    expect(within(usd).getByText('90071992547410.03 USD')).toBeInTheDocument();
+    expect(within(usd).getByText('90,071,992,547,410.03 USD')).toBeInTheDocument();
     expect(within(usd).getByRole('list', { name: 'USD payments by status' })).toHaveTextContent(
       'Failed1',
     );

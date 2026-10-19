@@ -84,14 +84,14 @@ function OverviewData({ orgId, range }: { orgId: string; range: OverviewRange })
         {data.payments.length === 0 ? (
           <p className="text-muted-foreground text-sm">No payments in this range.</p>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,20rem),1fr))] gap-4">
             {data.payments.map((entry) => (
               <CurrencyCard key={entry.currency} data={entry} />
             ))}
           </div>
         )}
       </section>
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <SuccessRateTile processing={data.processing} />
         <JobsTile jobs={data.jobs} orgId={orgId} />
         <IncidentsTile incidents={data.incidents} orgId={orgId} />
