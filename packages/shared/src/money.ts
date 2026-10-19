@@ -47,12 +47,14 @@ export function parseDecimalToMinor(value: string, currency: string): bigint {
   return sign === '-' ? -minor : minor;
 }
 
-/** Formats integer minor units as a decimal string with the currency's exact precision. */
-export function formatMinor(amount: bigint, currency: string): string {
+/** Formats minor units with the currency's exact precision; `group` adds thousands separators. */
+export function formatMinor(amount: bigint, currency: string, group = false): string {
   const exponent = currencyExponent(currency);
   const negative = amount < 0n;
   const digits = (negative ? -amount : amount).toString().padStart(exponent + 1, '0');
   const split = digits.length - exponent;
-  const body = exponent === 0 ? digits : `${digits.slice(0, split)}.${digits.slice(split)}`;
+  const whole = digits.slice(0, split);
+  const shown = group ? whole.replace(/\B(?=(\d{3})+$)/g, ',') : whole;
+  const body = exponent === 0 ? shown : `${shown}.${digits.slice(split)}`;
   return negative ? `-${body}` : body;
 }

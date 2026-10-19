@@ -47,6 +47,14 @@ describe('formatMinor', () => {
     expect(formatMinor(-5n, 'USD')).toBe('-0.05');
   });
 
+  it('groups thousands only when asked', () => {
+    expect(formatMinor(108000n, 'JPY', true)).toBe('108,000');
+    expect(formatMinor(123456789n, 'USD', true)).toBe('1,234,567.89');
+    expect(formatMinor(-100000n, 'USD', true)).toBe('-1,000.00');
+    expect(formatMinor(999n, 'USD', true)).toBe('9.99');
+    expect(formatMinor(108000n, 'JPY')).toBe('108000');
+  });
+
   it('round-trips with parseDecimalToMinor', () => {
     for (const [v, c] of [
       ['10.50', 'USD'],

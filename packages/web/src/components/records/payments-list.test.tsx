@@ -114,7 +114,7 @@ describe('PaymentsList', () => {
       .mockResolvedValueOnce({ items: [payment], nextCursor: 'abc' })
       .mockResolvedValueOnce({ items: [], nextCursor: null });
     renderWithQuery(<PaymentsList orgId={ORG_ID} />);
-    expect(await screen.findByText('90071992547409931.23 USD')).toBeInTheDocument();
+    expect(await screen.findByText('90,071,992,547,409,931.23 USD')).toBeInTheDocument();
     expect(within(screen.getByRole('table')).getByText('Partially refunded')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Load more' }));
     await waitFor(() => expect(mockedFetch).toHaveBeenCalledTimes(2));

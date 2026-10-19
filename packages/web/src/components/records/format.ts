@@ -9,7 +9,7 @@ const timestampFormat = new Intl.DateTimeFormat('en-GB', {
 });
 
 export function formatMoney(money: Money): string {
-  return `${formatMinor(BigInt(money.amountMinor), money.currency)} ${money.currency}`;
+  return `${formatMinor(BigInt(money.amountMinor), money.currency, true)} ${money.currency}`;
 }
 
 export function formatTimestamp(iso: string): string {
