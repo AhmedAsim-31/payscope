@@ -1,0 +1,25 @@
+docs/api.md
+  s_399d9740cf7ca4::t_7cf61724cdf873 6
+packages/api/src/app.test.ts
+  s_399d9740cf7ca4::t_e08276ab3ec44d 32-36
+packages/api/src/app.ts
+  s_399d9740cf7ca4::t_a90e94435463cd 52,125-127
+packages/api/src/server.ts
+  s_399d9740cf7ca4::t_97f768d07c977b 36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7908d5b0c07850439dab603c9a36dccbaa13efe1",
+  "prompts": {},
+  "sessions": {
+    "s_399d9740cf7ca4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d2b583dc-2a54-42c4-a45e-cafdc78c8e64",
+        "model": "unknown"
+      },
+      "human_author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
