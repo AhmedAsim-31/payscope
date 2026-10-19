@@ -24,3 +24,9 @@ test('filter payments by currency, then investigate one', async ({ page }) => {
     page.getByRole('listitem').filter({ hasText: 'Provider time' }).first(),
   ).toBeVisible();
 });
+
+test('unknown payment shows a payment-specific not-found page', async ({ page }) => {
+  await page.goto(`/app/${orgIds().acme}/payments/00000000-0000-4000-8000-000000000000`);
+  await expect(page.getByRole('heading', { name: 'Payment not found' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Back to payments' })).toBeVisible();
+});
