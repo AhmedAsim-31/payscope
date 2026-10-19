@@ -3,7 +3,7 @@ import { afterAll, beforeAll } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 import type { ProviderAdapter } from '@payscope/provider-adapters/adapter';
 import { createAdapterRegistry } from '@payscope/provider-adapters/registry';
-import { createHarness, type TestUser } from '../test/identity-harness';
+import { createHarness } from '../test/identity-harness';
 import { REASON, repairCall, type Tenant } from '../test/ops-harness';
 import {
   createFakeAdapter,
@@ -14,7 +14,6 @@ import {
 const harness = createHarness();
 export const { sql } = harness;
 export let app: FastifyInstance;
-let owner: TestUser;
 let current: ReturnType<typeof createFakeAdapter>;
 export const behaviors = new Map<string, FakeBehavior>();
 export const fetchSubscription: NonNullable<ProviderAdapter['fetchSubscription']> = (ctx, id) =>
@@ -27,11 +26,10 @@ export const registered: ProviderAdapter = {
 };
 const registry = createAdapterRegistry([registered]);
 
-/** Registers one app and owner per test file; module state is isolated per file by Vitest. */
+/** Registers one app per test file; module state is isolated per file by Vitest. */
 export function useRefreshHarness() {
   beforeAll(async () => {
     app = await harness.start({ adapters: registry });
-    owner = await harness.newUser();
   });
   afterAll(() => harness.stop());
 }
@@ -43,6 +41,7 @@ export function useFake(onCall?: (id: string) => Promise<void> | void) {
 }
 
 export async function tenant(withCredentials = true): Promise<Tenant> {
+  const owner = await harness.newUser();
   const res = await app.inject({
     method: 'POST',
     url: '/api/v1/orgs',
