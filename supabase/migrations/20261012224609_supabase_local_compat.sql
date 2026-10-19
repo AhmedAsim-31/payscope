@@ -15,7 +15,13 @@ $$;
 --> statement-breakpoint
 CREATE SCHEMA IF NOT EXISTS auth;
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS auth.users (id uuid PRIMARY KEY, email text);
+DO $$
+BEGIN
+  IF to_regclass('auth.users') IS NULL THEN
+    CREATE TABLE auth.users (id uuid PRIMARY KEY, email text);
+  END IF;
+END
+$$;
 --> statement-breakpoint
 DO $$
 BEGIN
