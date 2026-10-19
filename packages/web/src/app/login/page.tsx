@@ -1,4 +1,4 @@
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardHeader } from '@/components/ui/card';
 import { safeNextPath } from '@/lib/safe-redirect';
 import { LoginForm } from './login-form';
 
@@ -14,7 +14,9 @@ export default async function LoginPage({
     <main className="flex min-h-screen items-center justify-center p-6">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl">Sign in</CardTitle>
+          <h1 data-slot="card-title" className="text-2xl leading-none font-semibold">
+            Sign in
+          </h1>
           <CardDescription>Use your PayScope account.</CardDescription>
         </CardHeader>
         <LoginForm nextPath={nextPath} />
