@@ -90,5 +90,5 @@ Every run starts with `db:reset-demo`, so the specs are deterministic against th
 Never point it at a database you care about.
 Traces are kept on the first retry in `packages/e2e/test-results`; `playwright-report` and `.auth` (signed-in session files) are gitignored.
 
-E2E is not part of CI or `pnpm test`.
-Running it in GitHub Actions needs the repo owner to add `DEMO_USER_PASSWORD` plus the Supabase URL and publishable key as secrets, and a job with a Postgres service that runs migrations before `pnpm e2e`.
+E2E is not part of `pnpm test`, but the `e2e` CI job runs it on pushes to master and on same-repo PRs (fork PRs have no secrets, so the job is skipped).
+The job uses a Postgres service and the repo secrets `DEMO_USER_PASSWORD`, `SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, and uploads the Playwright report on failure.
