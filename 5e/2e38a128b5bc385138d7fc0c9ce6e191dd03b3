@@ -1,0 +1,16 @@
+packages/web/src/components/records/format.test.ts
+  h_78e539a96187c3 35-40
+packages/web/src/components/records/format.ts
+  h_78e539a96187c3 3,24-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5e2e38a128b5bc385138d7fc0c9ce6e191dd03b3",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
