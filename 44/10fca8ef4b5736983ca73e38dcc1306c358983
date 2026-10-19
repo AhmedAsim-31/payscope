@@ -1,0 +1,21 @@
+packages/api/src/scenarios/lab.ts
+  s_399d9740cf7ca4::t_7a10e0438e5462 87
+packages/api/src/scenarios/mirror-fetch.ts
+  s_399d9740cf7ca4::t_9059a213447edd 1,14-18,32-38,51-57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4410fca8ef4b5736983ca73e38dcc1306c358983",
+  "prompts": {},
+  "sessions": {
+    "s_399d9740cf7ca4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d2b583dc-2a54-42c4-a45e-cafdc78c8e64",
+        "model": "unknown"
+      },
+      "human_author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
