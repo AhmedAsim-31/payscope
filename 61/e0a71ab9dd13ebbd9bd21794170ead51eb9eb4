@@ -1,0 +1,20 @@
+packages/api/src/security/rls-isolation.integration.test.ts
+  h_78e539a96187c3 118-129
+supabase/migrations/20261019094927_restrict_raw_payload_grants.sql
+  h_78e539a96187c3 1-7
+supabase/migrations/meta/20261019094927_snapshot.json
+  h_78e539a96187c3 1-3578
+supabase/migrations/meta/_journal.json
+  h_78e539a96187c3 179-185
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "61e0a71ab9dd13ebbd9bd21794170ead51eb9eb4",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
