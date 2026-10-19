@@ -33,6 +33,7 @@ const app = await buildApp({
   logLevel: config.logLevel,
   trustProxy: config.trustProxy,
   hsts: config.nodeEnv === 'production',
+  serveOpenApi: config.nodeEnv !== 'production',
   rateLimits: config.rateLimits,
   readinessChecks: [
     {

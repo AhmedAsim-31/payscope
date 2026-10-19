@@ -49,6 +49,7 @@ export type BuildAppOptions = {
   logStream?: { write: (msg: string) => void };
   trustProxy?: boolean | number;
   hsts?: boolean;
+  serveOpenApi?: boolean;
   readinessChecks?: ReadinessCheck[];
   tokenVerifier?: TokenVerifier;
   db?: Db;
@@ -121,7 +122,9 @@ export async function buildApp(opts: BuildAppOptions = {}) {
     openapi: { info: { title: 'PayScope API', version: '0.0.0' } },
     transform: jsonSchemaTransform,
   });
-  app.get('/openapi.json', { schema: { hide: true } }, () => app.swagger());
+  if (opts.serveOpenApi ?? true) {
+    app.get('/openapi.json', { schema: { hide: true } }, () => app.swagger());
+  }
   await app.register(healthRoutes, { readinessChecks: opts.readinessChecks ?? [] });
   if (opts.tokenVerifier) {
     await app.register(authenticatePlugin, { tokenVerifier: opts.tokenVerifier });
