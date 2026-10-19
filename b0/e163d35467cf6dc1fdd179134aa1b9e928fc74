@@ -1,0 +1,14 @@
+packages/web/src/components/members/members-view.test.tsx
+  h_78e539a96187c3 124
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b0e163d35467cf6dc1fdd179134aa1b9e928fc74",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
