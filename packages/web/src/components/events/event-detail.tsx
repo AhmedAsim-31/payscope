@@ -60,7 +60,10 @@ function RelatedPanel({ orgId, related }: { orgId: string; related: EventRelated
         return (
           <DetailField key={key} label={label}>
             {id ? (
-              <Link href={recordHref(orgId, resource, id)} className="underline underline-offset-4">
+              <Link
+                href={recordHref(orgId, resource, id)}
+                className="tap-link underline underline-offset-4"
+              >
                 View {label.toLowerCase()}
               </Link>
             ) : (

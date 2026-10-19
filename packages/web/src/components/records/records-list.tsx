@@ -118,7 +118,7 @@ export function RecordsList<T extends { id: string }>({
         </p>
       ) : null}
       {viewAll && hasNextPage ? (
-        <Link href={viewAll.href} className="w-fit text-sm underline underline-offset-4">
+        <Link href={viewAll.href} className="tap-link w-fit text-sm underline underline-offset-4">
           {viewAll.label}
         </Link>
       ) : hasNextPage ? (

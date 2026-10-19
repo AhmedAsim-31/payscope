@@ -17,7 +17,7 @@ export const runColumns = (orgId: string): Column<ReconciliationRun>[] => [
     cell: (r) => (
       <Link
         href={recordHref(orgId, 'reconciliation', r.id)}
-        className="underline-offset-4 hover:underline"
+        className="tap-link underline-offset-4 hover:underline"
       >
         {formatTimestamp(r.startedAt)}
       </Link>
@@ -46,7 +46,7 @@ export function RunsView({ orgId }: { orgId: string }) {
           <>
             Runs compare PayScope records with each other and, in provider mode, with the provider.
             Results appear as{' '}
-            <Link className="underline" href={`/app/${orgId}/findings`}>
+            <Link className="tap-link underline" href={`/app/${orgId}/findings`}>
               findings
             </Link>
             .

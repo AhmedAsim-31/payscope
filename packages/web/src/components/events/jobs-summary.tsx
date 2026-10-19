@@ -25,7 +25,7 @@ function StatCard({ title, value, hint, link }: StatCardProps) {
         <p className="text-3xl font-semibold tabular-nums">{value}</p>
         <p className="text-muted-foreground text-xs">{hint}</p>
         {link ? (
-          <Link href={link.href} className="w-fit text-sm underline underline-offset-4">
+          <Link href={link.href} className="tap-link w-fit text-sm underline underline-offset-4">
             {link.label}
           </Link>
         ) : null}

@@ -17,7 +17,7 @@ export function eventColumns(orgId: string): Column<EventSummary>[] {
       cell: (e) => (
         <Link
           href={recordHref(orgId, 'events', e.id)}
-          className="font-mono text-xs underline-offset-4 hover:underline"
+          className="tap-link font-mono text-xs underline-offset-4 hover:underline"
         >
           {e.eventType}
         </Link>

@@ -15,7 +15,7 @@ export function findingColumns(orgId: string): Column<Finding>[] {
       cell: (f) => (
         <Link
           href={recordHref(orgId, 'findings', f.id)}
-          className="underline-offset-4 hover:underline"
+          className="tap-link underline-offset-4 hover:underline"
         >
           {humanize(f.type)}
         </Link>

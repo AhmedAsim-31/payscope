@@ -15,7 +15,7 @@ function columns(orgId: string): Column<Incident>[] {
       cell: (i) => (
         <Link
           href={recordHref(orgId, 'incidents', i.id)}
-          className="underline-offset-4 hover:underline"
+          className="tap-link underline-offset-4 hover:underline"
         >
           {i.title}
         </Link>

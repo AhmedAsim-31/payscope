@@ -15,7 +15,7 @@ export function paymentColumns(orgId: string): Column<Payment>[] {
       cell: (p) => (
         <Link
           href={recordHref(orgId, 'payments', p.id)}
-          className="font-mono text-xs underline-offset-4 hover:underline"
+          className="tap-link font-mono text-xs underline-offset-4 hover:underline"
         >
           {p.providerPaymentId}
         </Link>

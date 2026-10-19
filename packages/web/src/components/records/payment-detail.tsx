@@ -49,7 +49,7 @@ export function PaymentDetail({ orgId, paymentId }: { orgId: string; paymentId: 
             {payment.customer ? (
               <Link
                 href={recordHref(orgId, 'customers', payment.customer.id)}
-                className="underline underline-offset-4"
+                className="tap-link underline underline-offset-4"
               >
                 {payment.customer.email ?? payment.customer.id}
               </Link>
@@ -61,7 +61,7 @@ export function PaymentDetail({ orgId, paymentId }: { orgId: string; paymentId: 
             {payment.subscriptionId ? (
               <Link
                 href={recordHref(orgId, 'subscriptions', payment.subscriptionId)}
-                className="underline underline-offset-4"
+                className="tap-link underline underline-offset-4"
               >
                 View subscription
               </Link>

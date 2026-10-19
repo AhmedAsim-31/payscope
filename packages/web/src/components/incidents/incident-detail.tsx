@@ -49,7 +49,7 @@ export function IncidentDetail({ orgId, incidentId }: { orgId: string; incidentI
               {findingsType ? (
                 <Link
                   href={`/app/${orgId}/findings?${findingsQuery}`}
-                  className="underline underline-offset-4"
+                  className="tap-link underline underline-offset-4"
                 >
                   View findings
                 </Link>

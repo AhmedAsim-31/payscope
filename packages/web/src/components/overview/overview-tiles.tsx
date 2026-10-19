@@ -16,7 +16,7 @@ function Tile({
   href?: string;
 }) {
   const heading = href ? (
-    <Link href={href} className="underline-offset-4 hover:underline">
+    <Link href={href} className="tap-link underline-offset-4 hover:underline">
       {title}
     </Link>
   ) : (
