@@ -91,7 +91,7 @@ export function MembersTable({
                           size="sm"
                           disabled={busy}
                           onClick={() => onTransfer(member)}
-                          aria-label={`Transfer ownership to ${member.email}`}
+                          aria-label={`Make owner ${member.email}`}
                         >
                           <Crown aria-hidden="true" />
                           Make owner
