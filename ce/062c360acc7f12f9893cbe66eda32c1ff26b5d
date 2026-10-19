@@ -1,0 +1,23 @@
+packages/api/src/connections/connection-routes.ts
+  s_aa99ddb857d6ea::t_edafbebf1adf2f 23,26,33,39
+packages/api/src/connections/connections.integration.test.ts
+  s_aa99ddb857d6ea::t_b392f90ace850d 101,149-158,164-175,177-180
+packages/api/src/security/tenant-isolation.integration.test.ts
+  s_aa99ddb857d6ea::t_2725464668ec49 43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ce062c360acc7f12f9893cbe66eda32c1ff26b5d",
+  "prompts": {},
+  "sessions": {
+    "s_aa99ddb857d6ea": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9e75249e-ef1c-485b-84ed-929480cfe98a",
+        "model": "unknown"
+      },
+      "human_author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
