@@ -49,6 +49,7 @@ describe('revenuecat client', () => {
     expect(url).toBe('https://api.revenuecat.com/v1/subscribers/user_sandbox_001');
     expect(init.headers).toMatchObject({ Authorization: 'Bearer sk_test_rc' });
     expect(init.signal).toBeInstanceOf(AbortSignal);
+    expect(init.redirect).toBe('error');
   });
 
   it('reports inactive when every entitlement is expired or none exist', async () => {

@@ -46,6 +46,7 @@ describe('paddle client', () => {
     expect(url).toBe('https://sandbox-api.paddle.com/transactions/txn_1');
     expect(new Headers(init?.headers).get('authorization')).toBe(`Bearer ${KEY}`);
     expect(init?.signal).toBeInstanceOf(AbortSignal);
+    expect(init?.redirect).toBe('error');
   });
 
   it('fetches a subscription', async () => {

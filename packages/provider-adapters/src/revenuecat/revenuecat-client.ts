@@ -55,6 +55,7 @@ async function getJson(ctx: ProviderContext, appUserId: string, suffix = ''): Pr
         method: 'GET',
         headers: { Authorization: `Bearer ${ctx.credentials.apiKey}`, Accept: 'application/json' },
         signal: AbortSignal.timeout(TIMEOUT_MS),
+        redirect: 'error',
       },
     );
     if (!response.ok) {

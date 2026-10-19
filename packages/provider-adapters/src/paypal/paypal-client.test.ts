@@ -70,6 +70,8 @@ describe('paypal client', () => {
     });
     const [, captureInit] = fetchMock.mock.calls[1] as unknown as [string, RequestInit];
     expect(captureInit.headers).toMatchObject({ Authorization: 'Bearer A21-token' });
+    expect(tokenInit.redirect).toBe('error');
+    expect(captureInit.redirect).toBe('error');
   });
 
   it('caches the token until 60s before expiry', async () => {

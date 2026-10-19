@@ -85,6 +85,7 @@ async function stripeGet(ctx: ProviderContext, path: string): Promise<Record<str
       method: 'GET',
       headers: { Authorization: `Bearer ${ctx.credentials.apiKey}` },
       signal: AbortSignal.timeout(TIMEOUT_MS),
+      redirect: 'error',
     });
     if (!response.ok) {
       await response.body?.cancel();

@@ -49,6 +49,7 @@ async function send(ctx: ProviderContext, path: string, init: RequestInit): Prom
     const response = await ctx.fetch(`${ctx.baseUrl}${path}`, {
       ...init,
       signal: AbortSignal.timeout(TIMEOUT_MS),
+      redirect: 'error',
     });
     if (!response.ok) {
       await response.body?.cancel();
