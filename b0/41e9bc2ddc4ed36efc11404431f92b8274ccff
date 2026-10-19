@@ -1,0 +1,20 @@
+docs/security.md
+  h_78e539a96187c3 21-34
+packages/web/next.config.ts
+  h_78e539a96187c3 4,15-22
+packages/web/src/lib/security-headers.test.ts
+  h_78e539a96187c3 1-39
+packages/web/src/lib/security-headers.ts
+  h_78e539a96187c3 1-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b041e9bc2ddc4ed36efc11404431f92b8274ccff",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
