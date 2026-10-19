@@ -1,0 +1,26 @@
+packages/shared/src/money.test.ts
+  h_78e539a96187c3 50-57
+packages/shared/src/money.ts
+  h_78e539a96187c3 50-51,56-58
+packages/web/src/components/overview/overview-view.test.tsx
+  h_78e539a96187c3 92
+packages/web/src/components/overview/overview-view.tsx
+  h_78e539a96187c3 87,94
+packages/web/src/components/records/format.test.ts
+  h_78e539a96187c3 7,12,16
+packages/web/src/components/records/format.ts
+  h_78e539a96187c3 12
+packages/web/src/components/records/payments-list.test.tsx
+  h_78e539a96187c3 117
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8e1e24aa785c24509fdb349446371ee4529182cc",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
