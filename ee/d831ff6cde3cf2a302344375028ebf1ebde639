@@ -1,0 +1,14 @@
+packages/web/src/components/shell/org-switcher.tsx
+  h_78e539a96187c3 28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "eed831ff6cde3cf2a302344375028ebf1ebde639",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
