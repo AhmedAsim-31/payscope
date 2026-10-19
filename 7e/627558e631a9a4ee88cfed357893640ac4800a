@@ -1,0 +1,16 @@
+.github/workflows/ci.yml
+  h_78e539a96187c3 63-127
+docs/operations.md
+  h_78e539a96187c3 93-94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7e627558e631a9a4ee88cfed357893640ac4800a",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
