@@ -17,3 +17,9 @@ minimumReleaseAgeExclude:
   - vitest@5.0.4
 allowBuilds:
   esbuild: true
+overrides:
+  '@esbuild-kit/core-utils>esbuild': 0.25.12
+auditConfig:
+  # braces has no patched release (3.0.3 is latest); reachable only through dev tooling globbing repo files.
+  ignoreGhsas:
+    - GHSA-vfj7-8cjw-p6xm
