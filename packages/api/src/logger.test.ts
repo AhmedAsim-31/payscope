@@ -3,6 +3,7 @@ import { DrizzleQueryError } from 'drizzle-orm/errors';
 import { pino } from 'pino';
 import { ProviderError } from '@payscope/provider-adapters/provider-error';
 import { sanitizeError } from './jobs/job-errors';
+import { buildApp } from './app';
 import { LOG_SERIALIZERS } from './logger';
 
 const MARKER = 'leak-marker-value';
@@ -48,5 +49,17 @@ describe('error serialization', () => {
   it('keeps messages of allow-listed SQLSTATEs', () => {
     const text = logged(pgError('23505', 'duplicate key value violates unique constraint "u"'));
     expect(text).toContain('violates unique constraint');
+  });
+});
+
+describe('request serialization', () => {
+  it('does not log query strings', async () => {
+    const lines: string[] = [];
+    const app = await buildApp({ logStream: { write: (m: string) => lines.push(m) } });
+    await app.inject({ method: 'GET', url: '/healthz?q=jane%40example.com' });
+    await app.close();
+    const text = lines.join('');
+    expect(text).toContain('incoming request');
+    expect(text).not.toContain('example.com');
   });
 });
