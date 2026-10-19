@@ -40,7 +40,7 @@ const BODIES: Record<string, unknown> = {
     displayName: 'x',
     externalAccountId: 'acct_matrix',
   },
-  'PATCH /connections/:connectionId': { webhookSecret: 'whsec_matrix' },
+  'PATCH /connections/:connectionId': { webhookSecret: 'matrix-test-value-0001' },
   'POST /connections/:connectionId/verify': undefined,
   'DELETE /connections/:connectionId/credentials/:credential': undefined,
   'POST /events/:eventId/retry': undefined,
