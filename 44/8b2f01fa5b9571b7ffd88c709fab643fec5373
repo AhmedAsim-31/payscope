@@ -1,0 +1,21 @@
+packages/api/src/app.test.ts
+  s_aa99ddb857d6ea::t_678cc4fbb40cc0 108,110-130
+packages/api/src/error-handler.ts
+  s_aa99ddb857d6ea::t_5204ab05f5d288 42-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "448b2f01fa5b9571b7ffd88c709fab643fec5373",
+  "prompts": {},
+  "sessions": {
+    "s_aa99ddb857d6ea": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9e75249e-ef1c-485b-84ed-929480cfe98a",
+        "model": "unknown"
+      },
+      "human_author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
