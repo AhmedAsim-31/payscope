@@ -287,15 +287,15 @@ describe('webhook ingress', () => {
       method: 'PATCH',
       url: `/api/v1/orgs/${orgId}/connections/${id}`,
       headers: owner.headers,
-      payload: { webhookSecret: 'whsec_third' },
+      payload: { webhookSecret: 'third-test-value-0001' },
     });
     expect(third.statusCode).toBe(200);
     const body2 = JSON.stringify(stripeEvent());
     expect((await post('stripe', id, body2, stripeHeaders(body2, STRIPE_SECRET))).statusCode).toBe(
       400,
     );
-    expect((await post('stripe', id, body2, stripeHeaders(body2, 'whsec_third'))).statusCode).toBe(
-      200,
-    );
+    expect(
+      (await post('stripe', id, body2, stripeHeaders(body2, 'third-test-value-0001'))).statusCode,
+    ).toBe(200);
   });
 });

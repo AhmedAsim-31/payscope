@@ -86,6 +86,7 @@ Rate-limited requests answer `429 RATE_LIMITED` with `retry-after` and `x-rateli
 | POST   | `{org}/connections/:connectionId/verify`                  | `connections:manage` | Calls the provider with the stored API key; sets `status`, `lastVerifiedAt`, `lastError`. `409 SIMULATED_CONNECTION`, `422 NO_API_KEY` |
 | DELETE | `{org}/connections/:connectionId/credentials/:credential` | `connections:manage` | `:credential` is `webhookSecret` or `apiKey`. Returns the connection view; audited as `connection.credential_remove`                   |
 
+Webhook secrets must be 16 to 512 characters, on create and on rotation.
 Removing `webhookSecret` drops every stored webhook secret, and removing `apiKey` drops the API key.
 Removing the API key of a sandbox connection that is not `disabled` sets its `status` back to `unverified`.
 Removing a credential that is not stored answers `200` and changes nothing.

@@ -98,7 +98,7 @@ describe('connections API', () => {
       method: 'PATCH',
       url: `/api/v1/orgs/${orgId}/connections/${id}`,
       headers: viewer.headers,
-      payload: { webhookSecret: 'x' },
+      payload: { webhookSecret: 'viewer-test-value-01' },
     });
     expect(patch.statusCode).toBe(403);
     const list = await app.inject({
@@ -146,15 +146,38 @@ describe('connections API', () => {
 
   it('rejects live mode, too many secrets, and duplicate accounts', async () => {
     expect((await create(owner, base({ mode: 'live' }))).statusCode).toBe(400);
-    expect((await create(owner, base({ webhookSecrets: ['a', 'b', 'c'] }))).statusCode).toBe(400);
+    expect(
+      (
+        await create(
+          owner,
+          base({
+            webhookSecrets: ['test-value-aaaaaaaa', 'test-value-bbbbbbbb', 'test-value-cccccccc'],
+          }),
+        )
+      ).statusCode,
+    ).toBe(400);
     const account = `acct_${randomUUID()}`;
     expect((await create(owner, base({ externalAccountId: account }))).statusCode).toBe(201);
     expect((await create(owner, base({ externalAccountId: account }))).statusCode).toBe(409);
   });
 
+  it('rejects webhook secrets shorter than 16 characters', async () => {
+    expect((await create(owner, base({ webhookSecrets: ['short'] }))).statusCode).toBe(400);
+    const id = (await create(owner, base())).json<{ id: string }>().id;
+    const res = await app.inject({
+      method: 'PATCH',
+      url: `/api/v1/orgs/${orgId}/connections/${id}`,
+      headers: owner.headers,
+      payload: { webhookSecret: 'short' },
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
   it('keeps at most two secrets when rotating and hides connections from other orgs', async () => {
-    const id = (await create(owner, base({ webhookSecrets: ['s1'] }))).json<{ id: string }>().id;
-    for (const secret of ['s2', 's3']) {
+    const id = (await create(owner, base({ webhookSecrets: ['test-value-000001-pad'] }))).json<{
+      id: string;
+    }>().id;
+    for (const secret of ['test-value-000002-pad', 'test-value-000003-pad']) {
       const res = await app.inject({
         method: 'PATCH',
         url: `/api/v1/orgs/${orgId}/connections/${id}`,

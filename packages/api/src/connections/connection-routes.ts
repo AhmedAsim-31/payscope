@@ -20,21 +20,23 @@ import { connectionViewSchema, toConnectionView, type ConnectionRow } from './co
 import { assertSandboxApiKey } from './sandbox-key-guard';
 
 const MAX_LISTED_CONNECTIONS = 100;
+const MIN_WEBHOOK_SECRET_LENGTH = 16;
 
 const secretField = z.string().min(1).max(512);
+const webhookSecretField = z.string().min(MIN_WEBHOOK_SECRET_LENGTH).max(512);
 
 const createBody = z.object({
   provider: z.enum(PROVIDER_NAMES),
   mode: z.enum(['sandbox', 'simulation']),
   displayName: z.string().trim().min(1).max(100),
   externalAccountId: z.string().trim().min(1).max(200),
-  webhookSecrets: z.array(secretField).max(MAX_WEBHOOK_SECRETS).optional(),
+  webhookSecrets: z.array(webhookSecretField).max(MAX_WEBHOOK_SECRETS).optional(),
   apiKey: secretField.optional(),
 });
 
 const patchBody = z
   .object({
-    webhookSecret: secretField.optional(),
+    webhookSecret: webhookSecretField.optional(),
     apiKey: secretField.optional(),
     entitlementMap: entitlementMapSchema.optional(),
   })
