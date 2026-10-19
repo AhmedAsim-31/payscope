@@ -1,0 +1,58 @@
+packages/web/src/app/globals.css
+  h_78e539a96187c3 127-135
+packages/web/src/components/audit/audit-list.tsx
+  h_78e539a96187c3 39-42
+packages/web/src/components/events/event-detail.tsx
+  h_78e539a96187c3 63-66
+packages/web/src/components/events/events-list.tsx
+  h_78e539a96187c3 20
+packages/web/src/components/events/jobs-summary.tsx
+  h_78e539a96187c3 28
+packages/web/src/components/incidents/incident-detail.tsx
+  h_78e539a96187c3 52
+packages/web/src/components/incidents/incidents-list.tsx
+  h_78e539a96187c3 18
+packages/web/src/components/overview/overview-tiles.tsx
+  h_78e539a96187c3 19
+packages/web/src/components/overview/recent-activity.tsx
+  h_78e539a96187c3 26,28
+packages/web/src/components/reconciliation/findings-list.tsx
+  h_78e539a96187c3 18
+packages/web/src/components/reconciliation/runs-view.tsx
+  h_78e539a96187c3 20,49
+packages/web/src/components/records/customer-detail.tsx
+  h_78e539a96187c3 70,90
+packages/web/src/components/records/customers-list.tsx
+  h_78e539a96187c3 17
+packages/web/src/components/records/detail-parts.tsx
+  h_78e539a96187c3 10
+packages/web/src/components/records/entitlement-detail.tsx
+  h_78e539a96187c3 53,62
+packages/web/src/components/records/entitlements-list.tsx
+  h_78e539a96187c3 18
+packages/web/src/components/records/payment-detail.tsx
+  h_78e539a96187c3 52,64
+packages/web/src/components/records/payments-list.test.tsx
+  h_78e539a96187c3 112-118
+packages/web/src/components/records/payments-list.tsx
+  h_78e539a96187c3 18
+packages/web/src/components/records/records-list.tsx
+  h_78e539a96187c3 121
+packages/web/src/components/records/subscription-detail.tsx
+  h_78e539a96187c3 51,92
+packages/web/src/components/records/subscriptions-list.tsx
+  h_78e539a96187c3 18
+packages/web/src/components/scenarios/scenario-result.tsx
+  h_78e539a96187c3 97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b10a9c68f6fb3792b3cab70b76d8c2564690e16b",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
