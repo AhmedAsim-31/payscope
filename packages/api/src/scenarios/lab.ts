@@ -84,7 +84,7 @@ export async function createLab(env: ScenarioEnv) {
   const handlers = {
     [PROCESS_EVENT_JOB_KIND]: createProcessProviderEventHandler(faulty),
     [RUN_RECONCILIATION_JOB_KIND]: createRunReconciliationHandler(adapters, env.cipher, {
-      fetch: createMirrorFetch(db, overrides),
+      fetch: createMirrorFetch(db, overrides, { orgId, connectionId: connection.id }),
     }),
   };
 

@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import type { Db } from '../db/client';
 import { paymentRecordsTable, subscriptionRecordsTable } from '../db/schema/records';
 
@@ -11,7 +11,11 @@ const json = (body: object, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 
 /** A provider that mirrors local state, except where the scenario overrides it. */
-export function createMirrorFetch(db: Db, overrides: Map<string, ProviderOverride>): typeof fetch {
+export function createMirrorFetch(
+  db: Db,
+  overrides: Map<string, ProviderOverride>,
+  scope: { orgId: string; connectionId: string },
+): typeof fetch {
   return async (input) => {
     const url = input instanceof Request ? input.url : input.toString();
     // A mirror holds only local payments, so its listing can never surface one missing locally.
@@ -25,7 +29,13 @@ export function createMirrorFetch(db: Db, overrides: Map<string, ProviderOverrid
       const [row] = await db
         .select()
         .from(paymentRecordsTable)
-        .where(eq(paymentRecordsTable.providerPaymentId, id));
+        .where(
+          and(
+            eq(paymentRecordsTable.orgId, scope.orgId),
+            eq(paymentRecordsTable.connectionId, scope.connectionId),
+            eq(paymentRecordsTable.providerPaymentId, id),
+          ),
+        );
       if (!row) return json({}, 404);
       return json({
         id,
@@ -38,7 +48,13 @@ export function createMirrorFetch(db: Db, overrides: Map<string, ProviderOverrid
     const [row] = await db
       .select()
       .from(subscriptionRecordsTable)
-      .where(eq(subscriptionRecordsTable.providerSubscriptionId, id));
+      .where(
+        and(
+          eq(subscriptionRecordsTable.orgId, scope.orgId),
+          eq(subscriptionRecordsTable.connectionId, scope.connectionId),
+          eq(subscriptionRecordsTable.providerSubscriptionId, id),
+        ),
+      );
     if (!row) return json({}, 404);
     return json({ id, status: override?.status ?? row.status });
   };
