@@ -124,6 +124,15 @@
   }
 }
 
+@utility tap-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  @media (min-width: 48rem) {
+    min-height: 1.5rem;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

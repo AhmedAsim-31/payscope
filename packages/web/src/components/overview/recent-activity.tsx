@@ -23,9 +23,9 @@ export function RecentActivity({ orgId, events }: { orgId: string; events: Event
                 <div className="grid min-w-0 gap-0.5">
                   <Link
                     href={recordHref(orgId, 'events', event.id)}
-                    className="truncate text-sm underline-offset-4 hover:underline"
+                    className="tap-link text-sm underline-offset-4 hover:underline"
                   >
-                    {event.normalizedType ?? event.eventType}
+                    <span className="truncate">{event.normalizedType ?? event.eventType}</span>
                   </Link>
                   <span className="text-muted-foreground text-xs">
                     {humanize(event.provider)} · {formatTimestamp(event.receivedAt)}

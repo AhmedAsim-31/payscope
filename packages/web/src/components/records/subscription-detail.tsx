@@ -48,7 +48,7 @@ export function SubscriptionDetail({
           <DetailField label="Customer">
             <Link
               href={recordHref(orgId, 'customers', sub.customer.id)}
-              className="underline underline-offset-4"
+              className="tap-link underline underline-offset-4"
             >
               {sub.customer.email ?? sub.customer.id}
             </Link>
@@ -89,7 +89,7 @@ export function SubscriptionDetail({
               <li key={entitlement.id} className="flex flex-wrap items-center gap-2">
                 <Link
                   href={recordHref(orgId, 'entitlements', entitlement.id)}
-                  className="font-mono text-sm underline underline-offset-4"
+                  className="tap-link font-mono text-sm underline underline-offset-4"
                 >
                   {entitlement.entitlementKey}
                 </Link>

@@ -15,7 +15,7 @@ function entitlementColumns(orgId: string): Column<Entitlement>[] {
       cell: (e) => (
         <Link
           href={recordHref(orgId, 'entitlements', e.id)}
-          className="font-mono text-xs underline-offset-4 hover:underline"
+          className="tap-link font-mono text-xs underline-offset-4 hover:underline"
         >
           {e.entitlementKey}
         </Link>

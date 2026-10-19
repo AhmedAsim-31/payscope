@@ -94,7 +94,7 @@ export function ScenarioResult({ orgId, run }: { orgId: string; run: ScenarioRun
                 {evidence[g.key].slice(0, 3).map((id, index) => (
                   <Link
                     key={id}
-                    className="underline"
+                    className="tap-link underline"
                     href={g.href(orgId, id)}
                     aria-label={`${g.label} ${index + 1}`}
                   >

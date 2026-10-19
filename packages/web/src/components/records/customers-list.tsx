@@ -14,7 +14,7 @@ function customerColumns(orgId: string): Column<Customer>[] {
       cell: (c) => (
         <Link
           href={recordHref(orgId, 'customers', c.id)}
-          className="font-medium underline-offset-4 hover:underline"
+          className="tap-link font-medium underline-offset-4 hover:underline"
         >
           {c.email ?? 'No email'}
         </Link>

@@ -50,7 +50,7 @@ export function EntitlementDetail({
           <DetailField label="Customer">
             <Link
               href={recordHref(orgId, 'customers', entitlement.customer.id)}
-              className="underline underline-offset-4"
+              className="tap-link underline underline-offset-4"
             >
               {entitlement.customer.email ?? entitlement.customer.id}
             </Link>
@@ -59,7 +59,7 @@ export function EntitlementDetail({
             {entitlement.subscriptionId ? (
               <Link
                 href={recordHref(orgId, 'subscriptions', entitlement.subscriptionId)}
-                className="underline underline-offset-4"
+                className="tap-link underline underline-offset-4"
               >
                 View subscription
               </Link>

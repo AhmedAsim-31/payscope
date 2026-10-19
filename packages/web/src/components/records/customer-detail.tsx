@@ -67,7 +67,7 @@ export function CustomerDetail({ orgId, customerId }: { orgId: string; customerI
               <li key={subscription.id} className="flex flex-wrap items-center gap-2">
                 <Link
                   href={recordHref(orgId, 'subscriptions', subscription.id)}
-                  className="font-mono text-sm underline underline-offset-4"
+                  className="tap-link font-mono text-sm underline underline-offset-4"
                 >
                   {subscription.providerSubscriptionId}
                 </Link>
@@ -87,7 +87,7 @@ export function CustomerDetail({ orgId, customerId }: { orgId: string; customerI
               <li key={entitlement.id} className="flex flex-wrap items-center gap-2">
                 <Link
                   href={recordHref(orgId, 'entitlements', entitlement.id)}
-                  className="font-mono text-sm underline underline-offset-4"
+                  className="tap-link font-mono text-sm underline underline-offset-4"
                 >
                   {entitlement.entitlementKey}
                 </Link>

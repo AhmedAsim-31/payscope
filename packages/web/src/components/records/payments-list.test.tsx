@@ -109,6 +109,13 @@ describe('PaymentsList', () => {
     expect(replace).toHaveBeenCalledWith('/app/org/payments?status=failed');
   });
 
+  it('gives the record id link the enlarged tap target', async () => {
+    mockedFetch.mockResolvedValue({ items: [payment], nextCursor: null });
+    renderWithQuery(<PaymentsList orgId={ORG_ID} />);
+    const link = await screen.findByRole('link', { name: payment.providerPaymentId });
+    expect(link).toHaveClass('tap-link');
+  });
+
   it('renders exact amounts and status text, and loads more with the cursor', async () => {
     mockedFetch
       .mockResolvedValueOnce({ items: [payment], nextCursor: 'abc' })

@@ -36,7 +36,10 @@ function Target({ orgId, entry: e }: { orgId: string; entry: AuditEntry }) {
   const label = `${e.targetType}${e.targetId ? `:${e.targetId.slice(0, 8)}` : ''}`;
   const href = targetHref(orgId, e);
   return href ? (
-    <Link href={href} className="font-mono text-xs break-all underline-offset-4 hover:underline">
+    <Link
+      href={href}
+      className="tap-link font-mono text-xs break-all underline-offset-4 hover:underline"
+    >
       {label}
     </Link>
   ) : (

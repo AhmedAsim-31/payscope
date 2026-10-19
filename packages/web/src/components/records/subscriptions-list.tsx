@@ -15,7 +15,7 @@ function subscriptionColumns(orgId: string): Column<Subscription>[] {
       cell: (s) => (
         <Link
           href={recordHref(orgId, 'subscriptions', s.id)}
-          className="font-mono text-xs underline-offset-4 hover:underline"
+          className="tap-link font-mono text-xs underline-offset-4 hover:underline"
         >
           {s.providerSubscriptionId}
         </Link>
