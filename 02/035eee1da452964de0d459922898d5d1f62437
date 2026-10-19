@@ -1,0 +1,35 @@
+packages/web/src/app/app/[orgId]/customers/[customerId]/not-found.tsx
+  s_399d9740cf7ca4::t_2d834a7d9de128 1-5
+packages/web/src/app/app/[orgId]/entitlements/[entitlementId]/not-found.tsx
+  s_399d9740cf7ca4::t_d5f0c5a2080001 1-5
+packages/web/src/app/app/[orgId]/events/[eventId]/not-found.tsx
+  s_399d9740cf7ca4::t_32d7cfe36e6162 1-5
+packages/web/src/app/app/[orgId]/findings/[findingId]/not-found.tsx
+  s_399d9740cf7ca4::t_3ba2672119c7dc 1-5
+packages/web/src/app/app/[orgId]/incidents/[incidentId]/not-found.tsx
+  s_399d9740cf7ca4::t_34cf82c4b24919 1-5
+packages/web/src/app/app/[orgId]/payments/[paymentId]/not-found.tsx
+  s_399d9740cf7ca4::t_c0bdae6db5a2d3 1-5
+packages/web/src/app/app/[orgId]/reconciliation/[runId]/not-found.tsx
+  s_399d9740cf7ca4::t_cb4a50217552fc 1-5
+packages/web/src/app/app/[orgId]/subscriptions/[subscriptionId]/not-found.tsx
+  s_399d9740cf7ca4::t_313f93660a15d4 1-5
+packages/web/src/components/resource-not-found.tsx
+  s_399d9740cf7ca4::t_71861cfc49c0c2 1-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "02035eee1da452964de0d459922898d5d1f62437",
+  "prompts": {},
+  "sessions": {
+    "s_399d9740cf7ca4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d2b583dc-2a54-42c4-a45e-cafdc78c8e64",
+        "model": "unknown"
+      },
+      "human_author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
