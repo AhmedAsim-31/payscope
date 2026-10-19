@@ -24,7 +24,8 @@ import {
 const harness = createHarness();
 const { sql, db } = harness;
 let app: FastifyInstance;
-let owner: TestUser;
+const owners = new Map<string, TestUser>();
+const ownerOf = (o: Org) => owners.get(o.orgId)!.headers;
 let current: ReturnType<typeof createFakeAdapter>;
 const behaviors = new Map<string, FakeBehavior>();
 const registry = createAdapterRegistry([
@@ -44,18 +45,20 @@ type FindingView = { type: string; subjectId: string; severity: string };
 
 beforeAll(async () => {
   app = await harness.start({ adapters: registry });
-  owner = await harness.newUser();
 });
 afterAll(() => harness.stop());
 
 async function newOrg(): Promise<Org> {
+  const owner = await harness.newUser();
   const res = await app.inject({
     method: 'POST',
     url: '/api/v1/orgs',
     headers: owner.headers,
     payload: { name: 'Prov', slug: `org-${randomUUID().slice(0, 12)}` },
   });
-  return seedConnection(sql, res.json<{ id: string }>().id);
+  const org = await seedConnection(sql, res.json<{ id: string }>().id);
+  owners.set(org.orgId, owner);
+  return org;
 }
 
 function useFake(onCall?: (id: string) => Promise<void> | void, listed: FakeListed[][] = []) {
@@ -68,7 +71,7 @@ async function startProviderRun(o: Org): Promise<string> {
   const res = await app.inject({
     method: 'POST',
     url: `/api/v1/orgs/${o.orgId}/reconciliation/runs`,
-    headers: owner.headers,
+    headers: ownerOf(o),
     payload: { mode: 'provider', connectionId: o.connectionId },
   });
   expect(res.statusCode).toBe(202);
@@ -87,7 +90,7 @@ function execute(o: Org, runId: string, options: Partial<ExecutorOptions> = {}) 
 async function getRun(o: Org, runId: string): Promise<RunView> {
   const res = await app.inject({
     url: `/api/v1/orgs/${o.orgId}/reconciliation/runs/${runId}`,
-    headers: owner.headers,
+    headers: ownerOf(o),
   });
   return res.json<RunView>();
 }
@@ -95,7 +98,7 @@ async function getRun(o: Org, runId: string): Promise<RunView> {
 async function findings(o: Org): Promise<FindingView[]> {
   const res = await app.inject({
     url: `/api/v1/orgs/${o.orgId}/reconciliation/findings`,
-    headers: owner.headers,
+    headers: ownerOf(o),
   });
   return res.json<{ items: FindingView[] }>().items;
 }

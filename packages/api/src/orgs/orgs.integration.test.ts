@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 import { apiErrorSchema } from '@payscope/shared/api-error';
+import { MAX_OWNED_ORGS } from './org-routes';
 import { createHarness, type TestUser } from '../test/identity-harness';
 
 const harness = createHarness();
@@ -109,6 +110,17 @@ describe('organizations', () => {
     const { res } = await createOrg(owner, { slug: s });
     expect(res.statusCode).toBe(409);
     expect(apiError(res).code).toBe('CONFLICT');
+  });
+
+  it('caps the organizations a user can own with 409 ORG_LIMIT_REACHED', async () => {
+    const owner = await harness.newUser();
+    for (let i = 0; i < MAX_OWNED_ORGS; i++) {
+      expect((await createOrg(owner)).res.statusCode).toBe(201);
+    }
+    const { res } = await createOrg(owner);
+    expect(res.statusCode).toBe(409);
+    expect(apiError(res).code).toBe('ORG_LIMIT_REACHED');
+    expect((await createOrg(await harness.newUser())).res.statusCode).toBe(201);
   });
 
   it('rejects an invalid slug', async () => {

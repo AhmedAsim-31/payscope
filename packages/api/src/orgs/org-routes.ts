@@ -1,4 +1,4 @@
-import { asc, eq } from 'drizzle-orm';
+import { and, asc, count, eq, sql } from 'drizzle-orm';
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import { ROLES } from '@payscope/shared/permissions';
@@ -11,6 +11,7 @@ import { currentOrg, currentUserId } from './request-context';
 import { requireOrg } from './require-org';
 
 const MAX_LISTED_ORGS = 100;
+export const MAX_OWNED_ORGS = 5;
 
 const orgSchema = z.object({
   id: z.uuid(),
@@ -54,6 +55,18 @@ export const orgRoutes: FastifyPluginCallbackZod<{ db: Db }> = (app, { db }, don
       const userId = currentUserId(request);
       try {
         const created = await db.transaction(async (tx) => {
+          await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`org-create:${userId}`}))`);
+          const [owned] = await tx
+            .select({ n: count() })
+            .from(membershipsTable)
+            .where(and(eq(membershipsTable.userId, userId), eq(membershipsTable.role, 'OWNER')));
+          if ((owned?.n ?? 0) >= MAX_OWNED_ORGS) {
+            throw new ApiHttpError(
+              409,
+              'ORG_LIMIT_REACHED',
+              `You can own at most ${MAX_OWNED_ORGS} organizations`,
+            );
+          }
           const [org] = await tx
             .insert(organizationsTable)
             .values({ name: request.body.name, slug: request.body.slug })
