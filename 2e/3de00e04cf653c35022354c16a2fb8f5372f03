@@ -1,0 +1,19 @@
+packages/web/src/components/records/filter-bar.tsx
+  s_399d9740cf7ca4::t_a5194a4d6be3f3 3-4,8,73-75,77-173
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2e3de00e04cf653c35022354c16a2fb8f5372f03",
+  "prompts": {},
+  "sessions": {
+    "s_399d9740cf7ca4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d2b583dc-2a54-42c4-a45e-cafdc78c8e64",
+        "model": "unknown"
+      },
+      "human_author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
