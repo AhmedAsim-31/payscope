@@ -1,5 +1,6 @@
 import { formatMinor } from '@payscope/shared/money';
 import type { Money } from '@payscope/shared/records-schemas';
+import { PROVIDER_LABELS } from '@/lib/connection-queries';
 
 const timestampFormat = new Intl.DateTimeFormat('en-GB', {
   dateStyle: 'medium',
@@ -20,6 +21,8 @@ export function recordHref(orgId: string, resource: string, id: string): string 
 }
 
 export function humanize(value: string): string {
+  if (Object.hasOwn(PROVIDER_LABELS, value))
+    return PROVIDER_LABELS[value as keyof typeof PROVIDER_LABELS];
   const spaced = value.replaceAll('_', ' ');
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
