@@ -59,6 +59,7 @@ async function request(ctx: ProviderContext, path: string): Promise<unknown> {
     response = await ctx.fetch(`${ctx.baseUrl}${path}`, {
       headers: { Authorization: `Bearer ${ctx.credentials.apiKey}`, Accept: 'application/json' },
       signal: AbortSignal.timeout(TIMEOUT_MS),
+      redirect: 'error',
     });
     if (!response.ok) {
       await response.body?.cancel();

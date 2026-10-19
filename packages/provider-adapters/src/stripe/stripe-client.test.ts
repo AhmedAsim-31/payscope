@@ -50,6 +50,7 @@ describe('stripe client', () => {
     expect(url).toBe('https://api.stripe.com/v1/payment_intents/pi_test_1');
     expect(init.headers).toEqual({ Authorization: 'Bearer sk_test_abc' });
     expect(init.signal).toBeInstanceOf(AbortSignal);
+    expect(init.redirect).toBe('error');
   });
 
   it('lists payment intents created inside the window and pages with starting_after', async () => {
