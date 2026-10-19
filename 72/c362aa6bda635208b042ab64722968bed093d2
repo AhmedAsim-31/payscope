@@ -1,0 +1,21 @@
+packages/api/src/orgs/org-routes.ts
+  s_399d9740cf7ca4::t_b448f08e5bad95 1,14,58-69
+packages/api/src/orgs/orgs.integration.test.ts
+  s_399d9740cf7ca4::t_f91f7107073c09 5,114-124
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "72c362aa6bda635208b042ab64722968bed093d2",
+  "prompts": {},
+  "sessions": {
+    "s_399d9740cf7ca4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d2b583dc-2a54-42c4-a45e-cafdc78c8e64",
+        "model": "unknown"
+      },
+      "human_author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
