@@ -1,0 +1,14 @@
+supabase/migrations/20261012224609_supabase_local_compat.sql
+  h_78e539a96187c3 18-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9e97a3f78094d35a0e8409a0b6445d9526dde6f5",
+  "prompts": {},
+  "humans": {
+    "h_78e539a96187c3": {
+      "author": "Ahmed Asim <ahmedk082@gmail.com>"
+    }
+  }
+}
