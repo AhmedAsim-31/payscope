@@ -176,6 +176,13 @@
       "when": 1791949078979,
       "tag": "20261014033758_subscription_cancel_end_timestamps",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1792403367254,
+      "tag": "20261019094927_restrict_raw_payload_grants",
+      "breakpoints": true
     }
   ]
 }
