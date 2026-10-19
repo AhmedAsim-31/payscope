@@ -24,8 +24,9 @@ export function OrgSwitcher({ orgId }: { orgId: string }) {
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="max-w-36 justify-between sm:max-w-56"
-          aria-label="Switch organization"
+          className="min-w-0 max-w-56 flex-1 justify-between sm:flex-none"
+          aria-label={`Switch organization${current ? ` (current: ${current.name})` : ''}`}
+          title={current?.name}
         >
           <span className="truncate">{current?.name ?? 'Select organization'}</span>
           <ChevronsUpDown aria-hidden="true" className="text-muted-foreground" />
