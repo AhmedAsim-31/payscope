@@ -42,6 +42,7 @@ describe('policy defaults', () => {
     expect(DEFAULT_POLICIES.authenticatedWrite).toEqual({ max: 60, windowSec: 60 });
     expect(DEFAULT_POLICIES.credentialTest).toEqual({ max: 5, windowSec: 60 });
     expect(DEFAULT_POLICIES.webhookIngress).toEqual({ max: 600, windowSec: 60 });
+    expect(DEFAULT_POLICIES.webhookIngressIp).toEqual({ max: 1200, windowSec: 60 });
     expect(DEFAULT_POLICIES.internalTick).toEqual({ max: 30, windowSec: 60 });
     expect(DEFAULT_POLICIES.reconciliationRun).toEqual({ max: 5, windowSec: 600 });
     expect(DEFAULT_POLICIES.scenarioRun).toEqual({ max: 20, windowSec: 600 });

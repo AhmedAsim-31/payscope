@@ -15,6 +15,7 @@ export const POLICY_DEFS = {
   authenticatedWrite: { max: 60, windowSec: MINUTE, scope: 'user' },
   credentialTest: { max: 5, windowSec: MINUTE, scope: 'userOrg' },
   webhookIngress: { max: 600, windowSec: MINUTE, scope: 'connection' },
+  webhookIngressIp: { max: 1200, windowSec: MINUTE, scope: 'ip' },
   internalTick: { max: 30, windowSec: MINUTE, scope: 'ip' },
   reconciliationRun: { max: 5, windowSec: TEN_MINUTES, scope: 'org' },
   scenarioRun: { max: 20, windowSec: TEN_MINUTES, scope: 'org' },

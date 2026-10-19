@@ -47,6 +47,7 @@ export const webhookRoutes: FastifyPluginCallbackZod<Options> = (
   const parseOpts = { parseAs: 'buffer', bodyLimit: WEBHOOK_BODY_LIMIT_BYTES } as const;
   const keepRaw = (_request: unknown, body: Buffer, parsed: (err: null, body: Buffer) => void) =>
     parsed(null, body);
+  const connectionLimit = app.rateLimitFor('webhookIngress');
   app.addContentTypeParser('application/json', parseOpts, keepRaw);
   app.addContentTypeParser(JSON_CONTENT_TYPE, parseOpts, keepRaw);
 
@@ -54,13 +55,13 @@ export const webhookRoutes: FastifyPluginCallbackZod<Options> = (
     '/webhooks/:provider/:connectionId',
     {
       bodyLimit: WEBHOOK_BODY_LIMIT_BYTES,
-      onRequest: app.rateLimitFor('webhookIngress'),
+      onRequest: app.rateLimitFor('webhookIngressIp'),
       schema: {
         params,
         response: { 200: z.object({ received: z.literal(true), duplicate: z.boolean() }) },
       },
     },
-    async (request) => {
+    async (request, reply) => {
       const { provider, connectionId } = request.params;
       const notFound = () => new ApiHttpError(404, 'NOT_FOUND', 'Webhook endpoint not found');
       const adapter = findAdapter(adapters, provider);
@@ -101,6 +102,8 @@ export const webhookRoutes: FastifyPluginCallbackZod<Options> = (
           reason: verification.reason,
         });
       }
+
+      await connectionLimit(request, reply);
 
       const payload = parseJsonObject(rawBody);
       if (!payload) {

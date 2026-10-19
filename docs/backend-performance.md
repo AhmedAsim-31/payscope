@@ -9,17 +9,18 @@ Routes opt in with `app.rateLimitFor('<policy>')`, or `app.rateLimitByMethod()` 
 
 ### Policies
 
-| Policy               | Default    | Key              | Status       |
-| -------------------- | ---------- | ---------------- | ------------ |
-| `authenticatedRead`  | 300 / 60 s | user id          | wired        |
-| `authenticatedWrite` | 60 / 60 s  | user id          | wired        |
-| `credentialTest`     | 5 / 60 s   | user id + org id | wired        |
-| `webhookIngress`     | 600 / 60 s | connection id    | wired        |
-| `internalTick`       | 30 / 60 s  | client IP        | wired        |
-| `reconciliationRun`  | 5 / 600 s  | org id           | wired        |
-| `scenarioRun`        | 20 / 600 s | org id           | wired        |
-| `repairAction`       | 30 / 600 s | user id + org id | wired        |
-| `search`             | 60 / 60 s  | user id          | defined only |
+| Policy               | Default     | Key              | Status       |
+| -------------------- | ----------- | ---------------- | ------------ |
+| `authenticatedRead`  | 300 / 60 s  | user id          | wired        |
+| `authenticatedWrite` | 60 / 60 s   | user id          | wired        |
+| `credentialTest`     | 5 / 60 s    | user id + org id | wired        |
+| `webhookIngress`     | 600 / 60 s  | connection id    | wired        |
+| `webhookIngressIp`   | 1200 / 60 s | client IP        | wired        |
+| `internalTick`       | 30 / 60 s   | client IP        | wired        |
+| `reconciliationRun`  | 5 / 600 s   | org id           | wired        |
+| `scenarioRun`        | 20 / 600 s  | org id           | wired        |
+| `repairAction`       | 30 / 600 s  | user id + org id | wired        |
+| `search`             | 60 / 60 s   | user id          | defined only |
 
 Every authenticated route (`/me`, orgs, members, connections, records, events, reconciliation, incidents, repairs, scenarios, audit, overview) gets `authenticatedRead` or `authenticatedWrite` by method.
 `credentialTest` is applied to connection create and credential rotation, in addition to `authenticatedWrite`.

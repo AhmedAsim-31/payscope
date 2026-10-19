@@ -9,6 +9,7 @@ import { createWorker } from '../jobs/worker';
 import { createDefaultAdapterRegistry } from '../providers/adapter-registry';
 import { createHarness } from '../test/identity-harness';
 import { TEST_DATABASE_URL } from '../test/test-database-url';
+import { STRIPE_SECRET, stripeEvent, stripeHeaders } from '../test/webhook-fixtures';
 import { deleteExpiredBuckets, pgRateLimitStore } from './pg-rate-limit-store';
 import { DEFAULT_POLICIES, type PolicyName, type RatePolicy } from './policies';
 
@@ -236,22 +237,72 @@ describe('ip and connection limits', () => {
     expect(await tick(app, proxy, a)).toBe(429);
   });
 
-  it('limits webhook ingress per connection id', async () => {
+  const postWebhook = (
+    app: FastifyInstance,
+    id: string,
+    body = '{}',
+    headers: Record<string, string> = {},
+    remoteAddress?: string,
+  ) =>
+    app
+      .inject({
+        method: 'POST',
+        url: `/webhooks/stripe/${id}`,
+        headers: { 'content-type': 'application/json', ...headers },
+        payload: body,
+        ...(remoteAddress ? { remoteAddress } : {}),
+      })
+      .then((r) => r.statusCode);
+
+  it('limits webhook ingress per client IP before looking up the connection', async () => {
+    const app = await startWith({ webhookIngressIp: { max: 2, windowSec: 60 } });
+    const [ipA, ipB] = [randomIp(), randomIp()];
+    expect(await postWebhook(app, randomUUID(), '{}', {}, ipA)).toBe(404);
+    expect(await postWebhook(app, randomUUID(), '{}', {}, ipA)).toBe(404);
+    expect(await postWebhook(app, randomUUID(), '{}', {}, ipA)).toBe(429);
+    expect(await postWebhook(app, randomUUID(), '{}', {}, ipB)).toBe(404);
+  });
+
+  it('does not create connection buckets for unknown connection ids', async () => {
+    const app = await startWith({});
+    const id = randomUUID();
+    expect(await postWebhook(app, id)).toBe(404);
+    const rows = await harness.sql`select key from rate_limit_buckets where key like ${`%${id}%`}`;
+    expect(rows).toHaveLength(0);
+  });
+
+  it('spends the connection budget only on verified requests', async () => {
     const app = await startWith({ webhookIngress: { max: 2, windowSec: 60 } });
-    const [a, b] = [randomUUID(), randomUUID()];
-    const post = (id: string) =>
-      app
-        .inject({
-          method: 'POST',
-          url: `/webhooks/stripe/${id}`,
-          headers: { 'content-type': 'application/json' },
-          payload: '{}',
-        })
-        .then((r) => r.statusCode);
-    expect(await post(a)).toBe(404);
-    expect(await post(a)).toBe(404);
-    expect(await post(a)).toBe(429);
-    expect(await post(b)).toBe(404);
+    const owner = await harness.newUser();
+    const org = await app.inject({
+      method: 'POST',
+      url: '/api/v1/orgs',
+      headers: owner.headers,
+      payload: { name: 'Hooks', slug: `org-${randomUUID().slice(0, 12)}` },
+    });
+    const connection = await app.inject({
+      method: 'POST',
+      url: `/api/v1/orgs/${org.json<{ id: string }>().id}/connections`,
+      headers: owner.headers,
+      payload: {
+        provider: 'stripe',
+        mode: 'sandbox',
+        displayName: 'stripe',
+        externalAccountId: `acct_${randomUUID()}`,
+        webhookSecrets: [STRIPE_SECRET],
+      },
+    });
+    const id = connection.json<{ id: string }>().id;
+    const signed = () => {
+      const body = JSON.stringify(stripeEvent());
+      return postWebhook(app, id, body, stripeHeaders(body));
+    };
+    for (let i = 0; i < 3; i++) {
+      expect(await postWebhook(app, id, '{}', stripeHeaders('{"other":1}'))).toBe(400);
+    }
+    expect(await signed()).toBe(200);
+    expect(await signed()).toBe(200);
+    expect(await signed()).toBe(429);
   });
 });
 
